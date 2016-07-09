@@ -1,0 +1,154 @@
+From cc00d179fcf1d439cf23014ba38aee13340c1dd4 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Mon, 22 Oct 2012 18:13:06 +0900
+Subject: [PATCH 2/2] kva: workaround stays-on-top of Qt 4.7.3GA for OS/2
+
+Qt::WindowStaysOnTopHint does not work on Qt 4.7.3GA for OS/2.
+---
+ modules/video_output/kva.c | 90 +++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 85 insertions(+), 5 deletions(-)
+
+diff --git a/modules/video_output/kva.c b/modules/video_output/kva.c
+index fc46009..b2e1c99 100644
+--- a/modules/video_output/kva.c
++++ b/modules/video_output/kva.c
+@@ -75,6 +75,15 @@ vlc_module_begin ()
+     set_callbacks( Open, Close )
+ vlc_module_end ()
+ 
++/* Qt::WindowStaysOnTopHint does not work on Qt 4.7.3GA for OS/2.
++ * Use workaround for this.
++ */
++#define USE_WORKAROUND_STAYS_ON_TOP_OF_QT 1
++
++#if USE_WORKAROUND_STAYS_ON_TOP_OF_QT
++# define QPOPUP_CLASS   "QPopup"
++#endif
++
+ /*****************************************************************************
+  * vout_display_sys_t: video output method descriptor
+  *****************************************************************************
+@@ -104,6 +113,9 @@ struct vout_display_sys_t
+     unsigned           button_pressed;
+     bool               is_mouse_hidden;
+     bool               is_on_top;
++#if USE_WORKAROUND_STAYS_ON_TOP_OF_QT
++    PID                pid;
++#endif
+ };
+ 
+ struct picture_sys_t
+@@ -228,7 +240,7 @@ static void PMThread( void *arg )
+ 
+     WinSetWindowPtr( sys->client, 0, vd );
+ 
+-    if( !sys->parent_window )
++    if( !sys->parent_window || USE_WORKAROUND_STAYS_ON_TOP_OF_QT )
+     {
+         WinSetWindowPtr( sys->frame, 0, vd );
+         sys->p_old_frame = WinSubclassWindow( sys->frame, MyFrameWndProc );
+@@ -294,13 +306,17 @@ static void PMThread( void *arg )
+     sys->i_result = VLC_SUCCESS;
+     DosPostEventSem( sys->ack_event );
+ 
+-    if( !sys->parent_window )
++    if( !sys->parent_window || USE_WORKAROUND_STAYS_ON_TOP_OF_QT )
+         WinSetVisibleRegionNotify( sys->frame, TRUE );
+ 
++#if USE_WORKAROUND_STAYS_ON_TOP_OF_QT
++    WinQueryWindowProcess( sys->frame, &sys->pid, NULL );
++#endif
++
+     while( WinGetMsg( sys->hab, &qm, NULLHANDLE, 0, 0 ))
+         WinDispatchMsg( sys->hab, &qm );
+ 
+-    if( !sys->parent_window )
++    if( !sys->parent_window || USE_WORKAROUND_STAYS_ON_TOP_OF_QT )
+         WinSetVisibleRegionNotify( sys->frame, FALSE );
+ 
+     kvaEnableScreenSaver();
+@@ -313,7 +329,7 @@ exit_open_display :
+     kvaDone();
+ 
+ exit_kva_init :
+-    if( !sys->parent_window )
++    if( !sys->parent_window || USE_WORKAROUND_STAYS_ON_TOP_OF_QT )
+         WinSubclassWindow( sys->frame, sys->p_old_frame );
+ 
+     WinDestroyWindow( sys->frame );
+@@ -961,7 +977,71 @@ static MRESULT EXPENTRY MyFrameWndProc( HWND hwnd, ULONG msg, MPARAM mp1,
+         //case WM_VRNDISABLED :
+         case WM_VRNENABLED :
+             if( !vd->cfg->is_fullscreen && sys->is_on_top )
+-                WinSetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_ZORDER );
++            {
++                HWND frame = hwnd;
++                HWND top   = HWND_TOP;
++
++#if USE_WORKAROUND_STAYS_ON_TOP_OF_QT
++                if( sys->parent_window )
++                {
++                    HWND parent;
++                    HWND desktop = WinQueryDesktopWindow( sys->hab,
++                                                          NULLHANDLE );
++
++                    /* Find a main window */
++                    for( frame = sys->parent;; frame = parent )
++                    {
++                        parent = WinQueryWindow( frame, QW_PARENT );
++                        if( parent == desktop )
++                            break;
++                    }
++                }
++
++                HENUM henum;
++                HWND  current;
++                char  szClassName[ 80 ];
++                PID   pidCurrent;
++
++                /* Find a QPopup window above a video window, but
++                 * belowest one.
++                 */
++                henum = WinBeginEnumWindows( HWND_DESKTOP );
++                while(( current = WinGetNextWindow( henum )) != NULLHANDLE )
++                {
++                    /* Reached to me ? */
++                    if( current == frame )
++                        break;
++
++                    /* Only check a physically showing window */
++                    if( !WinIsWindowShowing( current ))
++                        continue;
++
++                    WinQueryWindowProcess( current, &pidCurrent, NULL );
++
++                    if( pidCurrent == sys->pid )
++                    {
++                        /* Behind any VLC window in case of
++                         * an embedded window.
++                         */
++                        if( sys->parent_window )
++                        {
++                            top = current;
++                            continue;
++                        }
++
++                        WinQueryClassName( current, sizeof( szClassName ),
++                                           szClassName );
++
++                        /* A QPopup window above me ? */
++                        if( !strcmp( szClassName, QPOPUP_CLASS ))
++                            top = current;
++                    }
++                }
++                WinEndEnumWindows( henum );
++#endif
++
++                WinSetWindowPos( frame, top, 0, 0, 0, 0, SWP_ZORDER );
++            }
+             break;
+     }
+ 
+-- 
+2.7.0
+
