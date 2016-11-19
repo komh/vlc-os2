@@ -1,4 +1,4 @@
-From 8a68b0fdc6ed7c17775dfd4fe5028d8f35429fc8 Mon Sep 17 00:00:00 2001
+From eeb31c0a56ed57251ae3014993cc185d445ac537 Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Fri, 14 Oct 2011 22:29:40 +0900
 Subject: [PATCH 1/3] build: fit DLL names longer than 8 characters to 8.3
@@ -10,15 +10,15 @@ Since libtool 2.4.4, -os2dllname is supported.
  modules/access_output/Makefile.am | 18 +++++++++++
  modules/audio_filter/Makefile.am  |  3 ++
  modules/genmf                     | 19 ++++++++++++
- modules/packetizer/Makefile.am    | 39 ++++++++++++++++++++++++
+ modules/packetizer/Makefile.am    | 42 ++++++++++++++++++++++++++
  modules/stream_out/Makefile.am    | 63 +++++++++++++++++++++++++++++++++++++++
  modules/video_chroma/Makefile.am  | 36 ++++++++++++++++++++++
  modules/video_filter/Makefile.am  |  3 ++
- 8 files changed, 193 insertions(+)
+ 8 files changed, 196 insertions(+)
  mode change 100755 => 100644 modules/genmf
 
 diff --git a/modules/access/Makefile.am b/modules/access/Makefile.am
-index a4eadd1..c69d5f0 100644
+index 061f2b1..e74363c 100644
 --- a/modules/access/Makefile.am
 +++ b/modules/access/Makefile.am
 @@ -70,6 +70,9 @@ libaccess_archive_plugin_la_SOURCES = access/archive/access.c access/archive/str
@@ -109,7 +109,7 @@ index 7c93116..0a49ee6 100644
  access_out_LTLIBRARIES += $(LTLIBaccess_output_shout)
  EXTRA_LTLIBRARIES += libaccess_output_shout_plugin.la
 diff --git a/modules/audio_filter/Makefile.am b/modules/audio_filter/Makefile.am
-index ef48c75..d157404 100644
+index b935045..26c2a8a 100644
 --- a/modules/audio_filter/Makefile.am
 +++ b/modules/audio_filter/Makefile.am
 @@ -2,6 +2,9 @@ audio_filterdir = $(pluginsdir)/audio_filter
@@ -169,10 +169,10 @@ index be97990..b67b842
        *\ ${mod}\ *)
  	;;
 diff --git a/modules/packetizer/Makefile.am b/modules/packetizer/Makefile.am
-index d44755f..fbbf3ef 100644
+index b873194..b67b2cf 100644
 --- a/modules/packetizer/Makefile.am
 +++ b/modules/packetizer/Makefile.am
-@@ -1,24 +1,60 @@
+@@ -1,28 +1,67 @@
  packetizerdir = $(pluginsdir)/packetizer
  
  libpacketizer_copy_plugin_la_SOURCES = packetizer/copy.c
@@ -191,14 +191,20 @@ index d44755f..fbbf3ef 100644
 +if HAVE_OS2
 +libpacketizer_mpeg4audio_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_mpeg4audio_plugin
 +endif
+ libpacketizer_mpegaudio_plugin_la_SOURCES = packetizer/mpegaudio.c
++if HAVE_OS2
++libpacketizer_mpegaudio_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_mpegaudio_plugin
++endif
  libpacketizer_h264_plugin_la_SOURCES = \
  	packetizer/h264_nal.c packetizer/h264_nal.h \
  	packetizer/h264.c packetizer/hxxx_nal.h \
+ 	packetizer/hxxx_sei.c packetizer/hxxx_sei.h \
  	packetizer/hxxx_common.c packetizer/hxxx_common.h
 +if HAVE_OS2
 +libpacketizer_h264_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_h264_plugin
 +endif
- libpacketizer_vc1_plugin_la_SOURCES = packetizer/vc1.c
+ libpacketizer_vc1_plugin_la_SOURCES = packetizer/vc1.c \
+         packetizer/hxxx_nal.h
 +if HAVE_OS2
 +libpacketizer_vc1_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_vc1_plugin
 +endif
@@ -216,6 +222,7 @@ index d44755f..fbbf3ef 100644
 +endif
  libpacketizer_hevc_plugin_la_SOURCES = packetizer/hevc.c \
  	packetizer/hevc_nal.h packetizer/hevc_nal.c \
+ 	packetizer/hxxx_sei.c packetizer/hxxx_sei.h \
  	packetizer/hxxx_nal.h \
  	packetizer/hxxx_common.c packetizer/hxxx_common.h
 +if HAVE_OS2
@@ -233,7 +240,7 @@ index d44755f..fbbf3ef 100644
  
  libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
  	packetizer/avparser.h \
-@@ -27,6 +63,9 @@ libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
+@@ -31,6 +70,9 @@ libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
  	codec/avcodec/fourcc.c
  libpacketizer_avparser_plugin_la_CFLAGS = $(AVCODEC_CFLAGS) $(AVUTIL_CFLAGS) $(AM_CFLAGS)
  libpacketizer_avparser_plugin_la_LIBADD = $(AVCODEC_LIBS) $(AVUTIL_LIBS) $(LIBM)
@@ -368,7 +375,7 @@ index a598bcc..4f04175 100644
  
  if ENABLE_SOUT
 diff --git a/modules/video_chroma/Makefile.am b/modules/video_chroma/Makefile.am
-index 2c5265e..974b751 100644
+index 0545c9b..e6c8b7f 100644
 --- a/modules/video_chroma/Makefile.am
 +++ b/modules/video_chroma/Makefile.am
 @@ -16,10 +16,16 @@ libgrey_yuv_plugin_la_SOURCES = video_chroma/grey_yuv.c
@@ -388,8 +395,8 @@ index 2c5265e..974b751 100644
  
  libi420_nv12_plugin_la_SOURCES = video_chroma/i420_nv12.c \
  	video_chroma/copy.c video_chroma/copy.h
-@@ -27,16 +33,28 @@ libi420_nv12_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
- 	-DMODULE_NAME_IS_i420_nv12
+@@ -32,16 +38,28 @@ libi420_10_p010_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+ 	-DMODULE_NAME_IS_i420_10_p010
  
  libi422_i420_plugin_la_SOURCES = video_chroma/i422_i420.c
 +if HAVE_OS2
@@ -417,7 +424,7 @@ index 2c5265e..974b751 100644
  
  libyuvp_plugin_la_SOURCES = video_chroma/yuvp.c
  
-@@ -71,14 +89,23 @@ endif
+@@ -77,14 +95,23 @@ endif
  libi420_rgb_mmx_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
  	video_chroma/i420_rgb16_x86.c video_chroma/i420_rgb_mmx.h
  libi420_rgb_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMMX
@@ -441,7 +448,7 @@ index 2c5265e..974b751 100644
  
  if HAVE_MMX
  chroma_LTLIBRARIES += \
-@@ -91,14 +118,23 @@ endif
+@@ -97,14 +124,23 @@ endif
  libi420_rgb_sse2_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
  	video_chroma/i420_rgb16_x86.c video_chroma/i420_rgb_sse2.h
  libi420_rgb_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DSSE2
@@ -466,10 +473,10 @@ index 2c5265e..974b751 100644
  if HAVE_SSE2
  chroma_LTLIBRARIES += \
 diff --git a/modules/video_filter/Makefile.am b/modules/video_filter/Makefile.am
-index d853717..002712f 100644
+index 5d5fdaf..5ea2543 100644
 --- a/modules/video_filter/Makefile.am
 +++ b/modules/video_filter/Makefile.am
-@@ -157,6 +157,9 @@ video_filter_LTLIBRARIES += libsubsdelay_plugin.la
+@@ -161,6 +161,9 @@ video_filter_LTLIBRARIES += libsubsdelay_plugin.la
  # sub sources
  libaudiobargraph_v_plugin_la_SOURCES = video_filter/audiobargraph_v.c
  libaudiobargraph_v_plugin_la_LIBADD = $(LIBM)
@@ -480,5 +487,5 @@ index d853717..002712f 100644
  libmarq_plugin_la_SOURCES = video_filter/marq.c
  libmosaic_plugin_la_SOURCES = video_filter/mosaic.c video_filter/mosaic.h
 -- 
-2.7.0
+2.9.2
 
