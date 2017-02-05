@@ -1,4 +1,4 @@
-From 9577f217775bb0cc80e8800b7a9dc47b4daab623 Mon Sep 17 00:00:00 2001
+From bf3cfe522c544bea7d4e9cb19fbbe4c135206570 Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Mon, 22 Oct 2012 18:13:06 +0900
 Subject: [PATCH 2/3] kva: workaround stays-on-top of Qt 4.7.3GA for OS/2
@@ -9,7 +9,7 @@ Qt::WindowStaysOnTopHint does not work on Qt 4.7.3GA for OS/2.
  1 file changed, 85 insertions(+), 5 deletions(-)
 
 diff --git a/modules/video_output/kva.c b/modules/video_output/kva.c
-index eb9aed4..5de2c55 100644
+index eb9aed4a99..5de2c554b2 100644
 --- a/modules/video_output/kva.c
 +++ b/modules/video_output/kva.c
 @@ -75,6 +75,15 @@ vlc_module_begin ()
@@ -150,5 +150,5 @@ index eb9aed4..5de2c55 100644
      }
  
 -- 
-2.9.2
+2.11.0
 

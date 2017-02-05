@@ -1,4 +1,4 @@
-From d007c51409b8bbf436ba2a08a77ff63fd17f95a2 Mon Sep 17 00:00:00 2001
+From 9e59847fb1bef7aba6335dcf9867a70a1619d17f Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Sat, 2 Apr 2016 16:22:26 +0900
 Subject: [PATCH 3/3] qt: lower the required version of Qt to 4.7.0
@@ -10,10 +10,10 @@ On OS/2, Qt v4.7.3 is the last version.
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 0f5994e..437ef7f 100644
+index f1f604e88e..eea2f8cb6b 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -3781,7 +3781,7 @@ AS_IF([test "${enable_qt}" != "no"], [
+@@ -3766,7 +3766,7 @@ AS_IF([test "${enable_qt}" != "no"], [
        AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
        AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
      ], [
@@ -23,7 +23,7 @@ index 0f5994e..437ef7f 100644
            AC_MSG_ERROR([${QT_PKG_ERRORS}.])
          ],[
 diff --git a/modules/gui/qt/qt.hpp b/modules/gui/qt/qt.hpp
-index 99ce132..8c9d095 100644
+index e416c569a9..3343561f88 100644
 --- a/modules/gui/qt/qt.hpp
 +++ b/modules/gui/qt/qt.hpp
 @@ -42,8 +42,8 @@
@@ -38,5 +38,5 @@ index 99ce132..8c9d095 100644
  
  #define HAS_QT5  ( QT_VERSION >= 0x050000 )
 -- 
-2.9.2
+2.11.0
 
