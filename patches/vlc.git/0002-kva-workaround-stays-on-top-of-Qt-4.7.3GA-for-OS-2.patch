@@ -1,7 +1,7 @@
-From bf3cfe522c544bea7d4e9cb19fbbe4c135206570 Mon Sep 17 00:00:00 2001
+From 080096dbb41c6b0cebc9dc5d5d1b29dd72f2cecc Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Mon, 22 Oct 2012 18:13:06 +0900
-Subject: [PATCH 2/3] kva: workaround stays-on-top of Qt 4.7.3GA for OS/2
+Subject: [PATCH 2/6] kva: workaround stays-on-top of Qt 4.7.3GA for OS/2
 
 Qt::WindowStaysOnTopHint does not work on Qt 4.7.3GA for OS/2.
 ---
@@ -9,7 +9,7 @@ Qt::WindowStaysOnTopHint does not work on Qt 4.7.3GA for OS/2.
  1 file changed, 85 insertions(+), 5 deletions(-)
 
 diff --git a/modules/video_output/kva.c b/modules/video_output/kva.c
-index eb9aed4a99..5de2c554b2 100644
+index dbd2a737ed..b51f80d049 100644
 --- a/modules/video_output/kva.c
 +++ b/modules/video_output/kva.c
 @@ -75,6 +75,15 @@ vlc_module_begin ()
@@ -76,7 +76,7 @@ index eb9aed4a99..5de2c554b2 100644
          WinSubclassWindow( sys->frame, sys->p_old_frame );
  
      WinDestroyWindow( sys->frame );
-@@ -922,7 +938,71 @@ static MRESULT EXPENTRY MyFrameWndProc( HWND hwnd, ULONG msg, MPARAM mp1,
+@@ -920,7 +936,71 @@ static MRESULT EXPENTRY MyFrameWndProc( HWND hwnd, ULONG msg, MPARAM mp1,
          //case WM_VRNDISABLED :
          case WM_VRNENABLED :
              if( !vd->cfg->is_fullscreen && sys->is_on_top )
@@ -150,5 +150,5 @@ index eb9aed4a99..5de2c554b2 100644
      }
  
 -- 
-2.11.0
+2.13.3
 

@@ -1,0 +1,25 @@
+From 19c81fcc412b27890a58da956ef4918b5736a1a0 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 24 Oct 2017 21:28:16 +0900
+Subject: [PATCH 6/6] qt: add QtSvg
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 35b4029c2f..cb526f499c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3667,7 +3667,7 @@ AS_IF([test "${enable_qt}" != "no"], [
+       AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
+       AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
+     ], [
+-      PKG_CHECK_MODULES([QT], [QtCore QtGui >= 4.7.0],, [
++      PKG_CHECK_MODULES([QT], [QtCore QtGui QtSvg >= 4.7.0],, [
+         AS_IF([test -n "${enable_qt}"],[
+           AC_MSG_ERROR([${QT_PKG_ERRORS}.])
+         ],[
+-- 
+2.13.3
+
