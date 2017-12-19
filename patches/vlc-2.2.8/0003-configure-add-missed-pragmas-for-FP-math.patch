@@ -1,0 +1,33 @@
+From 7f10186e41d9fe898ab26ba95dbd5b796ba32324 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Sat, 1 Oct 2016 22:11:42 +0900
+Subject: [PATCH 3/4] configure: add missed pragmas for FP math
+
+(partially cherry picked from commit 273ec260a1f1912d39c2180db642f24127b8f6b7)
+---
+ configure.ac | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index b49281cd77..670e4398ea 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -988,8 +988,15 @@ AS_IF([test "${enable_optimizations}" != "no"], [
+   AC_LANG_POP
+ 
+ AH_BOTTOM([
++#if defined(_MSC_VER) && !defined(__clang__)
++# pragma fenv_access(off)
++# pragma fp_contract(on)
++#elif defined(__GNUC__)
++/* Not supported so far */
++#else
+ # pragma STDC FENV_ACCESS OFF
+ # pragma STDC FP_CONTRACT ON
++#endif
+ ])
+ 
+   dnl Check for -funroll-loops
+-- 
+2.13.3
+

@@ -1,0 +1,73 @@
+From 264105ab0f7a61ace4d12e0627e495688649df75 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Wed, 9 Aug 2017 19:31:14 +0900
+Subject: [PATCH 4/4] freetype: fix memory corruption when fribidi enabled on
+ OS/2
+
+uni_char_t is 2-byte size on OS/2. However, FriBidiChar is 4-byte size.
+While conversion, the memory pointed by uni_char_t * is corrupted.
+---
+ modules/text_renderer/freetype.c | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/modules/text_renderer/freetype.c b/modules/text_renderer/freetype.c
+index b9da7bf28c..0ae6c16809 100644
+--- a/modules/text_renderer/freetype.c
++++ b/modules/text_renderer/freetype.c
+@@ -1153,16 +1153,31 @@ static int ProcessLines( filter_t *p_filter,
+                          FT_BBox     *p_bbox,
+                          int         *pi_max_face_height,
+ 
+-                         uni_char_t *psz_text,
++                         uni_char_t *psz_uni_text,
+                          text_style_t **pp_styles,
+                          uint32_t *pi_k_dates,
+                          int i_len )
+ {
+     filter_sys_t   *p_sys = p_filter->p_sys;
+-    uni_char_t     *p_fribidi_string = NULL;
++    uint32_t       *psz_text = (uint32_t*)psz_uni_text;
++    uint32_t       *p_fribidi_string = NULL;
+     text_style_t   **pp_fribidi_styles = NULL;
+     int            *p_new_positions = NULL;
+ 
++#ifdef __OS2__
++    uint32_t *psz_text_buf;
++
++    psz_text = malloc( (i_len + 1) * sizeof(*psz_text) );
++    if( !psz_text )
++        return VLC_ENOMEM;
++
++    /* Conversion uni_char_t string to FriBidiChar string */
++    for( int i = 0; i <= i_len; i++ )
++        psz_text[i] = psz_uni_text[i];
++
++    psz_text_buf = psz_text;
++#endif
++
+ #if defined(HAVE_FRIBIDI)
+     {
+         int    *p_old_positions;
+@@ -1183,6 +1198,9 @@ static int ProcessLines( filter_t *p_filter,
+             free( p_new_positions );
+             free( p_fribidi_string );
+             free( pp_fribidi_styles );
++#ifdef __OS2__
++            free( psz_text_buf );
++#endif
+             return VLC_ENOMEM;
+         }
+ 
+@@ -1567,6 +1585,9 @@ static int ProcessLines( filter_t *p_filter,
+     if( p_face )
+         FT_Done_Face( p_face );
+ 
++#ifdef __OS2__
++    free( psz_text_buf );
++#endif
+     free( pp_fribidi_styles );
+     free( p_fribidi_string );
+     free( pi_karaoke_bar );
+-- 
+2.13.3
+
