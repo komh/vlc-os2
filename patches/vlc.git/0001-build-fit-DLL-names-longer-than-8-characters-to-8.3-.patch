@@ -1,21 +1,21 @@
-From 43a6adae01c116544091255377662d3807817b14 Mon Sep 17 00:00:00 2001
+From 9f8d8136c3c8b23eb03ac159085e78b9bb18e24f Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Fri, 14 Oct 2011 22:29:40 +0900
-Subject: [PATCH 1/6] build: fit DLL names longer than 8 characters to 8.3
+Subject: [PATCH 01/20] build: fit DLL names longer than 8 characters to 8.3
  limit on OS/2
 
 Since libtool 2.4.4, -os2dllname is supported.
 ---
  modules/access/Makefile.am        | 15 ++++++++++
  modules/access_output/Makefile.am | 18 ++++++++++++
- modules/audio_filter/Makefile.am  |  3 ++
- modules/packetizer/Makefile.am    | 42 +++++++++++++++++++++++++++
+ modules/audio_filter/Makefile.am  |  9 ++++++
+ modules/packetizer/Makefile.am    | 39 +++++++++++++++++++++++++
  modules/stream_out/Makefile.am    | 60 +++++++++++++++++++++++++++++++++++++++
  modules/video_chroma/Makefile.am  | 36 +++++++++++++++++++++++
- 6 files changed, 174 insertions(+)
+ 6 files changed, 177 insertions(+)
 
 diff --git a/modules/access/Makefile.am b/modules/access/Makefile.am
-index 51ac1157c5..64deb3b936 100644
+index d193b27935..c73031b748 100644
 --- a/modules/access/Makefile.am
 +++ b/modules/access/Makefile.am
 @@ -34,6 +34,9 @@ libimem_plugin_la_LIBADD = $(LIBM)
@@ -116,7 +116,7 @@ index bc954ee03b..9900aea07e 100644
  access_out_LTLIBRARIES += $(LTLIBaccess_output_shout)
  EXTRA_LTLIBRARIES += libaccess_output_shout_plugin.la
 diff --git a/modules/audio_filter/Makefile.am b/modules/audio_filter/Makefile.am
-index bcff753948..142b713ce0 100644
+index e7c38cf8db..45729b55bf 100644
 --- a/modules/audio_filter/Makefile.am
 +++ b/modules/audio_filter/Makefile.am
 @@ -2,6 +2,9 @@ audio_filterdir = $(pluginsdir)/audio_filter
@@ -129,11 +129,27 @@ index bcff753948..142b713ce0 100644
  libchorus_flanger_plugin_la_SOURCES = audio_filter/chorus_flanger.c
  libchorus_flanger_plugin_la_LIBADD = $(LIBM)
  libcompressor_plugin_la_SOURCES = audio_filter/compressor.c
+@@ -17,9 +20,15 @@ libparam_eq_plugin_la_SOURCES = audio_filter/param_eq.c
+ libparam_eq_plugin_la_LIBADD = $(LIBM)
+ libscaletempo_plugin_la_SOURCES = audio_filter/scaletempo.c
+ libscaletempo_plugin_la_LIBADD = $(LIBM)
++if HAVE_OS2
++libscaletempo_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname st_plugin
++endif
+ libscaletempo_pitch_plugin_la_SOURCES = $(libscaletempo_plugin_la_SOURCES)
+ libscaletempo_pitch_plugin_la_LIBADD = $(libscaletempo_plugin_la_LIBADD)
+ libscaletempo_pitch_plugin_la_CFLAGS = $(AM_CFLAGS) -DPITCH_SHIFTER
++if HAVE_OS2
++libscaletempo_pitch_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname st_pitch_plugin
++endif
+ libstereo_widen_plugin_la_SOURCES = audio_filter/stereo_widen.c
+ libspatializer_plugin_la_SOURCES = \
+ 	audio_filter/spatializer/allpass.cpp \
 diff --git a/modules/packetizer/Makefile.am b/modules/packetizer/Makefile.am
-index ad8dc21050..63e26038c4 100644
+index 722a940c38..b53ed38e71 100644
 --- a/modules/packetizer/Makefile.am
 +++ b/modules/packetizer/Makefile.am
-@@ -1,29 +1,68 @@
+@@ -1,34 +1,73 @@
  packetizerdir = $(pluginsdir)/packetizer
  
  libpacketizer_copy_plugin_la_SOURCES = packetizer/copy.c
@@ -174,10 +190,6 @@ index ad8dc21050..63e26038c4 100644
 +if HAVE_OS2
 +libpacketizer_mlp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_mlp_plugin
 +endif
- libpacketizer_dirac_plugin_la_SOURCES = packetizer/dirac.c
-+if HAVE_OS2
-+libpacketizer_dirac_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_dirac_plugin
-+endif
  libpacketizer_flac_plugin_la_SOURCES = packetizer/flac.c
 +if HAVE_OS2
 +libpacketizer_flac_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_flac_plugin
@@ -202,10 +214,9 @@ index ad8dc21050..63e26038c4 100644
  
  libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
  	packetizer/avparser.h \
-@@ -32,6 +71,9 @@ libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
- 	codec/avcodec/fourcc.c
+ 	codec/avcodec/avcodec.h
  libpacketizer_avparser_plugin_la_CFLAGS = $(AVCODEC_CFLAGS) $(AVUTIL_CFLAGS) $(AM_CFLAGS)
- libpacketizer_avparser_plugin_la_LIBADD = $(AVCODEC_LIBS) $(AVUTIL_LIBS) $(LIBM)
+ libpacketizer_avparser_plugin_la_LIBADD = $(AVCODEC_LIBS) $(AVUTIL_LIBS) $(LIBM) libavcodec_common.la
 +if HAVE_OS2
 +libpacketizer_avparser_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_avparser_plugin
 +endif
@@ -328,10 +339,10 @@ index 8a1b42d34d..05b14bd4eb 100644
  
  if ENABLE_SOUT
 diff --git a/modules/video_chroma/Makefile.am b/modules/video_chroma/Makefile.am
-index e0298d50bf..8adfb4c631 100644
+index ac3de3cb88..7df301c03a 100644
 --- a/modules/video_chroma/Makefile.am
 +++ b/modules/video_chroma/Makefile.am
-@@ -16,10 +16,16 @@ libgrey_yuv_plugin_la_SOURCES = video_chroma/grey_yuv.c
+@@ -20,10 +20,16 @@ libgrey_yuv_plugin_la_SOURCES = video_chroma/grey_yuv.c
  libi420_rgb_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
  	video_chroma/i420_rgb8.c video_chroma/i420_rgb16.c video_chroma/i420_rgb_c.h
  libi420_rgb_plugin_la_LIBADD = $(LIBM)
@@ -346,10 +357,10 @@ index e0298d50bf..8adfb4c631 100644
 +libi420_yuy2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname i0_y2_plugin
 +endif
  
- libi420_nv12_plugin_la_SOURCES = video_chroma/i420_nv12.c \
- 	video_chroma/copy.c video_chroma/copy.h
-@@ -32,16 +38,28 @@ libi420_10_p010_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
- 	-DMODULE_NAME_IS_i420_10_p010
+ libi420_nv12_plugin_la_SOURCES = video_chroma/i420_nv12.c
+ libi420_nv12_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+@@ -36,16 +42,28 @@ libi420_10_p010_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+ libi420_10_p010_plugin_la_LIBADD = libchroma_copy.la
  
  libi422_i420_plugin_la_SOURCES = video_chroma/i422_i420.c
 +if HAVE_OS2
@@ -377,7 +388,7 @@ index e0298d50bf..8adfb4c631 100644
  
  libyuvp_plugin_la_SOURCES = video_chroma/yuvp.c
  
-@@ -77,14 +95,23 @@ endif
+@@ -81,14 +99,23 @@ endif
  libi420_rgb_mmx_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
  	video_chroma/i420_rgb16_x86.c video_chroma/i420_rgb_mmx.h
  libi420_rgb_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMMX
@@ -401,7 +412,7 @@ index e0298d50bf..8adfb4c631 100644
  
  if HAVE_MMX
  chroma_LTLIBRARIES += \
-@@ -97,14 +124,23 @@ endif
+@@ -101,14 +128,23 @@ endif
  libi420_rgb_sse2_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
  	video_chroma/i420_rgb16_x86.c video_chroma/i420_rgb_sse2.h
  libi420_rgb_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DSSE2

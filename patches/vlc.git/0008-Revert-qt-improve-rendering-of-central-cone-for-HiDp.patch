@@ -1,0 +1,78 @@
+From 046553807cff014ef347d35b835b744f4539a7e4 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Thu, 23 Nov 2017 16:51:23 +0900
+Subject: [PATCH 08/20] Revert "qt: improve rendering of central cone for
+ HiDpi"
+
+This reverts commit d98da2c893ea58aac9193f70e59c3205a76a4802.
+---
+ modules/gui/qt/components/interface_widgets.cpp | 36 ++++++++++++-------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/modules/gui/qt/components/interface_widgets.cpp b/modules/gui/qt/components/interface_widgets.cpp
+index 36d9d7a5c1..05b401632e 100644
+--- a/modules/gui/qt/components/interface_widgets.cpp
++++ b/modules/gui/qt/components/interface_widgets.cpp
+@@ -470,13 +470,8 @@ void BackgroundWidget::paintEvent( QPaintEvent *e )
+     int i_maxwidth, i_maxheight;
+     QPixmap pixmap = QPixmap( pixmapUrl );
+     QPainter painter(this);
+-
+-#if HAS_QT56
+-    qreal dpr = devicePixelRatioF();
+-#else
+-    qreal dpr = devicePixelRatio();
+-#endif
+-    pixmap.setDevicePixelRatio( dpr );
++    QBitmap pMask;
++    float f_alpha = 1.0;
+ 
+     i_maxwidth  = __MIN( maximumWidth(), width() ) - MARGIN * 2;
+     i_maxheight = __MIN( maximumHeight(), height() ) - MARGIN * 2;
+@@ -488,27 +483,32 @@ void BackgroundWidget::paintEvent( QPaintEvent *e )
+         /* Scale down the pixmap if the widget is too small */
+         if( pixmap.width() > i_maxwidth || pixmap.height() > i_maxheight )
+         {
+-            pixmap = pixmap.scaled( i_maxwidth * dpr, i_maxheight * dpr ,
++            pixmap = pixmap.scaled( i_maxwidth, i_maxheight,
+                             Qt::KeepAspectRatio, Qt::SmoothTransformation );
+         }
+         else
+         if ( b_expandPixmap &&
+              pixmap.width() < width() && pixmap.height() < height() )
+         {
++            /* Scale up the pixmap to fill widget's size */
++            f_alpha = ( (float) pixmap.height() / (float) height() );
+             pixmap = pixmap.scaled(
+-                    (width() - MARGIN * 2) * dpr,
+-                    (height() - MARGIN * 2) * dpr ,
+-                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
+-        }
+-        else if (dpr != 1.0)
+-        {
+-            pixmap = pixmap.scaled( pixmap.width() * dpr, pixmap.height() * dpr,
+-                                    Qt::KeepAspectRatio, Qt::SmoothTransformation );
++                    width() - MARGIN * 2,
++                    height() - MARGIN * 2,
++                    Qt::KeepAspectRatio,
++                    ( f_alpha < .2 )? /* Don't waste cpu when not visible */
++                        Qt::SmoothTransformation:
++                        Qt::FastTransformation
++                    );
++            /* Non agressive alpha compositing when sizing up */
++            pMask = QBitmap( pixmap.width(), pixmap.height() );
++            pMask.fill( QColor::fromRgbF( 1.0, 1.0, 1.0, f_alpha ) );
++            pixmap.setMask( pMask );
+         }
+ 
+         painter.drawPixmap(
+-                MARGIN + ( i_maxwidth - ( pixmap.width() / dpr ) ) / 2,
+-                MARGIN + ( i_maxheight - ( pixmap.height() / dpr ) ) / 2,
++                MARGIN + ( i_maxwidth - pixmap.width() ) /2,
++                MARGIN + ( i_maxheight - pixmap.height() ) /2,
+                 pixmap);
+     }
+     QWidget::paintEvent( e );
+-- 
+2.13.3
+

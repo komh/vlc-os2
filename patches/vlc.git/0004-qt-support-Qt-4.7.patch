@@ -1,7 +1,7 @@
-From dba987e714bdc2b7a23da2d6972c3c4a7840dbb7 Mon Sep 17 00:00:00 2001
+From d463cf7da999dcb3aa9d097209641cce121f9699 Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Sat, 2 Apr 2016 16:22:26 +0900
-Subject: [PATCH 4/6] qt: support Qt 4.7
+Subject: [PATCH 04/20] qt: support Qt 4.7
 
 OS/2 still uses Qt 4.7.3.
 ---
@@ -10,10 +10,10 @@ OS/2 still uses Qt 4.7.3.
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 4fd3b320c2..35b4029c2f 100644
+index 3f2401c72f..0e4c915413 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -3667,7 +3667,7 @@ AS_IF([test "${enable_qt}" != "no"], [
+@@ -3651,7 +3651,7 @@ AS_IF([test "${enable_qt}" != "no"], [
        AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
        AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
      ], [
@@ -23,7 +23,7 @@ index 4fd3b320c2..35b4029c2f 100644
            AC_MSG_ERROR([${QT_PKG_ERRORS}.])
          ],[
 diff --git a/modules/gui/qt/qt.hpp b/modules/gui/qt/qt.hpp
-index a4559961b8..000898f8a9 100644
+index d468d4e885..8652f1a3e6 100644
 --- a/modules/gui/qt/qt.hpp
 +++ b/modules/gui/qt/qt.hpp
 @@ -42,8 +42,8 @@

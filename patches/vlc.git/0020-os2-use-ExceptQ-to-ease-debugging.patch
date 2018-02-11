@@ -1,7 +1,7 @@
-From 79eb2e7500a60736ebb686d5d232e81e3d42c7c8 Mon Sep 17 00:00:00 2001
+From ecaf6211a3d0970a1d35c78eb065d59f7c5b45cc Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Tue, 1 Mar 2016 20:11:06 +0900
-Subject: [PATCH 5/6] os2: use ExceptQ to ease debugging
+Subject: [PATCH 20/20] os2: use ExceptQ to ease debugging
 
 ---
  bin/vlc.c        | 18 ++++++++++++++++++
@@ -9,7 +9,7 @@ Subject: [PATCH 5/6] os2: use ExceptQ to ease debugging
  2 files changed, 31 insertions(+)
 
 diff --git a/bin/vlc.c b/bin/vlc.c
-index 72e0eee428..eac375e0bf 100644
+index 7da76fb138..2680b18923 100644
 --- a/bin/vlc.c
 +++ b/bin/vlc.c
 @@ -109,11 +109,26 @@ static void exit_timeout (int signum)
@@ -39,7 +39,7 @@ index 72e0eee428..eac375e0bf 100644
      /* The so-called POSIX-compliant MacOS X reportedly processes SIGPIPE even
       * if it is blocked in all thread.
       * Note: this is NOT an excuse for not protecting against SIGPIPE. If
-@@ -276,6 +291,9 @@ out:
+@@ -277,6 +292,9 @@ out:
  #ifdef __OS2__
      for (int i = argc - i_argc; i < argc; i++)
          free (argv[i]);

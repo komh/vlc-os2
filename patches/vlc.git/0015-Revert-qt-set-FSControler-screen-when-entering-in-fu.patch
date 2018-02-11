@@ -1,0 +1,67 @@
+From b41ce45de24e20b1ca4761fb888a864300a36602 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Fri, 29 Dec 2017 15:54:34 +0900
+Subject: [PATCH 15/20] Revert "qt: set FSControler screen when entering in
+ fullscreen mode"
+
+This reverts commit 562a10a1570887291fde39a973c6a25cd96a453f.
+---
+ modules/gui/qt/components/controller.cpp | 9 +--------
+ modules/gui/qt/components/controller.hpp | 1 -
+ modules/gui/qt/main_interface.cpp        | 1 -
+ 3 files changed, 1 insertion(+), 10 deletions(-)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index 120a00be59..08a08d2212 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -846,7 +846,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
+     previousPosition = getSettings()->value( "FullScreen/pos" ).toPoint();
+     screenRes = getSettings()->value( "FullScreen/screen" ).toRect();
+     isWideFSC = getSettings()->value( "FullScreen/wide" ).toBool();
+-    i_screennumber = -1;
++    i_screennumber = var_InheritInteger( p_intf, "qt-fullscreen-screennumber" );
+ 
+     CONNECT( this, fullscreenChanged( bool ), THEMIM, changeFullscreen( bool ) );
+ }
+@@ -984,13 +984,6 @@ void FullscreenControllerWidget::toggleFullwidth()
+     restoreFSC();
+ }
+ 
+-
+-void FullscreenControllerWidget::setTargetScreen(int screennumber)
+-{
+-    i_screennumber = screennumber;
+-}
+-
+-
+ int FullscreenControllerWidget::targetScreen()
+ {
+     if( i_screennumber < 0 || i_screennumber > QApplication::desktop()->screenCount() )
+diff --git a/modules/gui/qt/components/controller.hpp b/modules/gui/qt/components/controller.hpp
+index 8bfe8e259c..b34147d5ab 100644
+--- a/modules/gui/qt/components/controller.hpp
++++ b/modules/gui/qt/components/controller.hpp
+@@ -257,7 +257,6 @@ public:
+     void toggleFullwidth();
+     void updateFullwidthGeometry( int number );
+     int targetScreen();
+-    void setTargetScreen( int );
+ 
+ private:
+     static int FullscreenChanged( vlc_object_t *obj,
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index b704d3fd6f..6fadfb189c 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -871,7 +871,6 @@ void MainInterface::setVideoFullScreen( bool fs )
+         if( numscreen == -1 || numscreen > QApplication::desktop()->screenCount() )
+             numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+ 
+-        fullscreenControls->setTargetScreen( numscreen );
+         QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
+         lastWinScreen = windowHandle()->screen();
+         windowHandle()->setScreen(QGuiApplication::screens()[numscreen]);
+-- 
+2.13.3
+

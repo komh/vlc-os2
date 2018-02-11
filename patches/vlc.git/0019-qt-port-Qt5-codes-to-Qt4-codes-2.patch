@@ -1,0 +1,164 @@
+From 9e6634d06dd7365bbc54ff0f840424accc03211d Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Fri, 26 Jan 2018 18:48:12 +0900
+Subject: [PATCH 19/20] qt: port Qt5 codes to Qt4 codes #2
+
+---
+ modules/gui/qt/components/interface_widgets.cpp |  6 +++++-
+ modules/gui/qt/components/open_panels.cpp       |  8 ++++++++
+ modules/gui/qt/components/open_panels.hpp       |  4 ++++
+ modules/gui/qt/components/sout/sout_widgets.cpp |  5 +++++
+ modules/gui/qt/dialogs/convert.cpp              | 18 ++++++++++++++++++
+ modules/gui/qt/dialogs/convert.hpp              |  4 ++++
+ 6 files changed, 44 insertions(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/components/interface_widgets.cpp b/modules/gui/qt/components/interface_widgets.cpp
+index 05b401632e..d6bc3460de 100644
+--- a/modules/gui/qt/components/interface_widgets.cpp
++++ b/modules/gui/qt/components/interface_widgets.cpp
+@@ -344,11 +344,15 @@ void VideoWidget::mouseMoveEvent( QMouseEvent *event )
+ {
+     if( p_window != NULL )
+     {
++#if HAS_QT5
+         QPointF current_pos = event->localPos();
++#else
++        QPointF current_pos = event->posF();
++#endif
+ 
+ #if HAS_QT56
+         current_pos *= devicePixelRatioF();
+-#else
++#elif HAS_QT5
+         current_pos *= devicePixelRatio();
+ #endif
+         vout_window_ReportMouseMoved( p_window, current_pos.x(), current_pos.y() );
+diff --git a/modules/gui/qt/components/open_panels.cpp b/modules/gui/qt/components/open_panels.cpp
+index a3055db086..660a50e997 100644
+--- a/modules/gui/qt/components/open_panels.cpp
++++ b/modules/gui/qt/components/open_panels.cpp
+@@ -228,7 +228,11 @@ void FileOpenPanel::browseFile()
+         urlList << url;
+         QListWidgetItem *item = nullptr;
+         item = new QListWidgetItem(
++#if HAS_QT5
+             toNativeSeparators( url.toDisplayString(QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments) ),
++#else
++            toNativeSeparators( url.toString(QUrl::RemovePassword) ),
++#endif
+             ui.fileListWidg
+             );
+         item->setFlags( Qt::ItemIsEnabled );
+@@ -264,7 +268,11 @@ void FileOpenPanel::browseFileSub()
+     }
+ 
+     subUrl = QUrl(urls[0]);
++#if HAS_QT5
+     ui.subInput->setText( subUrl.toDisplayString(QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments) );
++#else
++    ui.subInput->setText( subUrl.toString(QUrl::RemovePassword) );
++#endif
+     updateMRL();
+ }
+ 
+diff --git a/modules/gui/qt/components/open_panels.hpp b/modules/gui/qt/components/open_panels.hpp
+index 71a983141d..bfea8b07d0 100644
+--- a/modules/gui/qt/components/open_panels.hpp
++++ b/modules/gui/qt/components/open_panels.hpp
+@@ -41,6 +41,10 @@
+ 
+ #include <QFileDialog>
+ 
++#if !HAS_QT5
++#include <QUrl>
++#endif
++
+ #include <limits.h>
+ 
+ #define setSpinBoxFreq( spinbox ){ spinbox->setRange ( 0, INT_MAX ); \
+diff --git a/modules/gui/qt/components/sout/sout_widgets.cpp b/modules/gui/qt/components/sout/sout_widgets.cpp
+index dba513a944..33999d331a 100644
+--- a/modules/gui/qt/components/sout/sout_widgets.cpp
++++ b/modules/gui/qt/components/sout/sout_widgets.cpp
+@@ -92,8 +92,13 @@ void SoutInputBox::setMRL( const QString& mrl )
+     else
+     {
+         sourceLine->setText(
++#if HAS_QT5
+             toNativeSeparators(uri.toDisplayString(
+                 QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments
++#else
++            toNativeSeparators(uri.toString(
++                QUrl::RemovePassword
++#endif
+             )));
+         if ( type.isEmpty() ) type = qtr( I_FILE_SLASH_DIR );
+         sourceValueLabel->setText( type );
+diff --git a/modules/gui/qt/dialogs/convert.cpp b/modules/gui/qt/dialogs/convert.cpp
+index 8a87518fa9..3c616d9785 100644
+--- a/modules/gui/qt/dialogs/convert.cpp
++++ b/modules/gui/qt/dialogs/convert.cpp
+@@ -37,8 +37,13 @@
+ #include <QFileDialog>
+ #include <QCheckBox>
+ 
++#if HAS_QT5
+ #define urlToDisplayString(filestr) toNativeSeparators(QUrl(filestr).toDisplayString(\
+     QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments ))
++#else
++#define urlToDisplayString(filestr) toNativeSeparators(QUrl(filestr).toString(\
++    QUrl::RemovePassword ))
++#endif
+ 
+ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
+                               const QStringList& inputMRLs )
+@@ -158,10 +163,19 @@ void ConvertDialog::fileBrowse()
+ {
+     QString fileExtension = ( ! profile->isEnabled() ) ? ".*" : "." + profile->getMux();
+ 
++#if HAS_QT5
+     outgoingMRL = QFileDialog::getSaveFileUrl( this, qtr( "Save file..." ),
+         p_intf->p_sys->filepath,
+         QString( "%1 (*%2);;%3 (*.*)" ).arg( qtr( "Containers" ) )
+             .arg( fileExtension ).arg( qtr("All") ), 0, QFileDialog::DontConfirmOverwrite );
++#else
++    QString outgoingName;
++    outgoingName = QFileDialog::getSaveFileName( this, qtr( "Save file..." ),
++        p_intf->p_sys->filepath,
++        QString( "%1 (*%2);;%3 (*.*)" ).arg( qtr( "Containers" ) )
++            .arg( fileExtension ).arg( qtr("All") ), 0, QFileDialog::DontConfirmOverwrite );
++    outgoingMRL = QUrl::fromLocalFile( outgoingName );
++#endif
+     fileLine->setText( urlToDisplayString( outgoingMRL ) );
+     setDestinationFileExtension();
+ }
+@@ -250,7 +264,11 @@ void ConvertDialog::setDestinationFileExtension()
+ {
+     if( !outgoingMRL.isEmpty() && profile->isEnabled() )
+     {
++#if HAS_QT5
+         QString filepath = outgoingMRL.path(QUrl::FullyEncoded);
++#else
++        QString filepath = outgoingMRL.path();
++#endif
+         if( filepath.lastIndexOf( "." ) == -1 )
+         {
+             QString newFileExtension = "." + profile->getMux();
+diff --git a/modules/gui/qt/dialogs/convert.hpp b/modules/gui/qt/dialogs/convert.hpp
+index bfa9c9cadd..eade91774c 100644
+--- a/modules/gui/qt/dialogs/convert.hpp
++++ b/modules/gui/qt/dialogs/convert.hpp
+@@ -26,6 +26,10 @@
+ 
+ #include "util/qvlcframe.hpp"
+ 
++#if !HAS_QT5
++#include <QUrl>
++#endif
++
+ class QLineEdit;
+ class QCheckBox;
+ class QRadioButton;
+-- 
+2.13.3
+
