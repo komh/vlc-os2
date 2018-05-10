@@ -1,0 +1,113 @@
+From 074007606cd1b85215436b64cf9b7564a4ae0913 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 2 Jan 2018 18:04:55 +0900
+Subject: [PATCH 18/23] Revert "Qt: fix the qt-fullscreen-screennumber option"
+
+This reverts commit ff4b90c15a9ea6c4f33362b152c289fc528f3609.
+---
+ modules/gui/qt/components/controller.cpp | 4 +---
+ modules/gui/qt/main_interface.cpp        | 9 +--------
+ modules/gui/qt/main_interface.hpp        | 2 --
+ 3 files changed, 2 insertions(+), 13 deletions(-)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index 7e741e59ac..b8d2c5bdc7 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -50,7 +50,6 @@
+ #include <QSignalMapper>
+ #include <QTimer>
+ #include <QApplication>
+-#include <QWindow>
+ #include <QScreen>
+ 
+ //#define DEBUG_LAYOUT 1
+@@ -869,7 +868,6 @@ void FullscreenControllerWidget::restoreFSC()
+         adjustSize();
+ 
+         QRect currentRes = QApplication::desktop()->screenGeometry( targetScreen() );
+-        windowHandle()->setScreen(QGuiApplication::screens()[targetScreen()]);
+ 
+         if( currentRes == screenRes &&
+             QApplication::desktop()->screen()->geometry().contains( previousPosition, true ) )
+@@ -985,7 +983,7 @@ void FullscreenControllerWidget::toggleFullwidth()
+ 
+ int FullscreenControllerWidget::targetScreen()
+ {
+-    if( i_screennumber < 0 || i_screennumber > QApplication::desktop()->screenCount() )
++    if( i_screennumber < 0 || i_screennumber > QApplication::desktop()->numScreens() )
+         return QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+     return i_screennumber;
+ }
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index e70e496045..0f7c0b2b38 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -54,13 +54,11 @@
+ #include <QDate>
+ #include <QMimeData>
+ 
+-#include <QWindow>
+ #include <QMenu>
+ #include <QMenuBar>
+ #include <QStatusBar>
+ #include <QLabel>
+ #include <QStackedWidget>
+-#include <QScreen>
+ #ifdef _WIN32
+ #include <QFileInfo>
+ #endif
+@@ -98,7 +96,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
+     videoWidget          = NULL;
+     playlistWidget       = NULL;
+     stackCentralOldWidget= NULL;
+-    lastWinScreen        = NULL;
+     sysTray              = NULL;
+     fullscreenControls   = NULL;
+     cryptedLabel         = NULL;
+@@ -866,12 +863,10 @@ void MainInterface::setVideoFullScreen( bool fs )
+          * than current number of screens, take screennumber where current interface
+          * is
+          */
+-        if( numscreen == -1 || numscreen > QApplication::desktop()->screenCount() )
++        if( numscreen == -1 || numscreen > QApplication::desktop()->numScreens() )
+             numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+ 
+         QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
+-        lastWinScreen = windowHandle()->screen();
+-        windowHandle()->setScreen(QGuiApplication::screens()[numscreen]);
+ 
+         /* To be sure window is on proper-screen in xinerama */
+         if( !screenres.contains( pos() ) )
+@@ -899,8 +894,6 @@ void MainInterface::setVideoFullScreen( bool fs )
+     {
+         setMinimalView( b_minimalView );
+         setInterfaceFullScreen( b_interfaceFullScreen );
+-        if (lastWinScreen != NULL)
+-            windowHandle()->setScreen(lastWinScreen);
+         if( lastWinPosition.isNull() == false )
+         {
+             move( lastWinPosition );
+diff --git a/modules/gui/qt/main_interface.hpp b/modules/gui/qt/main_interface.hpp
+index ad0cf6c185..cdc443890c 100644
+--- a/modules/gui/qt/main_interface.hpp
++++ b/modules/gui/qt/main_interface.hpp
+@@ -51,7 +51,6 @@ class FullscreenControllerWidget;
+ class QVBoxLayout;
+ class QMenu;
+ class QSize;
+-class QScreen;
+ class QTimer;
+ class StandardPLPanel;
+ struct vout_window_t;
+@@ -168,7 +167,6 @@ protected:
+     QWidget             *stackCentralOldWidget;
+     QPoint              lastWinPosition;
+     QSize               lastWinSize;  /// To restore the same window size when leaving fullscreen
+-    QScreen             *lastWinScreen;
+ 
+     QMap<QWidget *, QSize> stackWidgetsSizes;
+ 
+-- 
+2.13.3
+

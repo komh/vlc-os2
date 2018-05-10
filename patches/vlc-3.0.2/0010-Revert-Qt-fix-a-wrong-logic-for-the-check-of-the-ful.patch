@@ -1,0 +1,41 @@
+From d181c6627c4ca5775aed18ca3ac0583c2c512e3d Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 2 Jan 2018 18:00:54 +0900
+Subject: [PATCH 10/23] Revert "Qt: fix a wrong logic for the check of the
+ fullscreen screen number"
+
+This reverts commit cd6598579be9e5e0cf4c6d38ff31fdffb2cf5e79.
+---
+ modules/gui/qt/components/controller.cpp | 2 +-
+ modules/gui/qt/main_interface.cpp        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index 07fbf0e28f..8720d19dbe 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -1008,7 +1008,7 @@ void FullscreenControllerWidget::setTargetScreen(int screennumber)
+ 
+ int FullscreenControllerWidget::targetScreen()
+ {
+-    if( i_screennumber < 0 || i_screennumber >= QApplication::desktop()->screenCount() )
++    if( i_screennumber < 0 || i_screennumber > QApplication::desktop()->screenCount() )
+         return QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+     return i_screennumber;
+ }
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index 9dbee5fbb3..7072eeb5cb 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -871,7 +871,7 @@ void MainInterface::setVideoFullScreen( bool fs )
+          * than current number of screens, take screennumber where current interface
+          * is
+          */
+-        if( numscreen < 0 || numscreen >= QApplication::desktop()->screenCount() )
++        if( numscreen == -1 || numscreen > QApplication::desktop()->screenCount() )
+             numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+ 
+         if( fullscreenControls )
+-- 
+2.13.3
+

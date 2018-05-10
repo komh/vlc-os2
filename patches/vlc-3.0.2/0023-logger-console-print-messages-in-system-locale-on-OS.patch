@@ -1,0 +1,66 @@
+From 9c365bc7c236be10f115c46057857886ecd6fae3 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Fri, 23 Mar 2018 20:09:34 +0900
+Subject: [PATCH 23/23] logger/console: print messages in system locale on OS/2
+
+---
+ modules/logger/console.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/modules/logger/console.c b/modules/logger/console.c
+index 14627479c9..525a3b5e4e 100644
+--- a/modules/logger/console.c
++++ b/modules/logger/console.c
+@@ -34,6 +34,29 @@
+ static const int ptr_width = 2 * /* hex digits */ sizeof (uintptr_t);
+ static const char msg_type[4][9] = { "", " error", " warning", " debug" };
+ 
++#ifdef __OS2__
++#include <vlc_charset.h>
++
++static int OS2ConsoleOutput(FILE *stream, const char *format, va_list ap)
++{
++    char *msg = NULL;
++    char *os2msg = NULL;
++    int ret = -1;
++
++    if (vasprintf(&msg, format, ap) != -1 && (os2msg = ToLocale(msg)) != NULL)
++    {
++        fputs(os2msg, stream);
++
++        ret = 0;
++    }
++
++    LocaleFree(os2msg);
++    free(msg);
++
++    return ret;
++}
++#endif
++
+ #ifndef _WIN32
+ # define COL(x,y) "\033[" #x ";" #y "m"
+ # define RED      COL(31,1)
+@@ -59,6 +82,9 @@ static void LogConsoleColor(void *opaque, int type, const vlc_log_t *meta,
+         fprintf(stream, "[%s] ", meta->psz_header);
+     fprintf(stream, "%s %s%s: %s", meta->psz_module, meta->psz_object_type,
+             msg_type[type], msg_color[type]);
++#ifdef __OS2__
++    if (OS2ConsoleOutput(stream, format, ap) == -1)
++#endif
+     vfprintf(stream, format, ap);
+     fputs(GRAY"\n", stream);
+     funlockfile(stream);
+@@ -80,6 +106,9 @@ static void LogConsoleGray(void *opaque, int type, const vlc_log_t *meta,
+         fprintf(stream, "[%s] ", meta->psz_header);
+     fprintf(stream, "%s %s%s: ", meta->psz_module, meta->psz_object_type,
+             msg_type[type]);
++#ifdef __OS2__
++    if (OS2ConsoleOutput(stream, format, ap) == -1)
++#endif
+     vfprintf(stream, format, ap);
+     putc_unlocked('\n', stream);
+     funlockfile(stream);
+-- 
+2.13.3
+
