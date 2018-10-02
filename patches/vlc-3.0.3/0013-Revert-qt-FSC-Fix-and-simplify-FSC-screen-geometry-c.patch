@@ -1,0 +1,27 @@
+From d9d1b1e3dd5480f6c5b71dcc05ffce8a0f6225ae Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Thu, 22 Mar 2018 21:10:00 +0900
+Subject: [PATCH 13/25] Revert "qt: FSC: Fix and simplify FSC/screen geometry
+ check"
+
+This reverts commit 3b0a4dc671e58723d7533f0c01c1e989569a2e15.
+---
+ modules/gui/qt/components/controller.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index 3ff7bf2186..858b72540b 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -888,7 +888,7 @@ void FullscreenControllerWidget::restoreFSC()
+         }
+ 
+         if( currentRes == screenRes &&
+-            currentRes.contains( previousPosition, true ) )
++            QApplication::desktop()->screen()->geometry().contains( previousPosition, true ) )
+         {
+             /* Restore to the last known position */
+             move( previousPosition );
+-- 
+2.13.3
+
