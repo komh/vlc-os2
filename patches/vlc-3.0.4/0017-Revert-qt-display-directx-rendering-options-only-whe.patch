@@ -1,0 +1,77 @@
+From f6e0901784fbff3f450d4cc41d0f1fd146c727ac Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Fri, 26 Jan 2018 15:00:35 +0900
+Subject: [PATCH 17/26] Revert "qt: display directx rendering options only when
+ vout is set to directx"
+
+This reverts commit 7526658131dc6b222f156593b2ad5e2c81737f72.
+---
+ modules/gui/qt/components/simple_preferences.cpp | 18 ------------------
+ modules/gui/qt/components/simple_preferences.hpp |  1 -
+ 2 files changed, 19 deletions(-)
+
+diff --git a/modules/gui/qt/components/simple_preferences.cpp b/modules/gui/qt/components/simple_preferences.cpp
+index 6122c40cf1..92b7b76729 100644
+--- a/modules/gui/qt/components/simple_preferences.cpp
++++ b/modules/gui/qt/components/simple_preferences.cpp
+@@ -364,10 +364,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+             CONFIG_BOOL( "video-deco", windowDecorations );
+             CONFIG_GENERIC( "vout", StringList, ui.voutLabel, outputModule );
+ 
+-            CONNECT( ui.outputModule, currentIndexChanged( int ),
+-                     this, updateVideoOptions( int ) );
+-            optionWidgets["videoOutCoB"] = ui.outputModule;
+-
+             optionWidgets["fullscreenScreenB"] = ui.fullscreenScreenBox;
+             ui.fullscreenScreenBox->addItem( qtr("Automatic"), -1 );
+             int i_screenCount = 0;
+@@ -390,7 +386,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+             CONFIG_BOOL( "directx-overlay", overlay );
+             CONFIG_BOOL( "directx-hw-yuv", hwYUVBox );
+             CONNECT( ui.overlay, toggled( bool ), ui.hwYUVBox, setEnabled( bool ) );
+-            optionWidgets["directxVideoB"] = ui.directXBox;
+ #else
+             ui.directXBox->setVisible( false );
+ #endif
+@@ -414,8 +409,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+                             snapshotsSequentialNumbering );
+             CONFIG_GENERIC( "snapshot-format", StringList, ui.arLabel,
+                             snapshotsFormat );
+-
+-            updateVideoOptions( ui.outputModule->currentIndex() );
+          END_SPREFS_CAT;
+ 
+         /******************************
+@@ -947,17 +940,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+ #undef CONFIG_BOOL
+ }
+ 
+-void SPrefsPanel::updateVideoOptions( int number )
+-{
+-    QString value = qobject_cast<QComboBox *>(optionWidgets["videoOutCoB"])
+-                                            ->itemData( number ).toString();
+-#ifdef _WIN32
+-    if( optionWidgets["directxVideoB"] ) {
+-        optionWidgets["directxVideoB"]->setVisible( ( value == "directdraw" ) );
+-    }
+-#endif
+-}
+-
+ 
+ void SPrefsPanel::updateAudioOptions( int number)
+ {
+diff --git a/modules/gui/qt/components/simple_preferences.hpp b/modules/gui/qt/components/simple_preferences.hpp
+index 856b88ba97..6390b21efd 100644
+--- a/modules/gui/qt/components/simple_preferences.hpp
++++ b/modules/gui/qt/components/simple_preferences.hpp
+@@ -117,7 +117,6 @@ private:
+ /* Display only the options for the selected audio output */
+ private slots:
+     void lastfm_Changed( int );
+-    void updateVideoOptions( int );
+     void updateAudioOptions( int );
+     void updateAudioVolume( int );
+     void langChanged( int );
+-- 
+2.13.3
+
