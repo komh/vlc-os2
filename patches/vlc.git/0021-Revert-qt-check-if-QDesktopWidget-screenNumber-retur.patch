@@ -1,7 +1,7 @@
-From 7317f0ca9590c89ce1818b24cea7f7d3fa06b7bc Mon Sep 17 00:00:00 2001
+From 97ad2152753a1442cddcb9ebea6666bd9f4d8f8a Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Fri, 29 Dec 2017 15:54:25 +0900
-Subject: [PATCH 14/20] Revert "qt: check if QDesktopWidget::screenNumber()
+Subject: [PATCH 21/24] Revert "qt: check if QDesktopWidget::screenNumber()
  returns a valid screen"
 
 This reverts commit 117658e75806a47ed7e333818c259a6c0f71bb9f.
@@ -11,10 +11,10 @@ This reverts commit 117658e75806a47ed7e333818c259a6c0f71bb9f.
  2 files changed, 14 insertions(+), 22 deletions(-)
 
 diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
-index 50694484db..120a00be59 100644
+index 19f0e29ff5..a0a2d30cc7 100644
 --- a/modules/gui/qt/components/controller.cpp
 +++ b/modules/gui/qt/components/controller.cpp
-@@ -869,9 +869,6 @@ void FullscreenControllerWidget::restoreFSC()
+@@ -866,9 +866,6 @@ void FullscreenControllerWidget::restoreFSC()
          setMinimumWidth( FSC_WIDTH );
          adjustSize();
  
@@ -25,10 +25,10 @@ index 50694484db..120a00be59 100644
          windowHandle()->setScreen(QGuiApplication::screens()[targetScreen()]);
  
 diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
-index 09b1c060b0..b704d3fd6f 100644
+index cf4d4c4810..1908981ddc 100644
 --- a/modules/gui/qt/main_interface.cpp
 +++ b/modules/gui/qt/main_interface.cpp
-@@ -872,28 +872,23 @@ void MainInterface::setVideoFullScreen( bool fs )
+@@ -875,28 +875,23 @@ void MainInterface::setVideoFullScreen( bool fs )
              numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
  
          fullscreenControls->setTargetScreen( numscreen );
@@ -70,7 +70,7 @@ index 09b1c060b0..b704d3fd6f 100644
 +            showTab( videoWidget );
          }
  
-         /* */
+         /* we won't be able to get its windowed sized once in fullscreen, so update it now */
 -- 
 2.13.3
 

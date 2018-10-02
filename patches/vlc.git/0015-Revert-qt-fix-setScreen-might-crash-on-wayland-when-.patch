@@ -1,7 +1,7 @@
-From fbc489e1ea29e0a23c517ff675c170354806b55f Mon Sep 17 00:00:00 2001
+From c6565fc4f0f869f6b05c3617cacd950f0fae7172 Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Fri, 29 Dec 2017 15:54:09 +0900
-Subject: [PATCH 12/20] Revert "qt: fix setScreen might crash on wayland when
+Subject: [PATCH 15/24] Revert "qt: fix setScreen might crash on wayland when
  entering fullscreen"
 
 This reverts commit 24b436c88a986fcf2cddb3c52e5a067565fc537e.
@@ -13,10 +13,10 @@ This reverts commit 24b436c88a986fcf2cddb3c52e5a067565fc537e.
  4 files changed, 2 insertions(+), 32 deletions(-)
 
 diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
-index 63edee16cb..50694484db 100644
+index 19666291d6..19f0e29ff5 100644
 --- a/modules/gui/qt/components/controller.cpp
 +++ b/modules/gui/qt/components/controller.cpp
-@@ -800,10 +800,6 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
+@@ -799,10 +799,6 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
      b_fullscreen        = false;
      i_hide_timeout      = 1;
      i_screennumber      = -1;
@@ -27,7 +27,7 @@ index 63edee16cb..50694484db 100644
  
      vout.clear();
  
-@@ -877,12 +873,7 @@ void FullscreenControllerWidget::restoreFSC()
+@@ -874,12 +870,7 @@ void FullscreenControllerWidget::restoreFSC()
              return;
  
          QRect currentRes = QApplication::desktop()->screenGeometry( targetScreen() );
@@ -41,10 +41,10 @@ index 63edee16cb..50694484db 100644
          if( currentRes == screenRes &&
              QApplication::desktop()->screen()->geometry().contains( previousPosition, true ) )
 diff --git a/modules/gui/qt/components/controller.hpp b/modules/gui/qt/components/controller.hpp
-index 25d4f4b00c..8bfe8e259c 100644
+index 1b68db5645..145d8581ae 100644
 --- a/modules/gui/qt/components/controller.hpp
 +++ b/modules/gui/qt/components/controller.hpp
-@@ -318,10 +318,6 @@ private:
+@@ -310,10 +310,6 @@ private:
  
      bool isWideFSC;
      int i_sensitivity;
@@ -56,10 +56,10 @@ index 25d4f4b00c..8bfe8e259c 100644
  
  #endif
 diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
-index f65a0ed9fe..c8fb0154fb 100644
+index 463a5e6fe2..00aad2df9d 100644
 --- a/modules/gui/qt/main_interface.cpp
 +++ b/modules/gui/qt/main_interface.cpp
-@@ -149,11 +149,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
+@@ -150,11 +150,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      /* Should the UI stays on top of other windows */
      b_interfaceOnTop = var_InheritBool( p_intf, "video-on-top" );
  
@@ -71,7 +71,7 @@ index f65a0ed9fe..c8fb0154fb 100644
      /**************************
       *  UI and Widgets design
       **************************/
-@@ -883,12 +878,7 @@ void MainInterface::setVideoFullScreen( bool fs )
+@@ -886,12 +881,7 @@ void MainInterface::setVideoFullScreen( bool fs )
  
              QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
              lastWinScreen = windowHandle()->screen();
@@ -84,7 +84,7 @@ index f65a0ed9fe..c8fb0154fb 100644
  
              /* To be sure window is on proper-screen in xinerama */
              if( !screenres.contains( pos() ) )
-@@ -914,13 +904,8 @@ void MainInterface::setVideoFullScreen( bool fs )
+@@ -917,13 +907,8 @@ void MainInterface::setVideoFullScreen( bool fs )
      {
          setMinimalView( b_minimalView );
          setInterfaceFullScreen( b_interfaceFullScreen );
@@ -100,10 +100,10 @@ index f65a0ed9fe..c8fb0154fb 100644
          {
              move( lastWinPosition );
 diff --git a/modules/gui/qt/main_interface.hpp b/modules/gui/qt/main_interface.hpp
-index 7cad9d71cd..03b7abd1a4 100644
+index b4fe5eb880..e79603f256 100644
 --- a/modules/gui/qt/main_interface.hpp
 +++ b/modules/gui/qt/main_interface.hpp
-@@ -183,9 +183,7 @@ protected:
+@@ -184,9 +184,7 @@ protected:
      bool                 b_pauseOnMinimize;
      bool                 b_maximizedView;
      bool                 b_isWindowTiled;

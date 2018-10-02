@@ -1,22 +1,72 @@
-From 9e6634d06dd7365bbc54ff0f840424accc03211d Mon Sep 17 00:00:00 2001
+From 7ec537bc83c8a08b69070d6912d74931ba9591f2 Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Fri, 26 Jan 2018 18:48:12 +0900
-Subject: [PATCH 19/20] qt: port Qt5 codes to Qt4 codes #2
+Subject: [PATCH 19/24] qt: port Qt5 codes to Qt4 codes #2
 
 ---
- modules/gui/qt/components/interface_widgets.cpp |  6 +++++-
- modules/gui/qt/components/open_panels.cpp       |  8 ++++++++
- modules/gui/qt/components/open_panels.hpp       |  4 ++++
- modules/gui/qt/components/sout/sout_widgets.cpp |  5 +++++
- modules/gui/qt/dialogs/convert.cpp              | 18 ++++++++++++++++++
- modules/gui/qt/dialogs/convert.hpp              |  4 ++++
- 6 files changed, 44 insertions(+), 1 deletion(-)
+ modules/gui/qt/components/extended_panels.cpp    | 16 ++++++++++++++++
+ modules/gui/qt/components/interface_widgets.cpp  | 13 ++++++++++++-
+ modules/gui/qt/components/open_panels.cpp        | 14 ++++++++++++++
+ modules/gui/qt/components/open_panels.hpp        |  8 ++++++++
+ modules/gui/qt/components/simple_preferences.cpp |  4 ++++
+ modules/gui/qt/components/sout/sout_widgets.cpp  | 11 +++++++++++
+ modules/gui/qt/dialogs/convert.cpp               | 18 ++++++++++++++++++
+ modules/gui/qt/dialogs/convert.hpp               |  4 ++++
+ modules/gui/qt/dialogs_provider.cpp              | 11 +++++++++++
+ 9 files changed, 98 insertions(+), 1 deletion(-)
 
+diff --git a/modules/gui/qt/components/extended_panels.cpp b/modules/gui/qt/components/extended_panels.cpp
+index bf9f3a1ea4..9ccd0ed574 100644
+--- a/modules/gui/qt/components/extended_panels.cpp
++++ b/modules/gui/qt/components/extended_panels.cpp
+@@ -358,26 +358,42 @@ void ExtVideo::updateFilters()
+ 
+ void ExtVideo::browseLogo()
+ {
++#if HAS_QT5
+     const QStringList schemes = QStringList(QStringLiteral("file"));
++#endif
+     QString filter = QString( "%1 (*.png *.jpg);;%2 (*)" )
+                         .arg( qtr("Image Files") )
+                         .arg( TITLE_EXTENSIONS_ALL );
++#if HAS_QT5
+     QString file = QFileDialog::getOpenFileUrl( NULL, qtr( "Logo filenames" ),
+                    p_intf->p_sys->filepath, filter,
+                    NULL, QFileDialog::Options(), schemes ).toLocalFile();
++#else
++    QString file = QFileDialog::getOpenFileName( NULL, qtr( "Logo filenames" ),
++                   p_intf->p_sys->filepath.toLocalFile(), filter,
++                   NULL, QFileDialog::Options());
++#endif
+ 
+     UPDATE_AND_APPLY_TEXT( logoFileText, file );
+ }
+ 
+ void ExtVideo::browseEraseFile()
+ {
++#if HAS_QT5
+     const QStringList schemes = QStringList(QStringLiteral("file"));
++#endif
+     QString filter = QString( "%1 (*.png *.jpg);;%2 (*)" )
+                         .arg( qtr("Image Files") )
+                         .arg( TITLE_EXTENSIONS_ALL );
++#if HAS_QT5
+     QString file = QFileDialog::getOpenFileUrl( NULL, qtr( "Image mask" ),
+                    p_intf->p_sys->filepath, filter,
+                    NULL, QFileDialog::Options(), schemes ).toLocalFile();
++#else
++    QString file = QFileDialog::getOpenFileName( NULL, qtr( "Image mask" ),
++                   p_intf->p_sys->filepath.toLocalFile(), filter,
++                   NULL, QFileDialog::Options());
++#endif
+ 
+     UPDATE_AND_APPLY_TEXT( eraseMaskText, file );
+ }
 diff --git a/modules/gui/qt/components/interface_widgets.cpp b/modules/gui/qt/components/interface_widgets.cpp
-index 05b401632e..d6bc3460de 100644
+index 1936a279f1..69f3ae893e 100644
 --- a/modules/gui/qt/components/interface_widgets.cpp
 +++ b/modules/gui/qt/components/interface_widgets.cpp
-@@ -344,11 +344,15 @@ void VideoWidget::mouseMoveEvent( QMouseEvent *event )
+@@ -363,11 +363,15 @@ void VideoWidget::mouseMoveEvent( QMouseEvent *event )
  {
      if( p_window != NULL )
      {
@@ -33,8 +83,24 @@ index 05b401632e..d6bc3460de 100644
          current_pos *= devicePixelRatio();
  #endif
          vout_window_ReportMouseMoved( p_window, current_pos.x(), current_pos.y() );
+@@ -909,8 +913,15 @@ void CoverArtLabel::setArtFromFile()
+     if( !p_item )
+         return;
+ 
++#if HAS_QT5
+     QUrl fileUrl = QFileDialog::getOpenFileUrl( this, qtr( "Choose Cover Art" ),
+         p_intf->p_sys->filepath, qtr( "Image Files (*.gif *.jpg *.jpeg *.png)" ) );
++#else
++    QString fileName = QFileDialog::getOpenFileName( this, qtr( "Choose Cover Art" ),
++        p_intf->p_sys->filepath.toLocalFile(), qtr( "Image Files (*.gif *.jpg *.jpeg *.png)" ) );
++
++    QUrl fileUrl = QUrl::fromLocalFile( fileName );
++#endif
+ 
+     if( fileUrl.isEmpty() )
+         return;
 diff --git a/modules/gui/qt/components/open_panels.cpp b/modules/gui/qt/components/open_panels.cpp
-index a3055db086..660a50e997 100644
+index 2476ae14ad..758bffef52 100644
 --- a/modules/gui/qt/components/open_panels.cpp
 +++ b/modules/gui/qt/components/open_panels.cpp
 @@ -228,7 +228,11 @@ void FileOpenPanel::browseFile()
@@ -61,8 +127,25 @@ index a3055db086..660a50e997 100644
      updateMRL();
  }
  
+@@ -640,10 +648,16 @@ void DiscOpenPanel::updateMRL()
+ 
+ void DiscOpenPanel::browseDevice()
+ {
++#if HAS_QT5
+     const QStringList schemes = QStringList(QStringLiteral("file"));
+     QString dir = QFileDialog::getExistingDirectoryUrl( this,
+             qtr( I_DEVICE_TOOLTIP ), p_intf->p_sys->filepath,
+             QFileDialog::ShowDirsOnly, schemes ).toLocalFile();
++#else
++    QString dir = QFileDialog::getExistingDirectory( this,
++            qtr( I_DEVICE_TOOLTIP ), p_intf->p_sys->filepath.toLocalFile(),
++            QFileDialog::ShowDirsOnly );
++#endif
+     if( !dir.isEmpty() )
+     {
+         ui.deviceCombo->addItem( toNativeSepNoSlash( dir ) );
 diff --git a/modules/gui/qt/components/open_panels.hpp b/modules/gui/qt/components/open_panels.hpp
-index 71a983141d..bfea8b07d0 100644
+index 48044383a5..1a169720d6 100644
 --- a/modules/gui/qt/components/open_panels.hpp
 +++ b/modules/gui/qt/components/open_panels.hpp
 @@ -41,6 +41,10 @@
@@ -76,8 +159,36 @@ index 71a983141d..bfea8b07d0 100644
  #include <limits.h>
  
  #define setSpinBoxFreq( spinbox ){ spinbox->setRange ( 0, INT_MAX ); \
+@@ -98,7 +102,11 @@ public:
+     FileOpenBox( QWidget *parent, const QString &caption,
+                  const QUrl &directory, const QString &filter ):
+                 QFileDialog( parent, caption, "", filter ) {
++#if HAS_QT5
+         setDirectoryUrl(directory);
++#else
++        setDirectory(directory.toLocalFile());
++#endif
+     }
+ public slots:
+     void accept(){}
+diff --git a/modules/gui/qt/components/simple_preferences.cpp b/modules/gui/qt/components/simple_preferences.cpp
+index 66206c9adf..f898c254e9 100644
+--- a/modules/gui/qt/components/simple_preferences.cpp
++++ b/modules/gui/qt/components/simple_preferences.cpp
+@@ -1045,7 +1045,11 @@ void SPrefsPanel::apply()
+ 
+     case SPrefsVideo:
+     {
++#if HAS_QT5
+         int i_fullscreenScreen =  qobject_cast<QComboBox *>(optionWidgets["fullscreenScreenB"])->currentData().toInt();
++#else
++        int i_fullscreenScreen =  qobject_cast<QComboBox *>(optionWidgets["fullscreenScreenB"])->currentText().toInt();
++#endif
+         config_PutInt( "qt-fullscreen-screennumber", i_fullscreenScreen );
+         break;
+     }
 diff --git a/modules/gui/qt/components/sout/sout_widgets.cpp b/modules/gui/qt/components/sout/sout_widgets.cpp
-index dba513a944..33999d331a 100644
+index 8fb1b993dd..6eba8b4f00 100644
 --- a/modules/gui/qt/components/sout/sout_widgets.cpp
 +++ b/modules/gui/qt/components/sout/sout_widgets.cpp
 @@ -92,8 +92,13 @@ void SoutInputBox::setMRL( const QString& mrl )
@@ -94,8 +205,25 @@ index dba513a944..33999d331a 100644
              )));
          if ( type.isEmpty() ) type = qtr( I_FILE_SLASH_DIR );
          sourceValueLabel->setText( type );
+@@ -169,10 +174,16 @@ QString FileDestBox::getMRL( const QString& mux )
+ 
+ void FileDestBox::fileBrowse()
+ {
++#if HAS_QT5
+     const QStringList schemes = QStringList(QStringLiteral("file"));
+     QString fileName = QFileDialog::getSaveFileUrl( this, qtr( "Save file..." ),
+             p_intf->p_sys->filepath, qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)" ),
+             nullptr, QFileDialog::Options(), schemes).toLocalFile();
++#else
++    QString fileName = QFileDialog::getSaveFileName( this, qtr( "Save file..." ),
++            p_intf->p_sys->filepath.toLocalFile(), qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)" ),
++            nullptr, QFileDialog::Options());
++#endif
+     fileEdit->setText( toNativeSeparators( fileName ) );
+     emit mrlUpdated();
+ }
 diff --git a/modules/gui/qt/dialogs/convert.cpp b/modules/gui/qt/dialogs/convert.cpp
-index 8a87518fa9..3c616d9785 100644
+index 96357cef75..dd5a6824d3 100644
 --- a/modules/gui/qt/dialogs/convert.cpp
 +++ b/modules/gui/qt/dialogs/convert.cpp
 @@ -37,8 +37,13 @@
@@ -124,7 +252,7 @@ index 8a87518fa9..3c616d9785 100644
 +#else
 +    QString outgoingName;
 +    outgoingName = QFileDialog::getSaveFileName( this, qtr( "Save file..." ),
-+        p_intf->p_sys->filepath,
++        p_intf->p_sys->filepath.toLocalFile(),
 +        QString( "%1 (*%2);;%3 (*.*)" ).arg( qtr( "Containers" ) )
 +            .arg( fileExtension ).arg( qtr("All") ), 0, QFileDialog::DontConfirmOverwrite );
 +    outgoingMRL = QUrl::fromLocalFile( outgoingName );
@@ -132,7 +260,7 @@ index 8a87518fa9..3c616d9785 100644
      fileLine->setText( urlToDisplayString( outgoingMRL ) );
      setDestinationFileExtension();
  }
-@@ -250,7 +264,11 @@ void ConvertDialog::setDestinationFileExtension()
+@@ -247,7 +261,11 @@ void ConvertDialog::setDestinationFileExtension()
  {
      if( !outgoingMRL.isEmpty() && profile->isEnabled() )
      {
@@ -159,6 +287,41 @@ index bfa9c9cadd..eade91774c 100644
  class QLineEdit;
  class QCheckBox;
  class QRadioButton;
+diff --git a/modules/gui/qt/dialogs_provider.cpp b/modules/gui/qt/dialogs_provider.cpp
+index 32ee5b0d22..93cc890c8d 100644
+--- a/modules/gui/qt/dialogs_provider.cpp
++++ b/modules/gui/qt/dialogs_provider.cpp
+@@ -120,8 +120,12 @@ QString DialogsProvider::getSaveFileName( QWidget *parent,
+                                           const QString &filter,
+                                           QString *selectedFilter )
+ {
++#if HAS_QT5
+     const QStringList schemes = QStringList(QStringLiteral("file"));
+     return QFileDialog::getSaveFileUrl( parent, caption, dir, filter, selectedFilter, QFileDialog::Options(), schemes).toLocalFile();
++#else
++    return QFileDialog::getSaveFileName( parent, caption, dir.toLocalFile(), filter, selectedFilter, QFileDialog::Options());
++#endif
+ }
+ 
+ void DialogsProvider::quit()
+@@ -550,10 +554,17 @@ static void openDirectory( intf_thread_t *p_intf, bool go )
+ 
+ QString DialogsProvider::getDirectoryDialog( intf_thread_t *p_intf )
+ {
++#if HAS_QT5
+     const QStringList schemes = QStringList(QStringLiteral("file"));
+     QUrl dirurl = QFileDialog::getExistingDirectoryUrl( NULL,
+             qtr( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath,
+             QFileDialog::ShowDirsOnly, schemes );
++#else
++    QString d = QFileDialog::getExistingDirectory( NULL,
++            qtr( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath.toLocalFile(),
++            QFileDialog::ShowDirsOnly );
++    QUrl dirurl = QUrl::fromLocalFile( d );
++#endif
+ 
+     if( dirurl.isEmpty() ) return QString();
+ 
 -- 
 2.13.3
 

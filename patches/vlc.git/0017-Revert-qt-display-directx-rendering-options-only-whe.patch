@@ -1,7 +1,7 @@
-From 21dfc23e936bf3d5df5707c8c55a5db0695b9a72 Mon Sep 17 00:00:00 2001
+From 46a8a04386ebe4886a40d2d92ff077ada44918de Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Fri, 26 Jan 2018 19:07:21 +0900
-Subject: [PATCH 17/20] Revert "qt: display directx rendering options only when
+Subject: [PATCH 17/24] Revert "qt: display directx rendering options only when
  vout is set to directx"
 
 This reverts commit e7d528fe5621875c4df6b272a51742dbb5278de8.
@@ -11,10 +11,10 @@ This reverts commit e7d528fe5621875c4df6b272a51742dbb5278de8.
  2 files changed, 19 deletions(-)
 
 diff --git a/modules/gui/qt/components/simple_preferences.cpp b/modules/gui/qt/components/simple_preferences.cpp
-index 9491fc6e1f..016f153e2b 100644
+index afe30f247d..ecfa1dbb02 100644
 --- a/modules/gui/qt/components/simple_preferences.cpp
 +++ b/modules/gui/qt/components/simple_preferences.cpp
-@@ -355,10 +355,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+@@ -360,10 +360,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
              CONFIG_BOOL( "video-deco", windowDecorations );
              CONFIG_GENERIC( "vout", StringList, ui.voutLabel, outputModule );
  
@@ -25,7 +25,7 @@ index 9491fc6e1f..016f153e2b 100644
              optionWidgets["fullscreenScreenB"] = ui.fullscreenScreenBox;
              ui.fullscreenScreenBox->addItem( qtr("Automatic"), -1 );
              int i_screenCount = 0;
-@@ -381,7 +377,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+@@ -386,7 +382,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
              CONFIG_BOOL( "directx-overlay", overlay );
              CONFIG_BOOL( "directx-hw-yuv", hwYUVBox );
              CONNECT( ui.overlay, toggled( bool ), ui.hwYUVBox, setEnabled( bool ) );
@@ -33,7 +33,7 @@ index 9491fc6e1f..016f153e2b 100644
  #else
              ui.directXBox->setVisible( false );
  #endif
-@@ -405,8 +400,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+@@ -410,8 +405,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                              snapshotsSequentialNumbering );
              CONFIG_GENERIC( "snapshot-format", StringList, ui.arLabel,
                              snapshotsFormat );
@@ -42,7 +42,7 @@ index 9491fc6e1f..016f153e2b 100644
           END_SPREFS_CAT;
  
          /******************************
-@@ -932,17 +925,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+@@ -943,17 +936,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
  #undef CONFIG_BOOL
  }
  

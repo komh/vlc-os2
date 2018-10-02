@@ -1,7 +1,7 @@
-From 98093017f4acc6659a5d93f4d1eccf39c5c8baa0 Mon Sep 17 00:00:00 2001
+From 76b03d754228cb42bf6405e060d2a7aece2e5069 Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Fri, 29 Dec 2017 15:54:17 +0900
-Subject: [PATCH 13/20] Revert "qt: fix crash when undocking playlist on
+Subject: [PATCH 16/24] Revert "qt: fix crash when undocking playlist on
  Wayland + optimization elsewhere"
 
 This reverts commit a420de32234b1517069c717d9cc7885854f7d289.
@@ -10,10 +10,10 @@ This reverts commit a420de32234b1517069c717d9cc7885854f7d289.
  1 file changed, 2 insertions(+), 11 deletions(-)
 
 diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
-index c8fb0154fb..09b1c060b0 100644
+index 00aad2df9d..60d1b1a4ce 100644
 --- a/modules/gui/qt/main_interface.cpp
 +++ b/modules/gui/qt/main_interface.cpp
-@@ -1075,21 +1075,12 @@ void MainInterface::dockPlaylist( bool p_docked )
+@@ -1074,21 +1074,12 @@ void MainInterface::dockPlaylist( bool p_docked )
      if( !p_docked ) /* Previously docked */
      {
          playlistVisible = playlistWidget->isVisible();

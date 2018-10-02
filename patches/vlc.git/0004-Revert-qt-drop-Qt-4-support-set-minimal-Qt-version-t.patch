@@ -1,7 +1,7 @@
-From 109154fe9b3f2bab4866645cfc5bf7c0598d7b00 Mon Sep 17 00:00:00 2001
+From a2bab71b6d678a89c0610ab775b5cb057cb4caaa Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Tue, 24 Oct 2017 20:15:06 +0900
-Subject: [PATCH 03/20] Revert "qt: drop Qt 4 support, set minimal Qt version
+Subject: [PATCH 04/24] Revert "qt: drop Qt 4 support, set minimal Qt version
  to 5.5"
 
 This reverts commit 1c221a77d92935866e897254c07e1d12a4b95ae0.
@@ -16,19 +16,18 @@ OS/2 still uses Qt 4.
  modules/gui/qt/dialogs/messages.cpp             |  4 ++++
  modules/gui/qt/dialogs/plugins.cpp              | 18 ++++++++++++++++++
  modules/gui/qt/dialogs/toolbar.cpp              |  8 ++++++++
- modules/gui/qt/dialogs_provider.cpp             |  7 +++++++
  modules/gui/qt/main_interface_win32.cpp         | 25 ++++++++++++++++++++++---
  modules/gui/qt/main_interface_win32.hpp         |  2 ++
  modules/gui/qt/qt.cpp                           | 24 +++++++++++++++++-------
  modules/gui/qt/qt.hpp                           | 11 +++++++++--
  modules/gui/qt/util/timetooltip.cpp             |  2 +-
- 14 files changed, 118 insertions(+), 22 deletions(-)
+ 13 files changed, 111 insertions(+), 22 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 556332aa10..3f2401c72f 100644
+index 09992925b7..30300498cf 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -3651,15 +3651,20 @@ AS_IF([test "${enable_qt}" != "no"], [
+@@ -3703,15 +3703,20 @@ AS_IF([test "${enable_qt}" != "no"], [
        AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
        AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
      ], [
@@ -56,7 +55,7 @@ index 556332aa10..3f2401c72f 100644
    ALIASES="${ALIASES} qvlc"
  ])
 diff --git a/modules/gui/qt/components/info_panels.cpp b/modules/gui/qt/components/info_panels.cpp
-index d465993107..49072f823a 100644
+index 4f86cb7f80..bc29110dac 100644
 --- a/modules/gui/qt/components/info_panels.cpp
 +++ b/modules/gui/qt/components/info_panels.cpp
 @@ -479,7 +479,11 @@ InfoPanel::InfoPanel( QWidget *parent ) : QWidget( parent )
@@ -72,7 +71,7 @@ index d465993107..49072f823a 100644
  }
  
 diff --git a/modules/gui/qt/components/interface_widgets.cpp b/modules/gui/qt/components/interface_widgets.cpp
-index a640424ee9..36d9d7a5c1 100644
+index 03519a7b21..0def04a66e 100644
 --- a/modules/gui/qt/components/interface_widgets.cpp
 +++ b/modules/gui/qt/components/interface_widgets.cpp
 @@ -62,7 +62,7 @@
@@ -84,7 +83,7 @@ index a640424ee9..36d9d7a5c1 100644
  #include <QWindow>
  #include <qpa/qplatformnativeinterface.h>
  #endif
-@@ -202,7 +202,7 @@ QSize VideoWidget::physicalSize() const
+@@ -208,7 +208,7 @@ QSize VideoWidget::physicalSize() const
          return QSize( x_attributes.width, x_attributes.height );
      }
  #endif
@@ -93,7 +92,7 @@ index a640424ee9..36d9d7a5c1 100644
      HWND hwnd;
      RECT rect;
  
-@@ -219,9 +219,11 @@ QSize VideoWidget::physicalSize() const
+@@ -225,9 +225,11 @@ QSize VideoWidget::physicalSize() const
  #   if HAS_QT56
      /* Android-like scaling */
      current_size *= devicePixelRatioF();
@@ -107,7 +106,7 @@ index a640424ee9..36d9d7a5c1 100644
  
      return current_size;
 diff --git a/modules/gui/qt/components/open_panels.cpp b/modules/gui/qt/components/open_panels.cpp
-index 47ec13df10..a3055db086 100644
+index f43be234e0..2476ae14ad 100644
 --- a/modules/gui/qt/components/open_panels.cpp
 +++ b/modules/gui/qt/components/open_panels.cpp
 @@ -280,9 +280,15 @@ void FileOpenPanel::updateMRL()
@@ -143,10 +142,10 @@ index ecc6b9918d..e8b1a49d10 100644
  
      setSelectionBehavior( QAbstractItemView::SelectRows );
 diff --git a/modules/gui/qt/dialogs/messages.cpp b/modules/gui/qt/dialogs/messages.cpp
-index c015868244..688543caf7 100644
+index 7f0bf9eb38..beacb2f80f 100644
 --- a/modules/gui/qt/dialogs/messages.cpp
 +++ b/modules/gui/qt/dialogs/messages.cpp
-@@ -340,7 +340,11 @@ void MessagesDialog::MsgCallback( void *self, int type, const vlc_log_t *item,
+@@ -355,7 +355,11 @@ void MessagesDialog::MsgCallback( void *self, int type, const vlc_log_t *item,
  {
      MessagesDialog *dialog = (MessagesDialog *)self;
      char *str;
@@ -159,7 +158,7 @@ index c015868244..688543caf7 100644
      if( verbosity < 0 || verbosity < (type - VLC_MSG_ERR)
       || unlikely(vasprintf( &str, format, ap ) == -1) )
 diff --git a/modules/gui/qt/dialogs/plugins.cpp b/modules/gui/qt/dialogs/plugins.cpp
-index 93c92b9fa6..9edcce9591 100644
+index f0147f0dcd..a4dd33c78a 100644
 --- a/modules/gui/qt/dialogs/plugins.cpp
 +++ b/modules/gui/qt/dialogs/plugins.cpp
 @@ -117,7 +117,11 @@ PluginTab::PluginTab( intf_thread_t *p_intf_ )
@@ -174,7 +173,7 @@ index 93c92b9fa6..9edcce9591 100644
      treePlugins->header()->setSortIndicatorShown( true );
      //    treePlugins->header()->setResizeMode( QHeaderView::ResizeToContents );
      treePlugins->setAlternatingRowColors( true );
-@@ -1042,7 +1046,11 @@ void ExtensionItemDelegate::paint( QPainter *painter,
+@@ -1041,7 +1045,11 @@ void ExtensionItemDelegate::paint( QPainter *painter,
                                     const QStyleOptionViewItem &option,
                                     const QModelIndex &index ) const
  {
@@ -186,7 +185,7 @@ index 93c92b9fa6..9edcce9591 100644
      initStyleOption( &opt, index );
  
      // Draw background
-@@ -1124,7 +1132,11 @@ void AddonItemDelegate::paint( QPainter *painter,
+@@ -1123,7 +1131,11 @@ void AddonItemDelegate::paint( QPainter *painter,
                                 const QStyleOptionViewItem &option,
                                 const QModelIndex &index ) const
  {
@@ -198,7 +197,7 @@ index 93c92b9fa6..9edcce9591 100644
      int i_state = index.data( AddonsListModel::StateRole ).toInt();
      int i_type = index.data( AddonsListModel::TypeRole ).toInt();
  
-@@ -1247,9 +1259,15 @@ void AddonItemDelegate::paint( QPainter *painter,
+@@ -1246,9 +1258,15 @@ void AddonItemDelegate::paint( QPainter *painter,
                  progressbar->setGeometry(
                      newopt.rect.adjusted( adjustment.width(), adjustment.height(),
                                            -adjustment.width(), -adjustment.height() ) );
@@ -215,22 +214,28 @@ index 93c92b9fa6..9edcce9591 100644
              painter->restore();
          }
 diff --git a/modules/gui/qt/dialogs/toolbar.cpp b/modules/gui/qt/dialogs/toolbar.cpp
-index 07196cc113..b8fa691222 100644
+index 58a90f7c5b..41ba760fbe 100644
 --- a/modules/gui/qt/dialogs/toolbar.cpp
 +++ b/modules/gui/qt/dialogs/toolbar.cpp
-@@ -317,7 +317,11 @@ void PreviewWidget::paintEvent( QPaintEvent * )
-     QPixmap pixmaps[3];
+@@ -318,6 +318,7 @@ void PreviewWidget::paintEvent( QPaintEvent * )
+ 
      for( int i=0; i<3; i++ )
      {
 +#if HAS_QT5
          pixmaps[i] = bars[i]->grab( bars[i]->contentsRect() );
+         /* Because non shown widgets do not have their bitmap updated, we need
+            to force redraw to grab a pixmap matching layout size */
+@@ -327,6 +328,9 @@ void PreviewWidget::paintEvent( QPaintEvent * )
+             pixmaps[i] = bars[i]->grab( bars[i]->contentsRect() );
+         }
+ 
 +#else
 +        pixmaps[i] = QPixmap::grabWidget( bars[i], bars[i]->contentsRect() );
 +#endif
          for( int j=0; j < bars[i]->layout()->count(); j++ )
          {
              QLayoutItem *item = bars[i]->layout()->itemAt( j );
-@@ -575,7 +579,11 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
+@@ -584,7 +588,11 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
          if( widget == NULL ) continue;
  
  
@@ -242,28 +247,6 @@ index 07196cc113..b8fa691222 100644
          widgetItem->setToolTip( widgetItem->text() );
          widget->hide();
          widgetItem->setData( Qt::UserRole, QVariant( i ) );
-diff --git a/modules/gui/qt/dialogs_provider.cpp b/modules/gui/qt/dialogs_provider.cpp
-index edf42665aa..d984b3b0a0 100644
---- a/modules/gui/qt/dialogs_provider.cpp
-+++ b/modules/gui/qt/dialogs_provider.cpp
-@@ -121,10 +121,17 @@ QStringList DialogsProvider::getOpenURL( QWidget *parent,
-                                          QString *selectedFilter )
- {
-     QStringList res;
-+
-+#if HAS_QT5
-     QList<QUrl> urls = QFileDialog::getOpenFileUrls( parent, caption, QUrl::fromUserInput( dir ), filter, selectedFilter );
- 
-     foreach( const QUrl& url, urls )
-         res.append( url.toEncoded() );
-+#else
-+    QStringList files = QFileDialog::getOpenFileNames( parent, caption, dir, filter, selectedFilter );
-+    foreach ( const QString& file, files )
-+        res.append( toURI( toNativeSeparators( file ) ) );
-+#endif
- 
-     return res;
- }
 diff --git a/modules/gui/qt/main_interface_win32.cpp b/modules/gui/qt/main_interface_win32.cpp
 index 8e5f1b8c59..d0ed14101f 100644
 --- a/modules/gui/qt/main_interface_win32.cpp
@@ -356,10 +339,10 @@ index 1e456c4c35..347eb8ea96 100644
      virtual void toggleUpdateSystrayMenuWhenVisible() Q_DECL_OVERRIDE;
  
 diff --git a/modules/gui/qt/qt.cpp b/modules/gui/qt/qt.cpp
-index 61c0049925..0f88774ae1 100644
+index 6fdbda06fa..6718c9597e 100644
 --- a/modules/gui/qt/qt.cpp
 +++ b/modules/gui/qt/qt.cpp
-@@ -68,14 +68,18 @@ extern "C" char **environ;
+@@ -68,17 +68,21 @@ extern "C" char **environ;
  
  #ifdef _WIN32 /* For static builds */
   #include <QtPlugin>
@@ -379,24 +362,27 @@ index 61c0049925..0f88774ae1 100644
 +    Q_IMPORT_PLUGIN(AccessibleFactory)
 +   #endif
    #endif
+   #ifdef _WIN32
+    Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin)
+   #endif
 + #else
 +  Q_IMPORT_PLUGIN(qjpeg)
 +  Q_IMPORT_PLUGIN(qtaccessiblewidgets)
   #endif
  #endif
  
-@@ -579,6 +583,7 @@ static void *Thread( void *obj )
- 
+@@ -575,6 +579,7 @@ static void *Thread( void *obj )
          /* Check window type from the Qt platform back-end */
-         p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
+         bool known_type = true;
+ 
 +#if HAS_QT5
          QString platform = app.platformName();
          if( platform == qfu("xcb") )
              p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
-@@ -590,6 +595,11 @@ static void *Thread( void *obj )
-             p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
-         else
+@@ -589,6 +594,11 @@ static void *Thread( void *obj )
              msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
+             known_type = false;
+         }
 +#elif defined (Q_WS_WIN) || defined (Q_WS_PM)
 +        p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
 +#elif defined (Q_WS_MAC)
@@ -404,17 +390,17 @@ index 61c0049925..0f88774ae1 100644
 +#endif
  
          var_Create( THEPL, "qt4-iface", VLC_VAR_ADDRESS );
-         var_SetAddress( THEPL, "qt4-iface", p_intf );
+         var_Create( THEPL, "window", VLC_VAR_STRING );
 diff --git a/modules/gui/qt/qt.hpp b/modules/gui/qt/qt.hpp
-index 111ae6af91..d468d4e885 100644
+index 85211a8f27..cd8f84122d 100644
 --- a/modules/gui/qt/qt.hpp
 +++ b/modules/gui/qt/qt.hpp
-@@ -42,13 +42,20 @@
- #define QT_NO_CAST_TO_ASCII
+@@ -43,13 +43,20 @@
  #include <QString>
+ #include <QUrl>
  
--#if ( QT_VERSION < 0x050500 )
--# error Update your Qt version to at least 5.5.0
+-#if ( QT_VERSION < 0x050900 )
+-# error Update your Qt version to at least 5.9.0
 +#if ( QT_VERSION < 0x040800 )
 +# error Update your Qt version to at least 4.8.0
  #endif
@@ -433,10 +419,10 @@ index 111ae6af91..d468d4e885 100644
      DialogEventTypeOffset = 0,
      IMEventTypeOffset     = 100,
 diff --git a/modules/gui/qt/util/timetooltip.cpp b/modules/gui/qt/util/timetooltip.cpp
-index 23d47b2528..0657210f1a 100644
+index 7a63a9d7d9..66a01e3eeb 100644
 --- a/modules/gui/qt/util/timetooltip.cpp
 +++ b/modules/gui/qt/util/timetooltip.cpp
-@@ -68,7 +68,7 @@ void TimeTooltip::adjustPosition()
+@@ -70,7 +70,7 @@ void TimeTooltip::adjustPosition()
  
      // The desired label position is just above the target
      QPoint position( mTarget.x() - size.width() / 2,
@@ -444,7 +430,7 @@ index 23d47b2528..0657210f1a 100644
 +#if defined( Q_OS_WIN ) && HAS_QT5
          mTarget.y() - 2 * size.height() - TIP_HEIGHT / 2 );
  #else
-         mTarget.y() - size.height() + TIP_HEIGHT / 2 );
+         mTarget.y() - size.height() - TIP_HEIGHT / 2 );
 -- 
 2.13.3
 

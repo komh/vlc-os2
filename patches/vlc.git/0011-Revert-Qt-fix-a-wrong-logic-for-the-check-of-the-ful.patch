@@ -1,7 +1,7 @@
-From b6e73429db0ee604e117e86e09232e6e588e398d Mon Sep 17 00:00:00 2001
+From f021c424e9a6b1ec98cea189bb9cef37ba647b69 Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Fri, 29 Dec 2017 15:45:58 +0900
-Subject: [PATCH 09/20] Revert "Qt: fix a wrong logic for the check of the
+Subject: [PATCH 11/24] Revert "Qt: fix a wrong logic for the check of the
  fullscreen screen number"
 
 This reverts commit cd6598579be9e5e0cf4c6d38ff31fdffb2cf5e79.
@@ -11,10 +11,10 @@ This reverts commit cd6598579be9e5e0cf4c6d38ff31fdffb2cf5e79.
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
-index e679206df8..eb3d9ac38d 100644
+index 63ac60dd77..bb3534c828 100644
 --- a/modules/gui/qt/components/controller.cpp
 +++ b/modules/gui/qt/components/controller.cpp
-@@ -1009,7 +1009,7 @@ void FullscreenControllerWidget::setTargetScreen(int screennumber)
+@@ -1000,7 +1000,7 @@ void FullscreenControllerWidget::setTargetScreen(int screennumber)
  
  int FullscreenControllerWidget::targetScreen()
  {
@@ -24,10 +24,10 @@ index e679206df8..eb3d9ac38d 100644
      return i_screennumber;
  }
 diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
-index 8a9f0fcd1c..12870d3741 100644
+index 70e08b462a..380b742a12 100644
 --- a/modules/gui/qt/main_interface.cpp
 +++ b/modules/gui/qt/main_interface.cpp
-@@ -873,7 +873,7 @@ void MainInterface::setVideoFullScreen( bool fs )
+@@ -876,7 +876,7 @@ void MainInterface::setVideoFullScreen( bool fs )
           * than current number of screens, take screennumber where current interface
           * is
           */

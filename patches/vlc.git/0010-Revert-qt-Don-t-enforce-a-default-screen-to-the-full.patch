@@ -1,0 +1,40 @@
+From 82a5a2906e352f8324f81c599913cc4f0d71b112 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Thu, 22 Mar 2018 19:49:21 +0900
+Subject: [PATCH 10/24] Revert "qt: Don't enforce a default screen to the
+ fullscreen controller"
+
+This reverts commit 22c9f2a46dbe3e427bf96560786c2473554450b4.
+---
+ modules/gui/qt/main_interface.cpp | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index 09f88519be..70e08b462a 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -872,11 +872,18 @@ void MainInterface::setVideoFullScreen( bool fs )
+     if( fs )
+     {
+         int numscreen = var_InheritInteger( p_intf, "qt-fullscreen-screennumber" );
++        /* if user hasn't defined screennumber, or screennumber that is bigger
++         * than current number of screens, take screennumber where current interface
++         * is
++         */
++        if( numscreen < 0 || numscreen >= QApplication::desktop()->screenCount() )
++            numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
++
++        if( fullscreenControls )
++            fullscreenControls->setTargetScreen( numscreen );
+ 
+-        if ( numscreen >= 0 && numscreen < QApplication::desktop()->screenCount() )
++        if ( numscreen >= 0 )
+         {
+-            if( fullscreenControls )
+-                fullscreenControls->setTargetScreen( numscreen );
+ 
+             QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
+             lastWinScreen = windowHandle()->screen();
+-- 
+2.13.3
+

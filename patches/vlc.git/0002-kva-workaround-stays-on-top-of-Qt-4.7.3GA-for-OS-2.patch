@@ -1,7 +1,7 @@
-From 7008586ba32247fd6caec61c4203df1814093a0f Mon Sep 17 00:00:00 2001
+From de5047ef53a01dfc289ea873a05d53e2023e86a7 Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Mon, 22 Oct 2012 18:13:06 +0900
-Subject: [PATCH 02/20] kva: workaround stays-on-top of Qt 4.7.3GA for OS/2
+Subject: [PATCH 02/24] kva: workaround stays-on-top of Qt 4.7.3GA for OS/2
 
 Qt::WindowStaysOnTopHint does not work on Qt 4.7.3GA for OS/2.
 ---
@@ -9,7 +9,7 @@ Qt::WindowStaysOnTopHint does not work on Qt 4.7.3GA for OS/2.
  1 file changed, 85 insertions(+), 5 deletions(-)
 
 diff --git a/modules/video_output/kva.c b/modules/video_output/kva.c
-index 15acb1a5fb..659272f2c7 100644
+index d97a4ea4e1..9cd317401f 100644
 --- a/modules/video_output/kva.c
 +++ b/modules/video_output/kva.c
 @@ -75,6 +75,15 @@ vlc_module_begin ()
@@ -28,17 +28,17 @@ index 15acb1a5fb..659272f2c7 100644
  /*****************************************************************************
   * vout_display_sys_t: video output method descriptor
   *****************************************************************************
-@@ -103,6 +112,9 @@ struct vout_display_sys_t
-     unsigned           button_pressed;
+@@ -104,6 +113,9 @@ struct vout_display_sys_t
      bool               is_mouse_hidden;
      bool               is_on_top;
+     ULONG              cursor_timeout;
 +#if USE_WORKAROUND_STAYS_ON_TOP_OF_QT
 +    PID                pid;
 +#endif
  };
  
- struct picture_sys_t
-@@ -216,7 +228,7 @@ static void PMThread( void *arg )
+ typedef struct
+@@ -217,7 +229,7 @@ static void PMThread( void *arg )
  
      WinSetWindowPtr( sys->client, 0, vd );
  
@@ -76,7 +76,7 @@ index 15acb1a5fb..659272f2c7 100644
          WinSubclassWindow( sys->frame, sys->p_old_frame );
  
      WinDestroyWindow( sys->frame );
-@@ -919,7 +935,71 @@ static MRESULT EXPENTRY MyFrameWndProc( HWND hwnd, ULONG msg, MPARAM mp1,
+@@ -894,7 +910,71 @@ static MRESULT EXPENTRY MyFrameWndProc( HWND hwnd, ULONG msg, MPARAM mp1,
          //case WM_VRNDISABLED :
          case WM_VRNENABLED :
              if( !vd->cfg->is_fullscreen && sys->is_on_top )

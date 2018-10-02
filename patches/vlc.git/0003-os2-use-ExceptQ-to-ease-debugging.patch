@@ -1,7 +1,7 @@
-From ecaf6211a3d0970a1d35c78eb065d59f7c5b45cc Mon Sep 17 00:00:00 2001
+From fb9e7ce8d2130d5586366e9e041159628c984322 Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Tue, 1 Mar 2016 20:11:06 +0900
-Subject: [PATCH 20/20] os2: use ExceptQ to ease debugging
+Subject: [PATCH 03/24] os2: use ExceptQ to ease debugging
 
 ---
  bin/vlc.c        | 18 ++++++++++++++++++
@@ -9,7 +9,7 @@ Subject: [PATCH 20/20] os2: use ExceptQ to ease debugging
  2 files changed, 31 insertions(+)
 
 diff --git a/bin/vlc.c b/bin/vlc.c
-index 7da76fb138..2680b18923 100644
+index 660a1b7996..c73e198ff8 100644
 --- a/bin/vlc.c
 +++ b/bin/vlc.c
 @@ -109,11 +109,26 @@ static void exit_timeout (int signum)
@@ -27,7 +27,7 @@ index 7da76fb138..2680b18923 100644
  /*****************************************************************************
   * main: parse command line, start interface and spawn threads.
   *****************************************************************************/
- int main( int i_argc, const char *ppsz_argv[] )
+ int main(int argc, const char *argv[])
  {
 +#ifdef __OS2__
 +    EXCEPTIONREGISTRATIONRECORD xcptRegRec;
@@ -39,10 +39,10 @@ index 7da76fb138..2680b18923 100644
      /* The so-called POSIX-compliant MacOS X reportedly processes SIGPIPE even
       * if it is blocked in all thread.
       * Note: this is NOT an excuse for not protecting against SIGPIPE. If
-@@ -277,6 +292,9 @@ out:
+@@ -278,6 +293,9 @@ out:
  #ifdef __OS2__
-     for (int i = argc - i_argc; i < argc; i++)
-         free (argv[i]);
+     for (int i = count - argc + 1; i < count; i++)
+         free(args[i]);
 +
 +    if (fLoaded)
 +        UninstallExceptq (&xcptRegRec);
@@ -50,10 +50,10 @@ index 7da76fb138..2680b18923 100644
      return ret;
  }
 diff --git a/src/os2/thread.c b/src/os2/thread.c
-index 20f7ccd79c..97a476c822 100644
+index 1c93c70797..10f8fe2811 100644
 --- a/src/os2/thread.c
 +++ b/src/os2/thread.c
-@@ -534,13 +534,26 @@ retry:
+@@ -562,13 +562,26 @@ retry:
      }
  }
  

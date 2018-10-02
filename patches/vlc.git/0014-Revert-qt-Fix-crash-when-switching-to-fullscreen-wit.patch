@@ -1,7 +1,7 @@
-From 4ede6874f48c7bf4628de54c51ab02ddcfaa60f2 Mon Sep 17 00:00:00 2001
+From 1ca5643a9932421c418168ceb4248f9811707a34 Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Fri, 26 Jan 2018 19:06:01 +0900
-Subject: [PATCH 11/20] Revert "qt: Fix crash when switching to fullscreen with
+Subject: [PATCH 14/24] Revert "qt: Fix crash when switching to fullscreen with
  video undocked"
 
 This reverts commit 78e2351cb5ccfb0c8a4e431f19d3b79a1e67175b.
@@ -10,10 +10,10 @@ This reverts commit 78e2351cb5ccfb0c8a4e431f19d3b79a1e67175b.
  1 file changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
-index eb3d9ac38d..63edee16cb 100644
+index f780f5bd49..19666291d6 100644
 --- a/modules/gui/qt/components/controller.cpp
 +++ b/modules/gui/qt/components/controller.cpp
-@@ -877,16 +877,12 @@ void FullscreenControllerWidget::restoreFSC()
+@@ -874,16 +874,12 @@ void FullscreenControllerWidget::restoreFSC()
              return;
  
          QRect currentRes = QApplication::desktop()->screenGeometry( targetScreen() );
