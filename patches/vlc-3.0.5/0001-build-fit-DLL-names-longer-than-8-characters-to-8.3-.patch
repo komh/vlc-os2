@@ -1,0 +1,446 @@
+From 47539a98a329a433a3ddb9b2c76f6d125bd42d99 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Fri, 14 Oct 2011 22:29:40 +0900
+Subject: [PATCH 01/26] build: fit DLL names longer than 8 characters to 8.3
+ limit on OS/2
+
+Since libtool 2.4.4, -os2dllname is supported.
+---
+ modules/access/Makefile.am        | 15 ++++++++++
+ modules/access_output/Makefile.am | 18 ++++++++++++
+ modules/audio_filter/Makefile.am  |  9 ++++++
+ modules/packetizer/Makefile.am    | 42 +++++++++++++++++++++++++++
+ modules/stream_out/Makefile.am    | 60 +++++++++++++++++++++++++++++++++++++++
+ modules/video_chroma/Makefile.am  | 36 +++++++++++++++++++++++
+ 6 files changed, 180 insertions(+)
+
+diff --git a/modules/access/Makefile.am b/modules/access/Makefile.am
+index 765ceec45f..7d982d313f 100644
+--- a/modules/access/Makefile.am
++++ b/modules/access/Makefile.am
+@@ -34,6 +34,9 @@ libimem_plugin_la_LIBADD = $(LIBM)
+ access_LTLIBRARIES += libimem_plugin.la
+ 
+ libaccess_imem_plugin_la_SOURCES = access/imem.c
++if HAVE_OS2
++libaccess_imem_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname a_imem_plugin
++endif
+ access_LTLIBRARIES += libaccess_imem_plugin.la
+ 
+ libsdp_plugin_la_SOURCES = access/sdp.c
+@@ -325,6 +328,9 @@ libaccess_mms_plugin_la_SOURCES = \
+ 	demux/asf/libasf_guid.h
+ libaccess_mms_plugin_la_CFLAGS = $(AM_CFLAGS)
+ libaccess_mms_plugin_la_LIBADD = $(SOCKET_LIBS)
++if HAVE_OS2
++libaccess_mms_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname a_mms_plugin
++endif
+ access_LTLIBRARIES += libaccess_mms_plugin.la
+ 
+ libsmb_plugin_la_SOURCES = access/smb.c access/smb_common.h
+@@ -376,6 +382,9 @@ libaccess_realrtsp_plugin_la_SOURCES = \
+ libaccess_realrtsp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+ libaccess_realrtsp_plugin_la_LIBADD = $(SOCKET_LIBS)
+ libaccess_realrtsp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
++if HAVE_OS2
++libaccess_realrtsp_plugin_la_LDFLAGS += -os2dllname a_realrtsp_plugin
++endif
+ access_LTLIBRARIES += $(LTLIBaccess_realrtsp)
+ EXTRA_LTLIBRARIES += libaccess_realrtsp_plugin.la
+ 
+@@ -396,12 +405,18 @@ access_LTLIBRARIES += libsatip_plugin.la
+ ### Misc ###
+ 
+ libaccess_concat_plugin_la_SOURCES = access/concat.c
++if HAVE_OS2
++libaccess_concat_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname a_concat_plugin
++endif
+ access_LTLIBRARIES += libaccess_concat_plugin.la
+ 
+ libaccess_mtp_plugin_la_SOURCES = access/mtp.c
+ libaccess_mtp_plugin_la_CFLAGS = $(AM_CFLAGS) $(MTP_CFLAGS)
+ libaccess_mtp_plugin_la_LIBADD = $(MTP_LIBS)
+ libaccess_mtp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
++if HAVE_OS2
++libaccess_mtp_plugin_la_LDFLAGS += -os2dllname a_mtp_plugin
++endif
+ access_LTLIBRARIES += $(LTLIBaccess_mtp)
+ EXTRA_LTLIBRARIES += libaccess_mtp_plugin.la
+ 
+diff --git a/modules/access_output/Makefile.am b/modules/access_output/Makefile.am
+index 26560f400c..73abd7318c 100644
+--- a/modules/access_output/Makefile.am
++++ b/modules/access_output/Makefile.am
+@@ -1,11 +1,23 @@
+ access_outdir = $(pluginsdir)/access_output
+ 
+ libaccess_output_dummy_plugin_la_SOURCES = access_output/dummy.c
++if HAVE_OS2
++libaccess_output_dummy_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname a_o_dummy_plugin
++endif
+ libaccess_output_file_plugin_la_SOURCES = access_output/file.c
+ libaccess_output_file_plugin_la_LIBADD = $(LIBPTHREAD)
++if HAVE_OS2
++libaccess_output_file_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname a_o_file_plugin
++endif
+ libaccess_output_http_plugin_la_SOURCES = access_output/http.c
++if HAVE_OS2
++libaccess_output_http_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname a_o_http_plugin
++endif
+ libaccess_output_udp_plugin_la_SOURCES = access_output/udp.c
+ libaccess_output_udp_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBPTHREAD)
++if HAVE_OS2
++libaccess_output_udp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname a_o_udp_plugin
++endif
+ 
+ access_out_LTLIBRARIES = \
+ 	libaccess_output_dummy_plugin.la \
+@@ -16,6 +28,9 @@ access_out_LTLIBRARIES = \
+ libaccess_output_livehttp_plugin_la_SOURCES = access_output/livehttp.c
+ libaccess_output_livehttp_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
+ libaccess_output_livehttp_plugin_la_LIBADD = $(GCRYPT_LIBS) -lgpg-error
++if HAVE_OS2
++libaccess_output_livehttp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname a_o_livehttp_plugin
++endif
+ if HAVE_GCRYPT
+ access_out_LTLIBRARIES += libaccess_output_livehttp_plugin.la
+ endif
+@@ -23,6 +38,9 @@ endif
+ libaccess_output_shout_plugin_la_SOURCES = access_output/shout.c
+ libaccess_output_shout_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SHOUT_CFLAGS)
+ libaccess_output_shout_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(access_outdir)'
++if HAVE_OS2
++libaccess_output_shout_plugin_la_LDFLAGS += -os2dllname a_o_shout_plugin
++endif
+ libaccess_output_shout_plugin_la_LIBADD = $(SHOUT_LIBS) $(SOCKET_LIBS)
+ access_out_LTLIBRARIES += $(LTLIBaccess_output_shout)
+ EXTRA_LTLIBRARIES += libaccess_output_shout_plugin.la
+diff --git a/modules/audio_filter/Makefile.am b/modules/audio_filter/Makefile.am
+index fde73b968d..3e2d9d031c 100644
+--- a/modules/audio_filter/Makefile.am
++++ b/modules/audio_filter/Makefile.am
+@@ -2,6 +2,9 @@ audio_filterdir = $(pluginsdir)/audio_filter
+ 
+ libaudiobargraph_a_plugin_la_SOURCES = audio_filter/audiobargraph_a.c
+ libaudiobargraph_a_plugin_la_LIBADD = $(LIBM)
++if HAVE_OS2
++libaudiobargraph_a_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname abg_a_plugin
++endif
+ libchorus_flanger_plugin_la_SOURCES = audio_filter/chorus_flanger.c
+ libchorus_flanger_plugin_la_LIBADD = $(LIBM)
+ libcompressor_plugin_la_SOURCES = audio_filter/compressor.c
+@@ -17,9 +20,15 @@ libparam_eq_plugin_la_SOURCES = audio_filter/param_eq.c
+ libparam_eq_plugin_la_LIBADD = $(LIBM)
+ libscaletempo_plugin_la_SOURCES = audio_filter/scaletempo.c
+ libscaletempo_plugin_la_LIBADD = $(LIBM)
++if HAVE_OS2
++libscaletempo_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname st_plugin
++endif
+ libscaletempo_pitch_plugin_la_SOURCES = $(libscaletempo_plugin_la_SOURCES)
+ libscaletempo_pitch_plugin_la_LIBADD = $(libscaletempo_plugin_la_LIBADD)
+ libscaletempo_pitch_plugin_la_CFLAGS = $(AM_CFLAGS) -DPITCH_SHIFTER
++if HAVE_OS2
++libscaletempo_pitch_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname st_pitch_plugin
++endif
+ libstereo_widen_plugin_la_SOURCES = audio_filter/stereo_widen.c
+ libspatializer_plugin_la_SOURCES = \
+ 	audio_filter/spatializer/allpass.cpp \
+diff --git a/modules/packetizer/Makefile.am b/modules/packetizer/Makefile.am
+index 588a3293bd..3a915c94c0 100644
+--- a/modules/packetizer/Makefile.am
++++ b/modules/packetizer/Makefile.am
+@@ -5,36 +5,78 @@ libpacketizer_av1_plugin_la_SOURCES = packetizer/av1.c \
+                                       packetizer/av1_obu.c \
+                                       packetizer/av1_obu.h
+ libpacketizer_copy_plugin_la_SOURCES = packetizer/copy.c
++if HAVE_OS2
++libpacketizer_copy_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_copy_plugin
++endif
+ libpacketizer_mpegvideo_plugin_la_SOURCES = packetizer/mpegvideo.c
++if HAVE_OS2
++libpacketizer_mpegvideo_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_mpegvideo_plugin
++endif
+ libpacketizer_mpeg4video_plugin_la_SOURCES = packetizer/mpeg4video.c
++if HAVE_OS2
++libpacketizer_mpeg4video_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_mpeg4video_plugin
++endif
+ libpacketizer_mpeg4audio_plugin_la_SOURCES = packetizer/mpeg4audio.c
++if HAVE_OS2
++libpacketizer_mpeg4audio_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_mpeg4audio_plugin
++endif
+ libpacketizer_mpegaudio_plugin_la_SOURCES = packetizer/mpegaudio.c
++if HAVE_OS2
++libpacketizer_mpegaudio_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_mpegaudio_plugin
++endif
+ libpacketizer_h264_plugin_la_SOURCES = \
+ 	packetizer/h264_nal.c packetizer/h264_nal.h \
+ 	packetizer/h264_slice.c packetizer/h264_slice.h \
+ 	packetizer/h264.c packetizer/hxxx_nal.h \
+ 	packetizer/hxxx_sei.c packetizer/hxxx_sei.h \
+ 	packetizer/hxxx_common.c packetizer/hxxx_common.h
++if HAVE_OS2
++libpacketizer_h264_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_h264_plugin
++endif
+ libpacketizer_vc1_plugin_la_SOURCES = packetizer/vc1.c \
+         packetizer/hxxx_nal.h
++if HAVE_OS2
++libpacketizer_vc1_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_vc1_plugin
++endif
+ libpacketizer_mlp_plugin_la_SOURCES = packetizer/mlp.c
++if HAVE_OS2
++libpacketizer_mlp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_mlp_plugin
++endif
+ libpacketizer_dirac_plugin_la_SOURCES = packetizer/dirac.c
++if HAVE_OS2
++libpacketizer_dirac_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_dirac_plugin
++endif
+ libpacketizer_flac_plugin_la_SOURCES = packetizer/flac.c \
+         packetizer/flac.h
++if HAVE_OS2
++libpacketizer_flac_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_flac_plugin
++endif
+ libpacketizer_hevc_plugin_la_SOURCES = packetizer/hevc.c \
+ 	packetizer/hevc_nal.h packetizer/hevc_nal.c \
+ 	packetizer/hxxx_sei.c packetizer/hxxx_sei.h \
+ 	packetizer/hxxx_nal.h \
+ 	packetizer/hxxx_common.c packetizer/hxxx_common.h
++if HAVE_OS2
++libpacketizer_hevc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_hevc_plugin
++endif
+ libpacketizer_a52_plugin_la_SOURCES = packetizer/a52.c packetizer/a52.h
++if HAVE_OS2
++libpacketizer_a52_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_a52_plugin
++endif
+ libpacketizer_dts_plugin_la_SOURCES = packetizer/dts.c \
+ 	packetizer/dts_header.c packetizer/dts_header.h
++if HAVE_OS2
++libpacketizer_dts_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_dts_plugin
++endif
+ 
+ libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
+ 	packetizer/avparser.h \
+ 	codec/avcodec/avcodec.h
+ libpacketizer_avparser_plugin_la_CFLAGS = $(AVCODEC_CFLAGS) $(AVUTIL_CFLAGS) $(AM_CFLAGS)
+ libpacketizer_avparser_plugin_la_LIBADD = $(AVCODEC_LIBS) $(AVUTIL_LIBS) $(LIBM) libavcodec_common.la
++if HAVE_OS2
++libpacketizer_avparser_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname p_avparser_plugin
++endif
+ 
+ noinst_HEADERS += packetizer/packetizer_helper.h packetizer/startcode_helper.h
+ 
+diff --git a/modules/stream_out/Makefile.am b/modules/stream_out/Makefile.am
+index 8a1b42d34d..05b14bd4eb 100644
+--- a/modules/stream_out/Makefile.am
++++ b/modules/stream_out/Makefile.am
+@@ -1,29 +1,80 @@
+ soutdir = $(pluginsdir)/stream_out
+ 
+ libstream_out_dummy_plugin_la_SOURCES = stream_out/dummy.c
++if HAVE_OS2
++libstream_out_dummy_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_dummy_plugin
++endif
+ libstream_out_cycle_plugin_la_SOURCES = stream_out/cycle.c
++if HAVE_OS2
++libstream_out_cycle_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_cycle_plugin
++endif
+ libstream_out_delay_plugin_la_SOURCES = stream_out/delay.c
++if HAVE_OS2
++libstream_out_delay_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_delay_plugin
++endif
+ libstream_out_stats_plugin_la_SOURCES = stream_out/stats.c
++if HAVE_OS2
++libstream_out_stats_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_stats_plugin
++endif
+ libstream_out_description_plugin_la_SOURCES = stream_out/description.c
++if HAVE_OS2
++libstream_out_description_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_description_plugin
++endif
+ libstream_out_standard_plugin_la_SOURCES = stream_out/standard.c
+ libstream_out_standard_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_access_output_srt)
+ libstream_out_standard_plugin_la_LIBADD = $(SOCKET_LIBS)
++if HAVE_OS2
++libstream_out_standard_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_standard_plugin
++endif
+ libstream_out_duplicate_plugin_la_SOURCES = stream_out/duplicate.c
++if HAVE_OS2
++libstream_out_duplicate_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_duplicate_plugin
++endif
+ libstream_out_es_plugin_la_SOURCES = stream_out/es.c
++if HAVE_OS2
++libstream_out_es_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_es_plugin
++endif
+ libstream_out_display_plugin_la_SOURCES = stream_out/display.c
++if HAVE_OS2
++libstream_out_display_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_display_plugin
++endif
+ libstream_out_gather_plugin_la_SOURCES = stream_out/gather.c
++if HAVE_OS2
++libstream_out_gather_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_gather_plugin
++endif
+ libstream_out_bridge_plugin_la_SOURCES = stream_out/bridge.c
++if HAVE_OS2
++libstream_out_bridge_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_bridge_plugin
++endif
+ libstream_out_mosaic_bridge_plugin_la_SOURCES = stream_out/mosaic_bridge.c
++if HAVE_OS2
++libstream_out_mosaic_bridge_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_mosaic_bridge_plugin
++endif
+ libstream_out_autodel_plugin_la_SOURCES = stream_out/autodel.c
++if HAVE_OS2
++libstream_out_autodel_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_autodel_plugin
++endif
+ libstream_out_record_plugin_la_SOURCES = stream_out/record.c
++if HAVE_OS2
++libstream_out_record_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_record_plugin
++endif
+ libstream_out_smem_plugin_la_SOURCES = stream_out/smem.c
++if HAVE_OS2
++libstream_out_smem_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_smem_plugin
++endif
+ libstream_out_setid_plugin_la_SOURCES = stream_out/setid.c
++if HAVE_OS2
++libstream_out_setid_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_setid_plugin
++endif
+ libstream_out_transcode_plugin_la_SOURCES = \
+ 	stream_out/transcode/transcode.c stream_out/transcode/transcode.h \
+ 	stream_out/transcode/spu.c \
+ 	stream_out/transcode/audio.c stream_out/transcode/video.c
+ libstream_out_transcode_plugin_la_CFLAGS = $(AM_CFLAGS)
+ libstream_out_transcode_plugin_la_LIBADD = $(LIBM)
++if HAVE_OS2
++libstream_out_transcode_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_transcode_plugin
++endif
+ 
+ sout_LTLIBRARIES = \
+ 	libstream_out_dummy_plugin.la \
+@@ -51,6 +102,9 @@ libstream_out_rtp_plugin_la_SOURCES = \
+ 	stream_out/rtcp.c stream_out/rtsp.c stream_out/vod.c
+ libstream_out_rtp_plugin_la_CFLAGS = $(AM_CFLAGS)
+ libstream_out_rtp_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBPTHREAD)
++if HAVE_OS2
++libstream_out_rtp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_rtp_plugin
++endif
+ if HAVE_GCRYPT
+ SRTP_CFLAGS = -I$(srcdir)/access/rtp
+ SRTP_LIBS = libvlc_srtp.la
+@@ -63,6 +117,9 @@ endif
+ libstream_out_chromaprint_plugin_la_SOURCES = stream_out/chromaprint.c stream_out/chromaprint_data.h dummy.cpp
+ libstream_out_chromaprint_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CHROMAPRINT_CFLAGS)
+ libstream_out_chromaprint_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(soutdir)'
++if HAVE_OS2
++libstream_out_chromaprint_plugin_la_LDFLAGS += -os2dllname s_o_chromaprint_plugin
++endif
+ libstream_out_chromaprint_plugin_la_LIBADD = $(CHROMAPRINT_LIBS)
+ EXTRA_LTLIBRARIES += libstream_out_chromaprint_plugin.la
+ sout_LTLIBRARIES += $(LTLIBstream_out_chromaprint)
+@@ -84,6 +141,9 @@ libstream_out_chromecast_plugin_la_SOURCES = stream_out/chromecast/cast.cpp stre
+ nodist_libstream_out_chromecast_plugin_la_SOURCES = stream_out/chromecast/cast_channel.pb.cc
+ libstream_out_chromecast_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -Istream_out/chromecast $(CHROMECAST_CFLAGS)
+ libstream_out_chromecast_plugin_la_LIBADD = $(CHROMECAST_LIBS) $(SOCKET_LIBS)
++if HAVE_OS2
++libstream_out_chromecast_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname s_o_chromecast_plugin
++endif
+ CLEANFILES += $(nodist_libstream_out_chromecast_plugin_la_SOURCES)
+ 
+ if ENABLE_SOUT
+diff --git a/modules/video_chroma/Makefile.am b/modules/video_chroma/Makefile.am
+index 3ee0ac5977..a58b9810fc 100644
+--- a/modules/video_chroma/Makefile.am
++++ b/modules/video_chroma/Makefile.am
+@@ -20,10 +20,16 @@ libgrey_yuv_plugin_la_SOURCES = video_chroma/grey_yuv.c
+ libi420_rgb_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
+ 	video_chroma/i420_rgb8.c video_chroma/i420_rgb16.c video_chroma/i420_rgb_c.h
+ libi420_rgb_plugin_la_LIBADD = $(LIBM)
++if HAVE_OS2
++libi420_rgb_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname i0_r_plugin
++endif
+ 
+ libi420_yuy2_plugin_la_SOURCES = video_chroma/i420_yuy2.c video_chroma/i420_yuy2.h
+ libi420_yuy2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+ 	-DMODULE_NAME_IS_i420_yuy2
++if HAVE_OS2
++libi420_yuy2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname i0_y2_plugin
++endif
+ 
+ libi420_nv12_plugin_la_SOURCES = video_chroma/i420_nv12.c
+ libi420_nv12_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+@@ -36,16 +42,28 @@ libi420_10_p010_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+ libi420_10_p010_plugin_la_LIBADD = libchroma_copy.la
+ 
+ libi422_i420_plugin_la_SOURCES = video_chroma/i422_i420.c
++if HAVE_OS2
++libi422_i420_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname i2_i0_plugin
++endif
+ 
+ libi422_yuy2_plugin_la_SOURCES = video_chroma/i422_yuy2.c video_chroma/i422_yuy2.h
+ libi422_yuy2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+ 	-DMODULE_NAME_IS_i422_yuy2
++if HAVE_OS2
++libi422_yuy2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname i2_y2_plugin
++endif
+ 
+ librv32_plugin_la_SOURCES = video_chroma/rv32.c
+ 
+ libyuy2_i420_plugin_la_SOURCES = video_chroma/yuy2_i420.c
++if HAVE_OS2
++libyuy2_i420_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname y2_i0_plugin
++endif
+ 
+ libyuy2_i422_plugin_la_SOURCES = video_chroma/yuy2_i422.c
++if HAVE_OS2
++libyuy2_i422_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname y2_i2_plugin
++endif
+ 
+ libyuvp_plugin_la_SOURCES = video_chroma/yuvp.c
+ 
+@@ -81,14 +99,23 @@ endif
+ libi420_rgb_mmx_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
+ 	video_chroma/i420_rgb16_x86.c video_chroma/i420_rgb_mmx.h
+ libi420_rgb_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMMX
++if HAVE_OS2
++libi420_rgb_mmx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname i0_r_mmx_plugin
++endif
+ 
+ libi420_yuy2_mmx_plugin_la_SOURCES = video_chroma/i420_yuy2.c video_chroma/i420_yuy2.h
+ libi420_yuy2_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+ 	-DMODULE_NAME_IS_i420_yuy2_mmx
++if HAVE_OS2
++libi420_yuy2_mmx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname i0_y2_mmx_plugin
++endif
+ 
+ libi422_yuy2_mmx_plugin_la_SOURCES = video_chroma/i422_yuy2.c video_chroma/i422_yuy2.h
+ libi422_yuy2_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+ 	-DMODULE_NAME_IS_i422_yuy2_mmx
++if HAVE_OS2
++libi422_yuy2_mmx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname i2_y2_mmx_plugin
++endif
+ 
+ if HAVE_MMX
+ chroma_LTLIBRARIES += \
+@@ -101,14 +128,23 @@ endif
+ libi420_rgb_sse2_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
+ 	video_chroma/i420_rgb16_x86.c video_chroma/i420_rgb_sse2.h
+ libi420_rgb_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DSSE2
++if HAVE_OS2
++libi420_rgb_sse2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname i0_r_sse2_plugin
++endif
+ 
+ libi420_yuy2_sse2_plugin_la_SOURCES = video_chroma/i420_yuy2.c video_chroma/i420_yuy2.h
+ libi420_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+ 	-DMODULE_NAME_IS_i420_yuy2_sse2
++if HAVE_OS2
++libi420_yuy2_sse2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname i0_y2_sse2_plugin
++endif
+ 
+ libi422_yuy2_sse2_plugin_la_SOURCES = video_chroma/i422_yuy2.c video_chroma/i422_yuy2.h
+ libi422_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+ 	-DMODULE_NAME_IS_i422_yuy2_sse2
++if HAVE_OS2
++libi422_yuy2_sse2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -os2dllname i2_y2_sse2_plugin
++endif
+ 
+ if HAVE_SSE2
+ chroma_LTLIBRARIES += \
+-- 
+2.13.3
+

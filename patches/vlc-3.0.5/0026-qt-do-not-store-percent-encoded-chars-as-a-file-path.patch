@@ -1,0 +1,32 @@
+From 7c9196cbf67a3b492e84e1d7fb67d24e4c1be66d Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Mon, 28 May 2018 22:50:52 +0900
+Subject: [PATCH 26/26] qt: do not store percent encoded chars as a file path
+
+Non-ascii chars are percent encoded. And they are shown in 'File name'
+field of file open dialog.
+
+In addition, that file is not recognized as a exisiting file.
+---
+ modules/gui/qt/dialogs_provider.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/modules/gui/qt/dialogs_provider.cpp b/modules/gui/qt/dialogs_provider.cpp
+index 406d0f92ef..0437d6f260 100644
+--- a/modules/gui/qt/dialogs_provider.cpp
++++ b/modules/gui/qt/dialogs_provider.cpp
+@@ -520,7 +520,11 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
+         fileTypes );
+ 
+     if( !urls.isEmpty() )
++#ifndef __OS2__
+         p_intf->p_sys->filepath = QUrl( urls.last() );
++#else
++        p_intf->p_sys->filepath = QUrl::fromEncoded( qtu( urls.last() ) );
++#endif
+ 
+     return urls;
+ }
+-- 
+2.13.3
+
