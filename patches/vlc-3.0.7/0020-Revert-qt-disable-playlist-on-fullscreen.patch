@@ -1,0 +1,34 @@
+From 4ce51f80618fb670c7fb3443326e6fe738679622 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 8 May 2018 19:18:27 +0900
+Subject: [PATCH 20/26] Revert "qt: disable playlist on fullscreen"
+
+This reverts commit 55ce60609e255ae37f778caa3b235257421b5a76.
+---
+ modules/gui/qt/main_interface.cpp | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index a35b8e435f..72de45d7d7 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -886,10 +886,13 @@ void MainInterface::setVideoFullScreen( bool fs )
+                 msg_Dbg( p_intf, "Moving video to correct position");
+                 move( QPoint( screenres.x(), screenres.y() ) );
+             }
+-        }
+ 
+-        if( playlistWidget != NULL && playlistWidget->artContainer->currentWidget() == videoWidget )
+-            showTab( videoWidget );
++            /* */
++            if( playlistWidget != NULL && playlistWidget->artContainer->currentWidget() == videoWidget )
++            {
++                showTab( videoWidget );
++            }
++        }
+ 
+         /* we won't be able to get its windowed sized once in fullscreen, so update it now */
+         stackWidgetsSizes[stackCentralW->currentWidget()] = stackCentralW->size();
+-- 
+2.13.3
+

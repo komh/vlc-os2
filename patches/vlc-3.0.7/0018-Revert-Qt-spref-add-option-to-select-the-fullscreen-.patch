@@ -1,0 +1,130 @@
+From a3cdb3edcce92f7eca25a9b446edf85d967f7ef6 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 2 Jan 2018 18:05:18 +0900
+Subject: [PATCH 18/26] Revert "Qt: spref, add option to select the fullscreen
+ screen"
+
+This reverts commit 40e152db5e09f433bb17b848d4bca09d522d1aca.
+---
+ modules/gui/qt/components/simple_preferences.cpp | 26 -----------------
+ modules/gui/qt/ui/sprefs_video.ui                | 36 ++++++++----------------
+ 2 files changed, 11 insertions(+), 51 deletions(-)
+
+diff --git a/modules/gui/qt/components/simple_preferences.cpp b/modules/gui/qt/components/simple_preferences.cpp
+index 14cbf0adcc..570ac64114 100644
+--- a/modules/gui/qt/components/simple_preferences.cpp
++++ b/modules/gui/qt/components/simple_preferences.cpp
+@@ -44,7 +44,6 @@
+ 
+ #include <QStyleFactory>
+ #include <QSettings>
+-#include <QScreen>
+ #include <QtAlgorithms>
+ #include <QDir>
+ #include <assert.h>
+@@ -370,24 +369,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+             CONFIG_BOOL( "video-deco", windowDecorations );
+             CONFIG_GENERIC( "vout", StringList, ui.voutLabel, outputModule );
+ 
+-            optionWidgets["fullscreenScreenB"] = ui.fullscreenScreenBox;
+-            ui.fullscreenScreenBox->addItem( qtr("Automatic"), -1 );
+-            int i_screenCount = 0;
+-            foreach( QScreen* screen, QGuiApplication::screens() )
+-            {
+-                ui.fullscreenScreenBox->addItem( screen->name(), i_screenCount );
+-                i_screenCount++;
+-            }
+-            p_config =  config_FindConfig( "qt-fullscreen-screennumber" );
+-            if( p_config )
+-            {
+-                int i_defaultScreen = p_config->value.i + 1;
+-                if ( i_defaultScreen < 0 || i_defaultScreen > ( ui.fullscreenScreenBox->count() - 1 ) )
+-                    ui.fullscreenScreenBox->setCurrentIndex( 0 );
+-                else
+-                    ui.fullscreenScreenBox->setCurrentIndex(p_config->value.i + 1);
+-            }
+-
+ #ifdef _WIN32
+             CONFIG_BOOL( "directx-overlay", overlay );
+             CONFIG_BOOL( "directx-hw-yuv", hwYUVBox );
+@@ -1072,13 +1053,6 @@ void SPrefsPanel::apply()
+         break;
+     }
+ 
+-    case SPrefsVideo:
+-    {
+-        int i_fullscreenScreen =  qobject_cast<QComboBox *>(optionWidgets["fullscreenScreenB"])->currentData().toInt();
+-        config_PutInt( p_intf, "qt-fullscreen-screennumber", i_fullscreenScreen );
+-        break;
+-    }
+-
+     case SPrefsAudio:
+     {
+         bool b_checked =
+diff --git a/modules/gui/qt/ui/sprefs_video.ui b/modules/gui/qt/ui/sprefs_video.ui
+index 899faeca60..766f747c2e 100644
+--- a/modules/gui/qt/ui/sprefs_video.ui
++++ b/modules/gui/qt/ui/sprefs_video.ui
+@@ -46,23 +46,6 @@
+          <string>Display</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+-         <item row="3" column="0">
+-          <widget class="QLabel" name="voutLabel">
+-           <property name="text">
+-            <string>O&amp;utput</string>
+-           </property>
+-           <property name="buddy">
+-            <cstring>outputModule</cstring>
+-           </property>
+-          </widget>
+-         </item>
+-         <item row="2" column="0">
+-          <widget class="QCheckBox" name="windowDecorations">
+-           <property name="text">
+-            <string>Window decorations</string>
+-           </property>
+-          </widget>
+-         </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="fullscreen">
+            <property name="text">
+@@ -77,16 +60,20 @@
+            </property>
+           </widget>
+          </item>
+-         <item row="4" column="1">
+-          <widget class="QComboBox" name="fullscreenScreenBox"/>
+-         </item>
+-         <item row="4" column="0">
+-          <widget class="QLabel" name="fullscreenScreenLabel">
++         <item row="3" column="0">
++          <widget class="QLabel" name="voutLabel">
+            <property name="text">
+-            <string>Fullscreen Video Device</string>
++            <string>O&amp;utput</string>
+            </property>
+            <property name="buddy">
+-            <cstring>fullscreenScreenBox</cstring>
++            <cstring>outputModule</cstring>
++           </property>
++          </widget>
++         </item>
++         <item row="2" column="0">
++          <widget class="QCheckBox" name="windowDecorations">
++           <property name="text">
++            <string>Window decorations</string>
+            </property>
+           </widget>
+          </item>
+@@ -318,7 +305,6 @@
+   <tabstop>fullscreen</tabstop>
+   <tabstop>windowDecorations</tabstop>
+   <tabstop>outputModule</tabstop>
+-  <tabstop>fullscreenScreenBox</tabstop>
+   <tabstop>overlay</tabstop>
+   <tabstop>hwYUVBox</tabstop>
+   <tabstop>kvaFixT23</tabstop>
+-- 
+2.13.3
+
