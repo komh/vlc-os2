@@ -1,0 +1,58 @@
+From cf8cb4de72bef4e374885ac1e0ec3f88ed6e1607 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Sun, 12 Nov 2017 19:45:53 +0900
+Subject: [PATCH 07/27] qt: port Qt5 codes to Qt4 codes
+
+---
+ modules/gui/qt/components/playlist/playlist_model.cpp | 9 +++++++++
+ modules/gui/qt/main_interface.cpp                     | 4 ++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/modules/gui/qt/components/playlist/playlist_model.cpp b/modules/gui/qt/components/playlist/playlist_model.cpp
+index 99e4c8f942..5311d120b8 100644
+--- a/modules/gui/qt/components/playlist/playlist_model.cpp
++++ b/modules/gui/qt/components/playlist/playlist_model.cpp
+@@ -528,7 +528,11 @@ PLItem *PLModel::findByPLId( PLItem *root, int i_id ) const
+ 
+     QStack<RemainingChildren> stack;
+     if( root->childCount() )
++#if HAS_QT5
+         stack.push( {root->children.cbegin(), root->children.cend()} );
++#else
++        stack.push( {root->children.constBegin(), root->children.constEnd()} );
++#endif
+ 
+     while ( !stack.isEmpty() )
+     {
+@@ -543,7 +547,12 @@ PLItem *PLModel::findByPLId( PLItem *root, int i_id ) const
+             stack.pop();
+ 
+         if( item->childCount() )
++#if HAS_QT5
+             stack.push( {item->children.cbegin(), item->children.cend()} );
++#else
++            stack.push( {item->children.constBegin(),
++                         item->children.constEnd()} );
++#endif
+     }
+     return NULL;
+ }
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index 259dcf7109..1c24cb9e2e 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -235,7 +235,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
+     CONNECT( this, askRaise(), this, setRaise() );
+ 
+ 
++#if HAS_QT5
+     connect( THEDP, &DialogsProvider::releaseMouseEvents, this, &MainInterface::voutReleaseMouseEvents ) ;
++#else
++    CONNECT( THEDP, releaseMouseEvents(), this, voutReleaseMouseEvents() );
++#endif
+     /** END of CONNECTS**/
+ 
+ 
+-- 
+2.22.0
+
