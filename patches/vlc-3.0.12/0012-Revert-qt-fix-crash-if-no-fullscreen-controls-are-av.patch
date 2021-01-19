@@ -1,0 +1,28 @@
+From 2a1b324580f3e1f74036c17d6d48390cb856d9b3 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 2 Jan 2018 18:02:33 +0900
+Subject: [PATCH 12/28] Revert "qt: fix crash if no fullscreen controls are
+ available"
+
+This reverts commit a5688a51a9eee3202468b1c85f4fd3ad82dc9b04.
+---
+ modules/gui/qt/main_interface.cpp | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index 9cc0e8c75a..496b8859a8 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -874,8 +874,7 @@ void MainInterface::setVideoFullScreen( bool fs )
+         if( numscreen == -1 || numscreen > QApplication::desktop()->screenCount() )
+             numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+ 
+-        if( fullscreenControls )
+-            fullscreenControls->setTargetScreen( numscreen );
++        fullscreenControls->setTargetScreen( numscreen );
+ 
+         if ( numscreen >= 0 )
+         {
+-- 
+2.22.0
+

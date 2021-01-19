@@ -1,0 +1,59 @@
+From f15e821df291c8378f159cc865bf3e9b8842aacc Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 19 Jan 2021 17:46:54 +0900
+Subject: [PATCH 28/28] vlc_fixups.h: define INET6_ADDRSTRLEN for OS/2
+
+This fixes the following compilation errors of access/rist.[ch] on OS/2:
+
+-----
+  CC       access/librist_plugin_la-rist.lo
+In file included from access/rist.c:41:
+access/rist.h: In function 'populate_cname':
+access/rist.h:161:22: error: 'INET6_ADDRSTRLEN' undeclared (first use in this function); did you mean 'INET_ADDRSTRLEN'?
+  161 |             char str[INET6_ADDRSTRLEN];
+      |                      ^~~~~~~~~~~~~~~~
+      |                      INET_ADDRSTRLEN
+access/rist.h:161:22: note: each undeclared identifier is reported only once for each function it appears in
+access/rist.h:161:18: warning: unused variable 'str' [-Wunused-variable]
+  161 |             char str[INET6_ADDRSTRLEN];
+      |                  ^~~
+access/rist.c: In function 'print_sockaddr_info_change':
+access/rist.c:448:21: error: 'INET6_ADDRSTRLEN' undeclared (first use in this function); did you mean 'INET_ADDRSTRLEN'?
+  448 |         char oldstr[INET6_ADDRSTRLEN];
+      |                     ^~~~~~~~~~~~~~~~
+      |                     INET_ADDRSTRLEN
+access/rist.c:449:14: warning: unused variable 'newstr' [-Wunused-variable]
+  449 |         char newstr[INET6_ADDRSTRLEN];
+      |              ^~~~~~
+access/rist.c:448:14: warning: unused variable 'oldstr' [-Wunused-variable]
+  448 |         char oldstr[INET6_ADDRSTRLEN];
+      |              ^~~~~~
+access/rist.c: In function 'print_sockaddr_info':
+access/rist.c:467:18: error: 'INET6_ADDRSTRLEN' undeclared (first use in this function); did you mean 'INET_ADDRSTRLEN'?
+  467 |         char str[INET6_ADDRSTRLEN];
+      |                  ^~~~~~~~~~~~~~~~
+      |                  INET_ADDRSTRLEN
+access/rist.c:467:14: warning: unused variable 'str' [-Wunused-variable]
+  467 |         char str[INET6_ADDRSTRLEN];
+      |              ^~~
+-----
+---
+ include/vlc_fixups.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/vlc_fixups.h b/include/vlc_fixups.h
+index a83d0689a3..2e8a1456bb 100644
+--- a/include/vlc_fixups.h
++++ b/include/vlc_fixups.h
+@@ -621,6 +621,8 @@ struct sockaddr_in6
+ static const struct in6_addr in6addr_any =
+     { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+ 
++# define INET6_ADDRSTRLEN   46
++
+ # include <errno.h>
+ # ifndef EPROTO
+ #  define EPROTO (ELAST + 1)
+-- 
+2.22.0
+
