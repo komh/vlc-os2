@@ -1,7 +1,7 @@
-From fb9e7ce8d2130d5586366e9e041159628c984322 Mon Sep 17 00:00:00 2001
+From 1098c0b7d50e132c38d8210eb946954d4b863553 Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Tue, 1 Mar 2016 20:11:06 +0900
-Subject: [PATCH 03/24] os2: use ExceptQ to ease debugging
+Subject: [PATCH 3/3] os2: use ExceptQ to ease debugging
 
 ---
  bin/vlc.c        | 18 ++++++++++++++++++
@@ -9,7 +9,7 @@ Subject: [PATCH 03/24] os2: use ExceptQ to ease debugging
  2 files changed, 31 insertions(+)
 
 diff --git a/bin/vlc.c b/bin/vlc.c
-index 660a1b7996..c73e198ff8 100644
+index d7834c9614..4b8d45a8ca 100644
 --- a/bin/vlc.c
 +++ b/bin/vlc.c
 @@ -109,11 +109,26 @@ static void exit_timeout (int signum)
@@ -39,7 +39,7 @@ index 660a1b7996..c73e198ff8 100644
      /* The so-called POSIX-compliant MacOS X reportedly processes SIGPIPE even
       * if it is blocked in all thread.
       * Note: this is NOT an excuse for not protecting against SIGPIPE. If
-@@ -278,6 +293,9 @@ out:
+@@ -274,6 +289,9 @@ out:
  #ifdef __OS2__
      for (int i = count - argc + 1; i < count; i++)
          free(args[i]);
@@ -50,11 +50,11 @@ index 660a1b7996..c73e198ff8 100644
      return ret;
  }
 diff --git a/src/os2/thread.c b/src/os2/thread.c
-index 1c93c70797..10f8fe2811 100644
+index fba569c6f0..be4a08b4e2 100644
 --- a/src/os2/thread.c
 +++ b/src/os2/thread.c
-@@ -562,13 +562,26 @@ retry:
-     }
+@@ -431,13 +431,26 @@ retry:
+     vlc_mutex_unlock (&super_mutex);
  }
  
 +#define INCL_LIBLOADEXCEPTQ
@@ -81,5 +81,5 @@ index 1c93c70797..10f8fe2811 100644
      vlc_thread_cleanup (th);
  }
 -- 
-2.13.3
+2.22.0
 

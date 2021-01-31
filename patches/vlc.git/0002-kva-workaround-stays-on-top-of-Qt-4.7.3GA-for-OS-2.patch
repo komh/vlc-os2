@@ -1,19 +1,19 @@
-From de5047ef53a01dfc289ea873a05d53e2023e86a7 Mon Sep 17 00:00:00 2001
+From c9c98190b6fa3093e22b892fdad31e78a8e13562 Mon Sep 17 00:00:00 2001
 From: KO Myung-Hun <komh@chollian.net>
 Date: Mon, 22 Oct 2012 18:13:06 +0900
-Subject: [PATCH 02/24] kva: workaround stays-on-top of Qt 4.7.3GA for OS/2
+Subject: [PATCH 2/3] kva: workaround stays-on-top of Qt 4.7.3GA for OS/2
 
 Qt::WindowStaysOnTopHint does not work on Qt 4.7.3GA for OS/2.
 ---
- modules/video_output/kva.c | 90 +++++++++++++++++++++++++++++++++++++++++++---
+ modules/video_output/kva.c | 90 +++++++++++++++++++++++++++++++++++---
  1 file changed, 85 insertions(+), 5 deletions(-)
 
 diff --git a/modules/video_output/kva.c b/modules/video_output/kva.c
-index d97a4ea4e1..9cd317401f 100644
+index 38fa658329..41a3816c12 100644
 --- a/modules/video_output/kva.c
 +++ b/modules/video_output/kva.c
-@@ -75,6 +75,15 @@ vlc_module_begin ()
-     set_callbacks( Open, Close )
+@@ -74,6 +74,15 @@ vlc_module_begin ()
+     set_callback_display( Open, 100 )
  vlc_module_end ()
  
 +/* Qt::WindowStaysOnTopHint does not work on Qt 4.7.3GA for OS/2.
@@ -28,31 +28,31 @@ index d97a4ea4e1..9cd317401f 100644
  /*****************************************************************************
   * vout_display_sys_t: video output method descriptor
   *****************************************************************************
-@@ -104,6 +113,9 @@ struct vout_display_sys_t
-     bool               is_mouse_hidden;
-     bool               is_on_top;
+@@ -103,6 +112,9 @@ struct vout_display_sys_t
      ULONG              cursor_timeout;
+ 
+     int                i_chroma_shift;
 +#if USE_WORKAROUND_STAYS_ON_TOP_OF_QT
 +    PID                pid;
 +#endif
  };
  
- typedef struct
-@@ -217,7 +229,7 @@ static void PMThread( void *arg )
+ /*****************************************************************************
+@@ -226,7 +238,7 @@ static void PMThread( void *arg )
  
      WinSetWindowPtr( sys->client, 0, vd );
  
--    if( !sys->parent_window )
-+    if( !sys->parent_window || USE_WORKAROUND_STAYS_ON_TOP_OF_QT )
+-    if( sys->b_fixt23 )
++    if( sys->b_fixt23 || USE_WORKAROUND_STAYS_ON_TOP_OF_QT )
      {
          WinSetWindowPtr( sys->frame, 0, vd );
          sys->p_old_frame = WinSubclassWindow( sys->frame, MyFrameWndProc );
-@@ -277,13 +289,17 @@ static void PMThread( void *arg )
+@@ -278,13 +290,17 @@ static void PMThread( void *arg )
      sys->i_result = VLC_SUCCESS;
      DosPostEventSem( sys->ack_event );
  
--    if( !sys->parent_window )
-+    if( !sys->parent_window || USE_WORKAROUND_STAYS_ON_TOP_OF_QT )
+-    if( sys->b_fixt23 )
++    if( sys->b_fixt23 || USE_WORKAROUND_STAYS_ON_TOP_OF_QT )
          WinSetVisibleRegionNotify( sys->frame, TRUE );
  
 +#if USE_WORKAROUND_STAYS_ON_TOP_OF_QT
@@ -62,21 +62,21 @@ index d97a4ea4e1..9cd317401f 100644
      while( WinGetMsg( sys->hab, &qm, NULLHANDLE, 0, 0 ))
          WinDispatchMsg( sys->hab, &qm );
  
--    if( !sys->parent_window )
-+    if( !sys->parent_window || USE_WORKAROUND_STAYS_ON_TOP_OF_QT )
+-    if( sys->b_fixt23 )
++    if( sys->b_fixt23 || USE_WORKAROUND_STAYS_ON_TOP_OF_QT )
          WinSetVisibleRegionNotify( sys->frame, FALSE );
  
      kvaEnableScreenSaver();
-@@ -296,7 +312,7 @@ exit_open_display :
+@@ -297,7 +313,7 @@ exit_open_display :
      kvaDone();
  
  exit_kva_init :
--    if( !sys->parent_window )
-+    if( !sys->parent_window || USE_WORKAROUND_STAYS_ON_TOP_OF_QT )
+-    if( sys->b_fixt23 )
++    if( sys->b_fixt23 || USE_WORKAROUND_STAYS_ON_TOP_OF_QT )
          WinSubclassWindow( sys->frame, sys->p_old_frame );
  
      WinDestroyWindow( sys->frame );
-@@ -894,7 +910,71 @@ static MRESULT EXPENTRY MyFrameWndProc( HWND hwnd, ULONG msg, MPARAM mp1,
+@@ -848,7 +864,71 @@ static MRESULT EXPENTRY MyFrameWndProc( HWND hwnd, ULONG msg, MPARAM mp1,
          //case WM_VRNDISABLED :
          case WM_VRNENABLED :
              if( !vd->cfg->is_fullscreen && sys->is_on_top )
@@ -150,5 +150,5 @@ index d97a4ea4e1..9cd317401f 100644
      }
  
 -- 
-2.13.3
+2.22.0
 
