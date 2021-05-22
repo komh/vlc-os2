@@ -1,0 +1,115 @@
+From bc33dde89de3d088a9a5c16b7c8862b63df6b681 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Fri, 26 Feb 2021 17:27:26 +0900
+Subject: [PATCH 30/31] freetype: use UCS-4 on OS/2
+
+OS/2 usesd UCS-2 whose data type was uint16_t with 2-bytes size.
+However, FriBidi APIs expects FriBidiChar which is 4-bytes size. This
+dismatch leads to unexpected behaviors such as corruption of a subtitle
+text or even SIGSEGV.
+And additional code paths for OS/2 are not necessary any more with this
+patch.
+---
+ modules/text_renderer/freetype/freetype.c    | 38 +++++++++++++++++++-
+ modules/text_renderer/freetype/freetype.h    |  3 +-
+ modules/text_renderer/freetype/text_layout.c |  7 ----
+ 3 files changed, 38 insertions(+), 10 deletions(-)
+
+diff --git a/modules/text_renderer/freetype/freetype.c b/modules/text_renderer/freetype/freetype.c
+index 32f1ea403b..79504d38ac 100644
+--- a/modules/text_renderer/freetype/freetype.c
++++ b/modules/text_renderer/freetype/freetype.c
+@@ -1049,6 +1049,42 @@ static void FreeStylesArray( text_style_t **pp_styles, size_t i_styles )
+     free( pp_styles );
+ }
+ 
++#ifdef __OS2__
++static void *ToUCS4( const char *in, size_t *outsize )
++{
++    uint16_t *psz_ucs2;
++    size_t i_ucs4_bytes;
++    uni_char_t *psz_ucs4;
++    int i_len;
++
++    psz_ucs2 = ToCharset( FREETYPE_TO_UCS, in, outsize );
++    if( !psz_ucs2 )
++        return NULL;
++
++    i_ucs4_bytes = *outsize * 2;
++    /* Realloc including NULL-terminator */
++    psz_ucs4 = realloc( psz_ucs2, i_ucs4_bytes + sizeof( *psz_ucs4 ) );
++    if( unlikely( !psz_ucs4 ) )
++    {
++        free( psz_ucs2 );
++
++        return NULL;
++    }
++
++    psz_ucs2 = ( uint16_t * )psz_ucs4;
++    i_len = i_ucs4_bytes / sizeof( *psz_ucs4 );
++    /* Copy including NULL-terminator */
++    for( int i = i_len; i >= 0; --i )
++        psz_ucs4[ i ] = psz_ucs2[ i ];
++
++    *outsize = i_ucs4_bytes;
++
++    return psz_ucs4;
++}
++#else
++# define ToUCS4( in, outsize ) ToCharset( FREETYPE_TO_UCS, ( in ), ( outsize ))
++#endif
++
+ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t *p_segment, size_t *pi_string_length,
+                                             text_style_t ***ppp_styles, size_t *pi_styles )
+ {
+@@ -1062,7 +1098,7 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
+         if( !s->psz_text || !s->psz_text[0] )
+             continue;
+         size_t i_string_bytes = 0;
+-        uni_char_t *psz_tmp = ToCharset( FREETYPE_TO_UCS, s->psz_text, &i_string_bytes );
++        uni_char_t *psz_tmp = ToUCS4( s->psz_text, &i_string_bytes );
+         if( !psz_tmp )
+         {
+             free( psz_uni );
+diff --git a/modules/text_renderer/freetype/freetype.h b/modules/text_renderer/freetype/freetype.h
+index b0ef9cf178..df2e809ff0 100644
+--- a/modules/text_renderer/freetype/freetype.h
++++ b/modules/text_renderer/freetype/freetype.h
+@@ -54,11 +54,10 @@
+ # define FT_MulFix(v, s) (((v)*(s))>>16)
+ #endif
+ 
++typedef uint32_t uni_char_t;
+ #ifdef __OS2__
+-typedef uint16_t uni_char_t;
+ # define FREETYPE_TO_UCS    "UCS-2LE"
+ #else
+-typedef uint32_t uni_char_t;
+ # if defined(WORDS_BIGENDIAN)
+ #  define FREETYPE_TO_UCS   "UCS-4BE"
+ # else
+diff --git a/modules/text_renderer/freetype/text_layout.c b/modules/text_renderer/freetype/text_layout.c
+index 4dce1e30ba..8bac0d91bc 100644
+--- a/modules/text_renderer/freetype/text_layout.c
++++ b/modules/text_renderer/freetype/text_layout.c
+@@ -735,17 +735,10 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
+ 
+         hb_buffer_set_direction( p_run->p_buffer, p_run->direction );
+         hb_buffer_set_script( p_run->p_buffer, p_run->script );
+-#ifdef __OS2__
+-        hb_buffer_add_utf16( p_run->p_buffer,
+-                             p_paragraph->p_code_points + p_run->i_start_offset,
+-                             p_run->i_end_offset - p_run->i_start_offset, 0,
+-                             p_run->i_end_offset - p_run->i_start_offset );
+-#else
+         hb_buffer_add_utf32( p_run->p_buffer,
+                              p_paragraph->p_code_points + p_run->i_start_offset,
+                              p_run->i_end_offset - p_run->i_start_offset, 0,
+                              p_run->i_end_offset - p_run->i_start_offset );
+-#endif
+         hb_shape( p_run->p_hb_font, p_run->p_buffer, 0, 0 );
+         p_run->p_glyph_infos =
+             hb_buffer_get_glyph_infos( p_run->p_buffer, &p_run->i_glyph_count );
+-- 
+2.30.0
+
