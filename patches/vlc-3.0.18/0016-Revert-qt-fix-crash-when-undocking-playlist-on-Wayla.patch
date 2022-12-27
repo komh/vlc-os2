@@ -1,0 +1,42 @@
+From f4c2934dc8b7146950fbefa25931cf2d2930cce6 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 2 Jan 2018 18:03:14 +0900
+Subject: [PATCH 16/28] Revert "qt: fix crash when undocking playlist on
+ Wayland + optimization elsewhere"
+
+This reverts commit dbded10b41460b09fad134e8d37e7a07425110c9.
+---
+ modules/gui/qt/main_interface.cpp | 13 ++-----------
+ 1 file changed, 2 insertions(+), 11 deletions(-)
+
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index bf77c74c3d..047e902d27 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -1073,21 +1073,12 @@ void MainInterface::dockPlaylist( bool p_docked )
+     if( !p_docked ) /* Previously docked */
+     {
+         playlistVisible = playlistWidget->isVisible();
+-
+-        /* repositioning the videowidget __before__ exporting the
+-           playlistwidget into the playlist dialog avoids two unneeded
+-           calls to the server in the qt library to reparent the underlying
+-           native window back and forth.
+-           For Wayland, this is mandatory since reparenting is not implemented.
+-           For X11 or Windows, this is just an optimization. */
++        stackCentralW->removeWidget( playlistWidget );
++        dialog->importPlaylistWidget( playlistWidget );
+         if ( videoWidget && THEMIM->getIM()->hasVideo() )
+             showTab(videoWidget);
+         else
+             showTab(bgWidget);
+-
+-        /* playlistwidget exported into the playlist dialog */
+-        stackCentralW->removeWidget( playlistWidget );
+-        dialog->importPlaylistWidget( playlistWidget );
+         if ( playlistVisible ) dialog->show();
+     }
+     else /* Previously undocked */
+-- 
+2.30.0
+

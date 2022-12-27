@@ -1,0 +1,25 @@
+From 412b1e456129777ac328561ebf2959233d3bdae2 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Wed, 26 Oct 2022 12:42:28 +0900
+Subject: [PATCH 28/28] cdrom: fix a typo
+
+---
+ modules/access/vcd/cdrom.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/access/vcd/cdrom.c b/modules/access/vcd/cdrom.c
+index 4d9f4f1f96..8b719ec532 100644
+--- a/modules/access/vcd/cdrom.c
++++ b/modules/access/vcd/cdrom.c
+@@ -428,7 +428,7 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
+             int i;
+ 
+             p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
+-            if( *p_toc->p_sectors == NULL )
++            if( p_toc->p_sectors == NULL )
+             {
+                 vcddev_toc_Free( p_toc );
+                 return NULL;
+-- 
+2.30.0
+
