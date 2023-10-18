@@ -1,0 +1,119 @@
+From ef616451468a1851a941a84725323f4d451e4b14 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 2 Jan 2018 18:02:57 +0900
+Subject: [PATCH 15/28] Revert "qt: fix setScreen might crash on wayland when
+ entering fullscreen"
+
+This reverts commit a7018fc36800b0a3560a4c072c8ec2c3b15776c2.
+---
+ modules/gui/qt/components/controller.cpp |  9 ---------
+ modules/gui/qt/components/controller.hpp |  4 ----
+ modules/gui/qt/main_interface.cpp        | 17 +----------------
+ modules/gui/qt/main_interface.hpp        |  4 +---
+ 4 files changed, 2 insertions(+), 32 deletions(-)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index 530995f137..74fa4e4964 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -805,10 +805,6 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
+     b_fullscreen        = false;
+     i_hide_timeout      = 1;
+     i_screennumber      = -1;
+-#ifdef QT5_HAS_WAYLAND
+-    b_hasWayland = QGuiApplication::platformName()
+-           .startsWith(QLatin1String("wayland"), Qt::CaseInsensitive);
+-#endif
+ 
+     vout.clear();
+ 
+@@ -889,12 +885,7 @@ void FullscreenControllerWidget::restoreFSC()
+             return;
+ 
+         QRect currentRes = QApplication::desktop()->screenGeometry( targetScreen() );
+-#ifdef QT5_HAS_WAYLAND
+-        if ( !b_hasWayland )
+-            windowHandle()->setScreen(QGuiApplication::screens()[targetScreen()]);
+-#else
+         windowHandle()->setScreen(QGuiApplication::screens()[targetScreen()]);
+-#endif
+ 
+         if( currentRes == screenRes &&
+             QApplication::desktop()->screen()->geometry().contains( previousPosition, true ) )
+diff --git a/modules/gui/qt/components/controller.hpp b/modules/gui/qt/components/controller.hpp
+index ab7b29f194..b328a3fbb2 100644
+--- a/modules/gui/qt/components/controller.hpp
++++ b/modules/gui/qt/components/controller.hpp
+@@ -321,10 +321,6 @@ private:
+ 
+     bool isWideFSC;
+     int i_sensitivity;
+-
+-#ifdef QT5_HAS_WAYLAND
+-    bool b_hasWayland;
+-#endif
+ };
+ 
+ #endif
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index b11d9f5425..bf77c74c3d 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -149,11 +149,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
+     /* Should the UI stays on top of other windows */
+     b_interfaceOnTop = var_InheritBool( p_intf, "video-on-top" );
+ 
+-#ifdef QT5_HAS_WAYLAND
+-    b_hasWayland = QGuiApplication::platformName()
+-        .startsWith(QLatin1String("wayland"), Qt::CaseInsensitive);
+-#endif
+-
+     /**************************
+      *  UI and Widgets design
+      **************************/
+@@ -881,12 +876,7 @@ void MainInterface::setVideoFullScreen( bool fs )
+ 
+             QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
+             lastWinScreen = windowHandle()->screen();
+-#ifdef QT5_HAS_WAYLAND
+-            if( !b_hasWayland )
+-                windowHandle()->setScreen(QGuiApplication::screens()[numscreen]);
+-#else
+             windowHandle()->setScreen(QGuiApplication::screens()[numscreen]);
+-#endif
+ 
+             /* To be sure window is on proper-screen in xinerama */
+             if( !screenres.contains( pos() ) )
+@@ -912,13 +902,8 @@ void MainInterface::setVideoFullScreen( bool fs )
+     {
+         setMinimalView( b_minimalView );
+         setInterfaceFullScreen( b_interfaceFullScreen );
+-#ifdef QT5_HAS_WAYLAND
+-        if( lastWinScreen != NULL && !b_hasWayland )
++        if (lastWinScreen != NULL)
+             windowHandle()->setScreen(lastWinScreen);
+-#else
+-        if( lastWinScreen != NULL )
+-            windowHandle()->setScreen(lastWinScreen);
+-#endif
+         if( lastWinPosition.isNull() == false )
+         {
+             move( lastWinPosition );
+diff --git a/modules/gui/qt/main_interface.hpp b/modules/gui/qt/main_interface.hpp
+index e73a6b5ce6..4e8cb26679 100644
+--- a/modules/gui/qt/main_interface.hpp
++++ b/modules/gui/qt/main_interface.hpp
+@@ -184,9 +184,7 @@ protected:
+     bool                 b_pauseOnMinimize;
+     bool                 b_maximizedView;
+     bool                 b_isWindowTiled;
+-#ifdef QT5_HAS_WAYLAND
+-    bool                 b_hasWayland;
+-#endif
++
+     /* States */
+     bool                 playlistVisible;       ///< Is the playlist visible ?
+ //    bool                 videoIsActive;       ///< Having a video now / THEMIM->hasV
+-- 
+2.42.0
+

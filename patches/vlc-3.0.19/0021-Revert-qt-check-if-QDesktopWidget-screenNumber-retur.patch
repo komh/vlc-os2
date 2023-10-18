@@ -1,0 +1,76 @@
+From 8d3639eee9c91085d8ff9d34c17750b38f1c71b3 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 2 Jan 2018 18:03:35 +0900
+Subject: [PATCH 21/28] Revert "qt: check if QDesktopWidget::screenNumber()
+ returns a valid screen"
+
+This reverts commit fbf1f129ce7ec1387c9ead843c01c243337be460.
+---
+ modules/gui/qt/components/controller.cpp |  3 ---
+ modules/gui/qt/main_interface.cpp        | 33 ++++++++++--------------
+ 2 files changed, 14 insertions(+), 22 deletions(-)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index 74fa4e4964..6074d23d57 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -881,9 +881,6 @@ void FullscreenControllerWidget::restoreFSC()
+         setMinimumWidth( FSC_WIDTH );
+         adjustSize();
+ 
+-        if ( targetScreen() < 0 )
+-            return;
+-
+         QRect currentRes = QApplication::desktop()->screenGeometry( targetScreen() );
+         windowHandle()->setScreen(QGuiApplication::screens()[targetScreen()]);
+ 
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index bacd901238..b15ce75c30 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -870,28 +870,23 @@ void MainInterface::setVideoFullScreen( bool fs )
+             numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+ 
+         fullscreenControls->setTargetScreen( numscreen );
++        QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
++        lastWinScreen = windowHandle()->screen();
++        windowHandle()->setScreen(QGuiApplication::screens()[numscreen]);
+ 
+-        if ( numscreen >= 0 )
++        /* To be sure window is on proper-screen in xinerama */
++        if( !screenres.contains( pos() ) )
+         {
++            lastWinPosition = pos();
++            lastWinSize = size();
++            msg_Dbg( p_intf, "Moving video to correct position");
++            move( QPoint( screenres.x(), screenres.y() ) );
++        }
+ 
+-            QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
+-            lastWinScreen = windowHandle()->screen();
+-            windowHandle()->setScreen(QGuiApplication::screens()[numscreen]);
+-
+-            /* To be sure window is on proper-screen in xinerama */
+-            if( !screenres.contains( pos() ) )
+-            {
+-                lastWinPosition = pos();
+-                lastWinSize = size();
+-                msg_Dbg( p_intf, "Moving video to correct position");
+-                move( QPoint( screenres.x(), screenres.y() ) );
+-            }
+-
+-            /* */
+-            if( playlistWidget != NULL && playlistWidget->artContainer->currentWidget() == videoWidget )
+-            {
+-                showTab( videoWidget );
+-            }
++        /* */
++        if( playlistWidget != NULL && playlistWidget->artContainer->currentWidget() == videoWidget )
++        {
++            showTab( videoWidget );
+         }
+ 
+         /* we won't be able to get its windowed sized once in fullscreen, so update it now */
+-- 
+2.42.0
+

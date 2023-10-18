@@ -1,0 +1,85 @@
+From a7dcd253b2bd81419fb8194498cbf81fdf461936 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 1 Mar 2016 20:11:06 +0900
+Subject: [PATCH 03/28] os2: use ExceptQ to ease debugging
+
+---
+ bin/vlc.c        | 18 ++++++++++++++++++
+ src/os2/thread.c | 13 +++++++++++++
+ 2 files changed, 31 insertions(+)
+
+diff --git a/bin/vlc.c b/bin/vlc.c
+index 72e0eee428..eac375e0bf 100644
+--- a/bin/vlc.c
++++ b/bin/vlc.c
+@@ -109,11 +109,26 @@ static void exit_timeout (int signum)
+     signal (SIGINT, SIG_DFL);
+ }
+ 
++#ifdef __OS2__
++#define INCL_DOS
++#include <os2.h>
++
++#define INCL_LOADEXCEPTQ
++#include <exceptq.h>
++#endif
++
+ /*****************************************************************************
+  * main: parse command line, start interface and spawn threads.
+  *****************************************************************************/
+ int main( int i_argc, const char *ppsz_argv[] )
+ {
++#ifdef __OS2__
++    EXCEPTIONREGISTRATIONRECORD xcptRegRec;
++    BOOL fLoaded;
++
++    fLoaded = LoadExceptq (&xcptRegRec, NULL, NULL);
++#endif
++
+     /* The so-called POSIX-compliant MacOS X reportedly processes SIGPIPE even
+      * if it is blocked in all thread.
+      * Note: this is NOT an excuse for not protecting against SIGPIPE. If
+@@ -276,6 +291,9 @@ out:
+ #ifdef __OS2__
+     for (int i = argc - i_argc; i < argc; i++)
+         free (argv[i]);
++
++    if (fLoaded)
++        UninstallExceptq (&xcptRegRec);
+ #endif
+     return ret;
+ }
+diff --git a/src/os2/thread.c b/src/os2/thread.c
+index 50ae56f35b..483718f255 100644
+--- a/src/os2/thread.c
++++ b/src/os2/thread.c
+@@ -534,13 +534,26 @@ retry:
+     }
+ }
+ 
++#define INCL_LIBLOADEXCEPTQ
++#define INCL_FORKEXCEPTQ
++#include <exceptq.h>
++
+ static void vlc_entry( void *p )
+ {
+     struct vlc_thread *th = p;
++    EXCEPTIONREGISTRATIONRECORD xcptRegRec;
++    BOOL fLoaded;
+ 
+     vlc_threadvar_set (thread_key, th);
+     th->killable = true;
++
++    fLoaded = LibLoadExceptq( &xcptRegRec );
++
+     th->data = th->entry (th->data);
++
++    if( fLoaded )
++        UninstallExceptq( &xcptRegRec );
++
+     DosPostEventSem( th->done_event );
+     vlc_thread_cleanup (th);
+ }
+-- 
+2.42.0
+

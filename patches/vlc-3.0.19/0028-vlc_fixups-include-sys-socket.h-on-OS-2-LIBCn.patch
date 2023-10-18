@@ -1,0 +1,30 @@
+From a130a026afa2ee8f8dad19a42eb14209edc1f83b Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 28 Feb 2023 23:43:27 +0900
+Subject: [PATCH 28/28] vlc_fixups: include sys/socket.h on OS/2 LIBCn
+
+LIBCn is a fork of kLIBC, and it has socklen_t in sys/socket.h.
+---
+ include/vlc_fixups.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/include/vlc_fixups.h b/include/vlc_fixups.h
+index 2e8a1456bb..37f7889337 100644
+--- a/include/vlc_fixups.h
++++ b/include/vlc_fixups.h
+@@ -589,6 +589,12 @@ struct addrinfo
+     struct addrinfo *ai_next;
+ };
+ 
++# ifdef __LIBCN__
++/* OS/2 LIBCn has inet_pton(). Because of this, socklen_t is not defined above.
++ * And OS/2 LIBCn has socklen_t. So include sys/socket.h here for socklen_t. */
++#  include <sys/socket.h>
++# endif
++
+ const char *gai_strerror (int);
+ 
+ int  getaddrinfo  (const char *node, const char *service,
+-- 
+2.42.0
+
