@@ -1,0 +1,38 @@
+From 4e39506d610ec7485af3692cfd05c2329f0959c8 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Fri, 26 Jan 2018 14:55:58 +0900
+Subject: [PATCH 14/27] Revert "qt: Fix crash when switching to fullscreen with
+ video undocked"
+
+This reverts commit d79907a5e1da092cb9ae271cba7673262ff878bf.
+---
+ modules/gui/qt/components/controller.cpp | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index 85ba3f93be..0d1a898ea1 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -889,16 +889,12 @@ void FullscreenControllerWidget::restoreFSC()
+             return;
+ 
+         QRect currentRes = QApplication::desktop()->screenGeometry( targetScreen() );
+-        QWindow *wh = windowHandle();
+-        if ( wh != Q_NULLPTR )
+-        {
+ #ifdef QT5_HAS_WAYLAND
+-            if ( !b_hasWayland )
+-                wh->setScreen(QGuiApplication::screens()[targetScreen()]);
++        if ( !b_hasWayland )
++            windowHandle()->setScreen(QGuiApplication::screens()[targetScreen()]);
+ #else
+-            wh->setScreen(QGuiApplication::screens()[targetScreen()]);
++        windowHandle()->setScreen(QGuiApplication::screens()[targetScreen()]);
+ #endif
+-        }
+ 
+         if( currentRes == screenRes &&
+             QApplication::desktop()->screen()->geometry().contains( previousPosition, true ) )
+-- 
+2.42.0
+
