@@ -1,0 +1,27 @@
+From 1e1de63ef74e8ff05e6112e88b7100491eee4e70 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Wed, 10 Jul 2019 19:26:21 +0900
+Subject: [PATCH 26/26] qt: fix actions of 'View' menu are duplicated whenever
+ they are shown
+
+---
+ modules/gui/qt/menus.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/modules/gui/qt/menus.cpp b/modules/gui/qt/menus.cpp
+index 460653c93e..a3d456c24f 100644
+--- a/modules/gui/qt/menus.cpp
++++ b/modules/gui/qt/menus.cpp
+@@ -478,6 +478,9 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
+             else menu->removeAction( a );
+             if( m && m->parent() == menu ) delete m;
+         }
++#ifdef __OS2__
++        menu->clear();
++#endif
+     }
+ 
+     menu->addAction(
+-- 
+2.42.0
+
