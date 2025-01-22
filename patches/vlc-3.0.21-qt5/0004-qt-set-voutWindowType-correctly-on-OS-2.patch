@@ -1,0 +1,25 @@
+From d8439b162dc921c36721459e7a19ccc493bea5fa Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 17 Jan 2025 16:29:39 +0900
+Subject: [PATCH 4/4] qt: set voutWindowType correctly on OS/2
+
+---
+ modules/gui/qt/qt.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/modules/gui/qt/qt.cpp b/modules/gui/qt/qt.cpp
+index cefc75830f..9ce92dc1a4 100644
+--- a/modules/gui/qt/qt.cpp
++++ b/modules/gui/qt/qt.cpp
+@@ -606,6 +606,8 @@ static void *ThreadPlatform( void *obj, char *platform_name )
+             p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
+         else if( platform == qfu("cocoa" ) )
+             p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
++        else if( platform == qfu("os2") )
++            p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
+         else
+             msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
+ 
+-- 
+2.42.0
+

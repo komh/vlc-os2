@@ -1,0 +1,73 @@
+From 7b25c27d39eba9f39d1c4885f008e5cf851650a1 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 17 Jan 2025 16:27:09 +0900
+Subject: [PATCH 3/4] os2: thread: use _beginthread() of LIBCx if possible
+
+On OS/2, Qt5 requires _beginthread() of LIBCx.
+---
+ src/os2/thread.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/src/os2/thread.c b/src/os2/thread.c
+index 50ae56f35b..eed24bb3e4 100644
+--- a/src/os2/thread.c
++++ b/src/os2/thread.c
+@@ -38,6 +38,7 @@
+ #include <limits.h>
+ #include <errno.h>
+ #include <time.h>
++#include <dlfcn.h>
+ 
+ #include <sys/types.h>
+ #include <sys/socket.h>
+@@ -132,6 +133,9 @@ static vlc_mutex_t super_mutex;
+ static vlc_cond_t  super_variable;
+ extern vlc_rwlock_t config_lock;
+ 
++static void *libcx_handle;
++static int (*p__beginthread)(void (*)(void *), void *, unsigned, void *);
++
+ static void vlc_static_cond_destroy_all(void);
+ 
+ int _CRT_init(void);
+@@ -155,9 +159,19 @@ unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
+             vlc_rwlock_init (&config_lock);
+             vlc_CPU_init ();
+ 
++            /* Qt5 requires _beginthread() of libcx */
++            libcx_handle = dlopen("libcx0.dll", RTLD_LAZY);
++            if (libcx_handle)
++                p__beginthread = dlsym(libcx_handle, "__beginthread");
++            if (!p__beginthread)
++                p__beginthread = _beginthread;
++
+             return 1;
+ 
+         case 1 :    /* Termination */
++            if (libcx_handle)
++                dlclose(libcx_handle);
++
+             vlc_rwlock_destroy (&config_lock);
+             vlc_threadvar_delete (&thread_key);
+             vlc_cond_destroy (&super_variable);
+@@ -567,7 +581,7 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
+     if( th->cancel_sock < 0 )
+         goto error;
+ 
+-    th->tid = _beginthread (vlc_entry, NULL, 1024 * 1024, th);
++    th->tid = p__beginthread (vlc_entry, NULL, 1024 * 1024, th);
+     if((int)th->tid == -1)
+         goto error;
+ 
+@@ -953,7 +967,7 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
+     timer->htimer = NULLHANDLE;
+     timer->interval = 0;
+     timer->quit = false;
+-    timer->tid  = _beginthread (vlc_timer_do, NULL, 1024 * 1024, timer);
++    timer->tid  = p__beginthread (vlc_timer_do, NULL, 1024 * 1024, timer);
+ 
+     *id = timer;
+     return 0;
+-- 
+2.42.0
+
