@@ -1,0 +1,60 @@
+From 7fa14c46cc70b294a0bdce02addd7f292faad757 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:17 +0900
+Subject: [PATCH 072/120] Revert "qt: check cdda module exists before handling
+ cdda specific option"
+
+This reverts commit edd971323433b7440d24020f89a2fc5c38537f6b.
+---
+ .../gui/qt/components/simple_preferences.cpp  | 26 ++++++++-----------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
+
+diff --git a/modules/gui/qt/components/simple_preferences.cpp b/modules/gui/qt/components/simple_preferences.cpp
+index 157d0b2ca9..6cbe62aa2d 100644
+--- a/modules/gui/qt/components/simple_preferences.cpp
++++ b/modules/gui/qt/components/simple_preferences.cpp
+@@ -609,21 +609,18 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+                          "for DVD, VCD, and CDDA are set.\n"
+                          "You can define a unique one or configure them \n"
+                          "individually in the advanced preferences." ) );
+-                bool have_cdda = module_exists( "cdda" );
+-                char *dvd_discpath = config_GetPsz( p_intf, "dvd" );
+-                char *vcd_discpath = config_GetPsz( p_intf, "vcd" );
+-                char *cdda_discpath = have_cdda ? config_GetPsz( p_intf, "cd-audio" ) : nullptr;
+-                if( dvd_discpath && vcd_discpath && ( !have_cdda || cdda_discpath ) )
++                char *psz_dvddiscpath = config_GetPsz( p_intf, "dvd" );
++                char *psz_vcddiscpath = config_GetPsz( p_intf, "vcd" );
++                char *psz_cddadiscpath = config_GetPsz( p_intf, "cd-audio" );
++                if( psz_dvddiscpath && psz_vcddiscpath && psz_cddadiscpath )
++                if( !strcmp( psz_cddadiscpath, psz_dvddiscpath ) &&
++                    !strcmp( psz_dvddiscpath, psz_vcddiscpath ) )
+                 {
+-                    if( !strcmp( dvd_discpath, vcd_discpath ) &&
+-                        ( !have_cdda || !strcmp( cdda_discpath, dvd_discpath ) ) )
+-                    {
+-                        ui.DVDDeviceComboBox->setEditText( qfu( dvd_discpath ) );
+-                    }
++                    ui.DVDDeviceComboBox->setEditText( qfu( psz_dvddiscpath ) );
+                 }
+-                free( cdda_discpath );
+-                free( dvd_discpath );
+-                free( vcd_discpath );
++                free( psz_cddadiscpath );
++                free( psz_dvddiscpath );
++                free( psz_vcddiscpath );
+             }
+ #ifndef _WIN32
+             QStringList DVDDeviceComboBoxStringList = QStringList();
+@@ -1053,8 +1050,7 @@ void SPrefsPanel::apply()
+         {
+             config_PutPsz( p_intf, "dvd", devicepath );
+             config_PutPsz( p_intf, "vcd", devicepath );
+-            if( module_exists( "cdda" ) )
+-                config_PutPsz( p_intf, "cd-audio", devicepath );
++            config_PutPsz( p_intf, "cd-audio", devicepath );
+         }
+ 
+ #define CaC( name, factor ) config_PutInt( p_intf, name, i_comboValue * factor )
+-- 
+2.50.1
+

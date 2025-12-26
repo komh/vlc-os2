@@ -1,0 +1,63 @@
+From 066429a052141fedf76a7c366220b725f7ef138a Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:09:28 +0900
+Subject: [PATCH 050/120] Revert "qt: use screenAt() to find the screen at a
+ given position"
+
+This reverts commit fc2b1f6d5b1fbac0fc1698da668ea0bd45103d6b.
+
+  Conflicts:
+    modules/gui/qt/components/controller.cpp
+---
+ modules/gui/qt/components/controller.cpp |  3 ---
+ modules/gui/qt/util/timetooltip.cpp      | 11 -----------
+ 2 files changed, 14 deletions(-)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index 63b614af70..1a038df349 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -51,9 +51,6 @@
+ #include <QTimer>
+ #include <QApplication>
+ #include <QScreen>
+-#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
+-#include <QDesktopWidget>
+-#endif
+ 
+ //#define DEBUG_LAYOUT 1
+ 
+diff --git a/modules/gui/qt/util/timetooltip.cpp b/modules/gui/qt/util/timetooltip.cpp
+index 495fa6add8..a3c9696308 100644
+--- a/modules/gui/qt/util/timetooltip.cpp
++++ b/modules/gui/qt/util/timetooltip.cpp
+@@ -25,11 +25,7 @@
+ #include <QPainter>
+ #include <QBitmap>
+ #include <QFontMetrics>
+-#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
+ #include <QDesktopWidget>
+-#else
+-#include <QScreen>
+-#endif
+ 
+ #define TIP_HEIGHT 5
+ 
+@@ -80,14 +76,7 @@ void TimeTooltip::adjustPosition()
+ #endif
+ 
+     // Keep the tooltip on the same screen if possible
+-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+-    QRect screen{};
+-    auto *screenAt = QGuiApplication::screenAt( mTarget );
+-    if (screenAt != nullptr)
+-        screen = screenAt->geometry();
+-#else
+     QRect screen = QApplication::desktop()->screenGeometry( mTarget );
+-#endif
+     position.setX( qMax( screen.left(), qMin( position.x(),
+         screen.left() + screen.width() - size.width() ) ) );
+     position.setY( qMax( screen.top(), qMin( position.y(),
+-- 
+2.50.1
+

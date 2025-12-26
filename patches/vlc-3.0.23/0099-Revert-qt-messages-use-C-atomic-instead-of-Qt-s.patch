@@ -1,0 +1,35 @@
+From c5e112f71de719eb0763cccc9e037c432ff28288 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:37 +0900
+Subject: [PATCH 099/120] Revert "qt: messages: use C++ atomic instead of Qt's"
+
+This reverts commit f537d0e1063c76d1d0d96839f31d32efa511c517.
+---
+ modules/gui/qt/dialogs/messages.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/dialogs/messages.hpp b/modules/gui/qt/dialogs/messages.hpp
+index e8e6de3279..0491a8f158 100644
+--- a/modules/gui/qt/dialogs/messages.hpp
++++ b/modules/gui/qt/dialogs/messages.hpp
+@@ -29,7 +29,7 @@
+ #include "ui/messages_panel.h"
+ #include <stdarg.h>
+ #include <QMutex>
+-#include <atomic>
++#include <QAtomicInt>
+ 
+ class QPushButton;
+ class QTreeWidget;
+@@ -49,7 +49,7 @@ private:
+     void sinkMessage( const MsgEvent * );
+     bool matchFilter( const QString& );
+ 
+-    std::atomic<int> verbosity;
++    QAtomicInt verbosity;
+     static void MsgCallback( void *, int, const vlc_log_t *, const char *,
+                              va_list );
+ 
+-- 
+2.50.1
+

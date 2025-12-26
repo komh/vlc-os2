@@ -1,0 +1,98 @@
+From ae1cf5f6cc9bce93b6b9171108cd63a3fb39aa85 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:15 +0900
+Subject: [PATCH 052/120] Revert "qt: use QEnterEvent with enterEvent() in Qt6"
+
+This reverts commit 1e28616a7ed5662b926a6166dbf069e6cb615815.
+---
+ modules/gui/qt/components/controller.cpp        | 4 ----
+ modules/gui/qt/components/controller.hpp        | 4 ----
+ modules/gui/qt/components/playlist/selector.hpp | 4 ----
+ modules/gui/qt/util/input_slider.cpp            | 4 ----
+ modules/gui/qt/util/input_slider.hpp            | 6 +-----
+ 5 files changed, 1 insertion(+), 21 deletions(-)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index 1a038df349..5744dd6e97 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -1138,11 +1138,7 @@ void FullscreenControllerWidget::mouseReleaseEvent( QMouseEvent *event )
+ /**
+  * On mouse go above FSC
+  */
+-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+-void FullscreenControllerWidget::enterEvent( QEnterEvent *event )
+-#else
+ void FullscreenControllerWidget::enterEvent( QEvent *event )
+-#endif
+ {
+     b_mouse_over = true;
+ 
+diff --git a/modules/gui/qt/components/controller.hpp b/modules/gui/qt/components/controller.hpp
+index 37bc049011..b1e6d438d3 100644
+--- a/modules/gui/qt/components/controller.hpp
++++ b/modules/gui/qt/components/controller.hpp
+@@ -276,11 +276,7 @@ protected:
+     void mouseMoveEvent( QMouseEvent *event ) Q_DECL_OVERRIDE;
+     void mousePressEvent( QMouseEvent *event ) Q_DECL_OVERRIDE;
+     void mouseReleaseEvent( QMouseEvent *event ) Q_DECL_OVERRIDE;
+-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+-    void enterEvent( QEnterEvent *event ) Q_DECL_OVERRIDE;
+-#else
+     void enterEvent( QEvent *event ) Q_DECL_OVERRIDE;
+-#endif
+     void leaveEvent( QEvent *event ) Q_DECL_OVERRIDE;
+     void keyPressEvent( QKeyEvent *event ) Q_DECL_OVERRIDE;
+ 
+diff --git a/modules/gui/qt/components/playlist/selector.hpp b/modules/gui/qt/components/playlist/selector.hpp
+index d0c612aac6..2e333a3a66 100644
+--- a/modules/gui/qt/components/playlist/selector.hpp
++++ b/modules/gui/qt/components/playlist/selector.hpp
+@@ -99,11 +99,7 @@ signals:
+     void action( PLSelItem* );
+ 
+ private:
+-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+-    inline void enterEvent( QEnterEvent* ){ showAction(); }
+-#else
+     inline void enterEvent( QEvent* ){ showAction(); }
+-#endif
+     inline void leaveEvent( QEvent* ){ hideAction(); }
+ 
+     QTreeWidgetItem*     qitem;
+diff --git a/modules/gui/qt/util/input_slider.cpp b/modules/gui/qt/util/input_slider.cpp
+index 7670f33d3a..b0400db553 100644
+--- a/modules/gui/qt/util/input_slider.cpp
++++ b/modules/gui/qt/util/input_slider.cpp
+@@ -417,11 +417,7 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
+     event->accept();
+ }
+ 
+-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+-void SeekSlider::enterEvent( QEnterEvent * )
+-#else
+ void SeekSlider::enterEvent( QEvent * )
+-#endif
+ {
+     /* Cancel the fade-out timer */
+     hideHandleTimer->stop();
+diff --git a/modules/gui/qt/util/input_slider.hpp b/modules/gui/qt/util/input_slider.hpp
+index 648088220b..aad65ce4d4 100644
+--- a/modules/gui/qt/util/input_slider.hpp
++++ b/modules/gui/qt/util/input_slider.hpp
+@@ -65,11 +65,7 @@ protected:
+     void mousePressEvent( QMouseEvent* event ) Q_DECL_OVERRIDE;
+     void mouseReleaseEvent( QMouseEvent *event ) Q_DECL_OVERRIDE;
+     void wheelEvent( QWheelEvent *event ) Q_DECL_OVERRIDE;
+-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+-    void enterEvent( QEnterEvent *event ) Q_DECL_OVERRIDE;
+-#else
+-    void enterEvent( QEvent *event ) Q_DECL_OVERRIDE;
+-#endif
++    void enterEvent( QEvent * ) Q_DECL_OVERRIDE;
+     void leaveEvent( QEvent * ) Q_DECL_OVERRIDE;
+     void hideEvent( QHideEvent * ) Q_DECL_OVERRIDE;
+     void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
+-- 
+2.50.1
+

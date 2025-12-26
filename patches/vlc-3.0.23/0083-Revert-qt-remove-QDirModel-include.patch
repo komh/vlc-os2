@@ -1,0 +1,47 @@
+From 39dbc05dde6d567b4ed7d4163ded3c939933372a Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:49 +0900
+Subject: [PATCH 083/120] Revert "qt: remove QDirModel include"
+
+This reverts commit 3293e98afff2ab1dac1bfcc3f41647b8d01cec9e.
+---
+ modules/gui/qt/components/open_panels.cpp | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/modules/gui/qt/components/open_panels.cpp b/modules/gui/qt/components/open_panels.cpp
+index 8b1813e2a2..5f4bd42256 100644
+--- a/modules/gui/qt/components/open_panels.cpp
++++ b/modules/gui/qt/components/open_panels.cpp
+@@ -48,6 +48,7 @@
+ #include <QLineEdit>
+ #include <QStackedLayout>
+ #include <QCompleter>
++#include <QDirModel>
+ #include <QScrollArea>
+ #include <QUrl>
+ #include <QMimeData>
+@@ -84,6 +85,21 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
+ 
+     setAcceptDrops( true );
+ 
++    /* Set Filters for file selection */
++/*    QString fileTypes = "";
++    ADD_FILTER_MEDIA( fileTypes );
++    ADD_FILTER_VIDEO( fileTypes );
++    ADD_FILTER_AUDIO( fileTypes );
++    ADD_FILTER_PLAYLIST( fileTypes );
++    ADD_FILTER_ALL( fileTypes );
++    fileTypes.replace( QString(";*"), QString(" *")); */
++
++
++/*    lineFileEdit = ui.fileEdit;
++    //TODO later: fill the fileCompleteList with previous items played.
++    QCompleter *fileCompleter = new QCompleter( fileCompleteList, this );
++    fileCompleter->setModel( new QDirModel( fileCompleter ) );
++    lineFileEdit->setCompleter( fileCompleter );*/
+     if( var_InheritBool( p_intf, "qt-embedded-open" ) )
+     {
+         ui.tempWidget->hide();
+-- 
+2.50.1
+

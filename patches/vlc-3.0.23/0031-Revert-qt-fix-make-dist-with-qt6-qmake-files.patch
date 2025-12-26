@@ -1,0 +1,26 @@
+From 218431866c995e55158a069a75a84d93c82ced48 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:03:25 +0900
+Subject: [PATCH 031/120] Revert "qt: fix make dist with qt6 qmake files"
+
+This reverts commit ce0c8b05f97fd126ee1cd1b668b8403b84828db6.
+---
+ modules/gui/qt/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/Makefile.am b/modules/gui/qt/Makefile.am
+index 2d59dedacb..6e787445d8 100644
+--- a/modules/gui/qt/Makefile.am
++++ b/modules/gui/qt/Makefile.am
+@@ -10,7 +10,7 @@
+ #   - Add it to DEPS_res
+ 
+ SUFFIXES += .ui .h .hpp .moc.cpp
+-EXTRA_DIST += gui/qt/qt6.pro gui/qt/private-gui.pro
++EXTRA_DIST += qt6.pro private-gui.pro
+ 
+ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+ 	-DQT_USE_QSTRINGBUILDER \
+-- 
+2.50.1
+

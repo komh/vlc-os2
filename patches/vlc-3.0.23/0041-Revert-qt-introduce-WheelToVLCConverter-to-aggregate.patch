@@ -1,0 +1,169 @@
+From b3bc081b5c76e4b1d49dce9178b38a624f5bff5f Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:05:04 +0900
+Subject: [PATCH 041/120] Revert "qt: introduce WheelToVLCConverter to
+ aggregate wheel events as VLC keys"
+
+This reverts commit 49e97a2a04d6eaa322ef37f791f037887f353712.
+---
+ modules/gui/qt/util/customwidgets.cpp | 93 ---------------------------
+ modules/gui/qt/util/customwidgets.hpp | 44 -------------
+ 2 files changed, 137 deletions(-)
+
+diff --git a/modules/gui/qt/util/customwidgets.cpp b/modules/gui/qt/util/customwidgets.cpp
+index 594703f34c..cf321845de 100644
+--- a/modules/gui/qt/util/customwidgets.cpp
++++ b/modules/gui/qt/util/customwidgets.cpp
+@@ -421,96 +421,3 @@ YesNoCheckBox::YesNoCheckBox( QWidget *parent ) : QCheckBox( parent )
+     });
+ #endif
+ }
+-
+-Qt::Orientations WheelToVLCConverter::getWheelOrientation(int x, int y)
+-{
+-    const qreal v_cos_deadzone = 0.45; // ~63 degrees
+-    const qreal h_cos_deadzone = 0.95; // ~15 degrees
+-
+-    if (x == 0 && y == 0)
+-        return Qt::Orientations{};
+-
+-    qreal cos = qFabs(x)/qSqrt(x*x + y*y);
+-    if (cos < v_cos_deadzone)
+-        return Qt::Vertical;
+-    else if (cos > h_cos_deadzone)
+-        return Qt::Horizontal;
+-    return Qt::Orientations{};
+-}
+-
+-void WheelToVLCConverter::wheelEvent( const QWheelEvent* e )
+-{
+-    if (!e)
+-        return;
+-
+-    const int deltaPerStep = QWheelEvent::DefaultDeltasPerStep;
+-
+-    if (e->modifiers() != m_modifiers)
+-    {
+-        m_scrollAmount = {};
+-        m_modifiers = e->modifiers();
+-    }
+-    if (e->buttons() != m_buttons)
+-    {
+-        m_scrollAmount = {};
+-        m_buttons = e->buttons();
+-    }
+-
+-    QPoint p = e->angleDelta();
+-#if HAS_QT57
+-    if (e->inverted())
+-    {
+-        const Qt::Orientations preliminaryOrientation = getWheelOrientation(p.x(), p.y());
+-        if (preliminaryOrientation == Qt::Vertical)
+-            p.setY(-p.y());
+-        else if (preliminaryOrientation == Qt::Horizontal)
+-            p.setX(-p.x());
+-    }
+-#endif
+-    p += m_scrollAmount;
+-
+-    if (p.isNull())
+-        return;
+-
+-    int i_vlck = qtKeyModifiersToVLC(e);  // Handle modifiers
+-    Qt::Orientations orientation = getWheelOrientation(p.x(), p.y());
+-    if (orientation == Qt::Vertical && qAbs(p.y()) >= deltaPerStep)
+-    {
+-        if (p.y() > 0)
+-            i_vlck |= KEY_MOUSEWHEELUP;
+-        else
+-            i_vlck |= KEY_MOUSEWHEELDOWN;
+-
+-        const int steps = p.y() / deltaPerStep;
+-
+-        emit wheelUpDown(steps, e->modifiers());
+-        //in practice this will emit once
+-        for (int i = 0; i < qAbs(steps); i++)
+-            emit vlcWheelKey(i_vlck);
+-
+-        m_scrollAmount.setX(0);
+-        m_scrollAmount.setY(p.y() % deltaPerStep);
+-
+-    }
+-    else if (orientation == Qt::Horizontal && qAbs(p.x()) >= deltaPerStep)
+-    {
+-        if (p.x() > 0)
+-            i_vlck |= KEY_MOUSEWHEELLEFT;
+-        else
+-            i_vlck |= KEY_MOUSEWHEELRIGHT;
+-
+-        const int steps = p.x() / deltaPerStep;
+-
+-        emit wheelLeftRight(steps, e->modifiers());
+-        //in practice this will emit once
+-        for (int i = 0; i < qAbs(steps); i++)
+-            emit vlcWheelKey(i_vlck);
+-
+-        m_scrollAmount.setY(0);
+-        m_scrollAmount.setX(p.x() % deltaPerStep);
+-    }
+-    else
+-    {
+-        m_scrollAmount = p;
+-    }
+-}
+diff --git a/modules/gui/qt/util/customwidgets.hpp b/modules/gui/qt/util/customwidgets.hpp
+index 1ad2cbf647..c801900bf7 100644
+--- a/modules/gui/qt/util/customwidgets.hpp
++++ b/modules/gui/qt/util/customwidgets.hpp
+@@ -149,48 +149,4 @@ int qtEventToVLCKey( const QKeyEvent *e );
+ int qtWheelEventToVLCKey( const QWheelEvent *e );
+ QString VLCKeyToString( unsigned val, bool );
+ 
+-/**
+- * @brief The WheelToVLCConverter class aggregates wheel events and
+- * emit a signal once it gathers a full scroll step, as VLC doesn't handle
+- * fractionnal scroll events
+- */
+-class WheelToVLCConverter : public QObject
+-{
+-    Q_OBJECT
+-
+-public:
+-    using QObject::QObject;
+-
+-public:
+-    Qt::Orientations getWheelOrientation(int x, int y);
+-
+-signals:
+-    /**
+-     * @param vlcKey the VLC hotkey representation
+-     */
+-    void vlcWheelKey(int vlcKey);
+-    /**
+-     * @param steps: positive value indicated UP wheel events, negative DOWN wheel event
+-     * @param modifiers are keyboard pressed modifiers
+-     */
+-    void wheelUpDown(int steps, Qt::KeyboardModifiers modifiers);
+-    /**
+-     * @param steps: positive value indicated UP wheel events, negative DOWN wheel event
+-     * @param modifiers are keyboard pressed modifiers
+-     */
+-    void wheelLeftRight(int steps, Qt::KeyboardModifiers modifiers);
+-
+-public slots:
+-    /**
+-     * @brief qmlWheelEvent handles wheel events as emitted by QWidget
+-     * @param e the wheel event
+-     */
+-    void wheelEvent(const QWheelEvent* e);
+-
+-private:
+-    QPoint m_scrollAmount = {};
+-    Qt::KeyboardModifiers m_modifiers = {};
+-    Qt::MouseButtons m_buttons = {};
+-};
+-
+ #endif
+-- 
+2.50.1
+

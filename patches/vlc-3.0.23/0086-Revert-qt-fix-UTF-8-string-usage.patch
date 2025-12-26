@@ -1,0 +1,77 @@
+From 79c8ad0f6dcbb8c7cf41fd61c1e71005b291f6f2 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:59 +0900
+Subject: [PATCH 086/120] Revert "qt: fix UTF-8 string usage"
+
+This reverts commit d2d422907dbc98d7fe04ebe43c9320041aad50e5.
+---
+ modules/gui/qt/components/open_panels.cpp        | 4 ++--
+ modules/gui/qt/components/simple_preferences.cpp | 2 +-
+ modules/gui/qt/dialogs/plugins.cpp               | 2 +-
+ modules/gui/qt/menus.cpp                         | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/modules/gui/qt/components/open_panels.cpp b/modules/gui/qt/components/open_panels.cpp
+index 6c218aa246..cacd55d4b4 100644
+--- a/modules/gui/qt/components/open_panels.cpp
++++ b/modules/gui/qt/components/open_panels.cpp
+@@ -417,7 +417,7 @@ void DiscOpenPanel::onFocus()
+                     displayName = displayName + " - "  + psz_title;
+                 }
+ 
+-                ui.deviceCombo->addItem( displayName, qfu(psz_drive) );
++                ui.deviceCombo->addItem( displayName, psz_drive );
+                 free( psz_drive );
+                 free( psz_title );
+             }
+@@ -429,7 +429,7 @@ void DiscOpenPanel::onFocus()
+     }
+ 
+     char *psz_config = config_GetPsz( p_intf, "dvd" );
+-    int temp = ui.deviceCombo->findData( qfu(psz_config), Qt::UserRole, Qt::MatchStartsWith );
++    int temp = ui.deviceCombo->findData( psz_config, Qt::UserRole, Qt::MatchStartsWith );
+     free( psz_config );
+     if( temp != -1 )
+         ui.deviceCombo->setCurrentIndex( temp );
+diff --git a/modules/gui/qt/components/simple_preferences.cpp b/modules/gui/qt/components/simple_preferences.cpp
+index 04611a203a..c003e9a455 100644
+--- a/modules/gui/qt/components/simple_preferences.cpp
++++ b/modules/gui/qt/components/simple_preferences.cpp
+@@ -717,7 +717,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+                 DWORD len = 256;
+                 if( RegQueryValueEx( h_key, TEXT("Lang"), NULL, NULL, (LPBYTE) &szData, &len ) == ERROR_SUCCESS ) {
+                     langReg = FromWide( szData );
+-                    ui.langCombo->setCurrentIndex( ui.langCombo->findData(qfu(langReg)) );
++                    ui.langCombo->setCurrentIndex( ui.langCombo->findData(langReg) );
+                 }
+             }
+             free( langReg);
+diff --git a/modules/gui/qt/dialogs/plugins.cpp b/modules/gui/qt/dialogs/plugins.cpp
+index 069d90b4d6..fdacc3cf5f 100644
+--- a/modules/gui/qt/dialogs/plugins.cpp
++++ b/modules/gui/qt/dialogs/plugins.cpp
+@@ -850,7 +850,7 @@ QVariant AddonsListModel::Addon::data( int role ) const
+         returnval = QVariant( (int) p_entry->i_score );
+         break;
+     case VersionRole:
+-        returnval = QVariant( qfu(p_entry->psz_version) );
++        returnval = QVariant( p_entry->psz_version );
+         break;
+     case AuthorRole:
+         returnval = qfu( p_entry->psz_author );
+diff --git a/modules/gui/qt/menus.cpp b/modules/gui/qt/menus.cpp
+index f68c8e11dc..622c0fbda7 100644
+--- a/modules/gui/qt/menus.cpp
++++ b/modules/gui/qt/menus.cpp
+@@ -1562,7 +1562,7 @@ void VLCMenuBar::updateAudioDevice( intf_thread_t * p_intf, audio_output_t *p_ao
+     for( int i = 0; i < i_result; i++ )
+     {
+         action = new QAction( qfue( names[i] ), actionGroup );
+-        action->setData( qfu(ids[i]) );
++        action->setData( ids[i] );
+         action->setCheckable( true );
+         if( (selected && !strcmp( ids[i], selected ) ) ||
+             (selected == NULL && ids[i] && ids[i][0] == '\0' ) )
+-- 
+2.50.1
+

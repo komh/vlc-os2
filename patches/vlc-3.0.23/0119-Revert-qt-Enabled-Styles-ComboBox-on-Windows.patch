@@ -1,0 +1,38 @@
+From 218eddd196b201e011740a4a425bed930c1b4c85 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:15:38 +0900
+Subject: [PATCH 119/120] Revert "qt: Enabled Styles ComboBox on Windows"
+
+This reverts commit 9305408197f68baa4bc215ef14f33ab3e64d276b.
+---
+ modules/gui/qt/components/simple_preferences.cpp | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/components/simple_preferences.cpp b/modules/gui/qt/components/simple_preferences.cpp
+index 05dcc2a75d..912a373fa0 100644
+--- a/modules/gui/qt/components/simple_preferences.cpp
++++ b/modules/gui/qt/components/simple_preferences.cpp
+@@ -742,7 +742,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+ 
+             optionWidgets["skinRB"] = ui.skins;
+             optionWidgets["qtRB"] = ui.qt;
+-
++#if !defined( _WIN32)
+             ui.stylesCombo->addItem( qtr("System's default") );
+             ui.stylesCombo->addItems( QStyleFactory::keys() );
+             ui.stylesCombo->setCurrentIndex( ui.stylesCombo->findText(
+@@ -753,7 +753,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+ 
+             CONNECT( ui.stylesCombo, currentIndexChanged( QString ), this, changeStyle( QString ) );
+             optionWidgets["styleCB"] = ui.stylesCombo;
+-
++#else
++            ui.stylesCombo->hide();
++            ui.stylesLabel->hide();
++#endif
+             radioGroup = new QButtonGroup(this);
+             radioGroup->addButton( ui.qt, 0 );
+             radioGroup->addButton( ui.skins, 1 );
+-- 
+2.50.1
+

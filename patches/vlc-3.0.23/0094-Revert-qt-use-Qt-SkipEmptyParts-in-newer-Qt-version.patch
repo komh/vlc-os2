@@ -1,0 +1,191 @@
+From 805f4f4a3965c0e3abccd35565d79c604df355ec Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:22 +0900
+Subject: [PATCH 094/120] Revert "qt: use Qt::SkipEmptyParts in newer Qt
+ version"
+
+This reverts commit 2043530875d855d0d3b1eb9aa74c00e01282518b.
+---
+ modules/gui/qt/components/controller.cpp      |  8 +----
+ modules/gui/qt/components/extended_panels.cpp | 33 +++----------------
+ .../gui/qt/components/simple_preferences.cpp  |  9 +----
+ modules/gui/qt/dialogs/bookmarks.cpp          |  8 +----
+ modules/gui/qt/dialogs/vlm.cpp                | 25 ++------------
+ 5 files changed, 10 insertions(+), 73 deletions(-)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index dd9cdc8b46..faa5727826 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -113,13 +113,7 @@ void AbstractController::setupButton( QAbstractButton *aButton )
+ void AbstractController::parseAndCreate( const QString& config,
+                                          QBoxLayout *newControlLayout )
+ {
+-    QStringList list = config.split( ";",
+-                                      #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+-                                        Qt::SkipEmptyParts
+-                                      #else
+-                                        QString::SkipEmptyParts
+-                                      #endif
+-                                    );
++    QStringList list = config.split( ";", QString::SkipEmptyParts ) ;
+     for( int i = 0; i < list.count(); i++ )
+     {
+         QStringList list2 = list.at( i ).split( "-" );
+diff --git a/modules/gui/qt/components/extended_panels.cpp b/modules/gui/qt/components/extended_panels.cpp
+index 585f48fd62..8f4d6d9916 100644
+--- a/modules/gui/qt/components/extended_panels.cpp
++++ b/modules/gui/qt/components/extended_panels.cpp
+@@ -60,14 +60,7 @@
+ 
+ static bool filterIsPresent( const QString &filters, const QString &filter )
+ {
+-    QStringList list = filters.split( ':',
+-                                      #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+-                                        Qt::SkipEmptyParts
+-                                      #else
+-                                        QString::SkipEmptyParts
+-                                      #endif
+-                                    );
+-
++    QStringList list = filters.split( ':', QString::SplitBehavior::SkipEmptyParts );
+     foreach( const QString &filterCmp, list )
+     {
+         if( filterCmp.compare( filter ) == 0 )
+@@ -303,13 +296,7 @@ static QString ChangeFiltersString( struct intf_thread_t *p_intf, const char *ps
+     char* psz_chain = var_GetString( THEPL, psz_filter_type );
+ 
+     QString const chain = QString( psz_chain ? psz_chain : "" );
+-    QStringList list = chain.split( ':',
+-                                    #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+-                                        Qt::SkipEmptyParts
+-                                    #else
+-                                        QString::SkipEmptyParts
+-                                    #endif
+-                                  );
++    QStringList list = chain.split( ':', QString::SplitBehavior::SkipEmptyParts );
+ 
+     if( b_add && std::find(list.begin(), list.end(), psz_name) == list.end() )
+         list << psz_name;
+@@ -1063,13 +1050,7 @@ QStringList EqualizerSliderData::getBandsFromAout() const
+             char *psz_bands = var_GetString( p_aout, qtu(p_data->name) );
+             if ( psz_bands )
+             {
+-                bands = QString( psz_bands ).split( " ",
+-                                                    #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+-                                                        Qt::SkipEmptyParts
+-                                                    #else
+-                                                        QString::SkipEmptyParts
+-                                                    #endif
+-                                                  );
++                bands = QString( psz_bands ).split( " ", QString::SkipEmptyParts );
+                 free( psz_bands );
+             }
+         }
+@@ -1085,13 +1066,7 @@ QStringList EqualizerSliderData::getBandsFromAout() const
+     char *psz_bands = config_GetPsz( p_intf, qtu(p_data->name) );
+     if ( psz_bands )
+     {
+-        bands = QString( psz_bands ).split( " ",
+-                                            #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+-                                                Qt::SkipEmptyParts
+-                                            #else
+-                                                QString::SkipEmptyParts
+-                                            #endif
+-                                          );
++        bands = QString( psz_bands ).split( " ", QString::SkipEmptyParts );
+         free( psz_bands );
+     }
+ 
+diff --git a/modules/gui/qt/components/simple_preferences.cpp b/modules/gui/qt/components/simple_preferences.cpp
+index c003e9a455..db24ea30cb 100644
+--- a/modules/gui/qt/components/simple_preferences.cpp
++++ b/modules/gui/qt/components/simple_preferences.cpp
+@@ -580,14 +580,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+                      setEnabled( bool ) );
+ 
+             char* psz = config_GetPsz( p_intf, "audio-filter" );
+-            qs_filter = qfu( psz ).split( ':',
+-                                          #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+-                                              Qt::SkipEmptyParts
+-                                          #else
+-                                              QString::SkipEmptyParts
+-                                          #endif
+-                                        );
+-
++            qs_filter = qfu( psz ).split( ':', QString::SkipEmptyParts );
+             free( psz );
+ 
+             bool b_enabled = ( qs_filter.contains( "normvol" ) );
+diff --git a/modules/gui/qt/dialogs/bookmarks.cpp b/modules/gui/qt/dialogs/bookmarks.cpp
+index 0840097504..4282a3e6e5 100644
+--- a/modules/gui/qt/dialogs/bookmarks.cpp
++++ b/modules/gui/qt/dialogs/bookmarks.cpp
+@@ -242,13 +242,7 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
+     }
+     else if( column == 2 )
+     {
+-        fields = item->text( column ).split( ":",
+-                                      #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+-                                        Qt::SkipEmptyParts
+-                                      #else
+-                                        QString::SkipEmptyParts
+-                                      #endif
+-                                    );
++        fields = item->text( column ).split( ":", QString::SkipEmptyParts );
+         if( fields.count() == 1 )
+             p_seekpoint->i_time_offset = 1000000 * ( fields[0].toFloat() );
+         else if( fields.count() == 2 )
+diff --git a/modules/gui/qt/dialogs/vlm.cpp b/modules/gui/qt/dialogs/vlm.cpp
+index aefee2d308..e88cc63caa 100644
+--- a/modules/gui/qt/dialogs/vlm.cpp
++++ b/modules/gui/qt/dialogs/vlm.cpp
+@@ -692,14 +692,7 @@ void VLMWrapper::EditBroadcast( const QString& name, const QString& input,
+         vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+         vlm_MessageDelete( message );
+ 
+-        QStringList options = inputOptions.split( " :",
+-                                                  #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+-                                                      Qt::SkipEmptyParts
+-                                                  #else
+-                                                      QString::SkipEmptyParts
+-                                                  #endif
+-                                                );
+-
++        QStringList options = inputOptions.split( " :", QString::SkipEmptyParts );
+         for( int i = 0; i < options.count(); i++ )
+         {
+             command = "setup \"" + name + "\" option \"" + options[i].trimmed() + "\"";
+@@ -786,13 +779,7 @@ void VLMWrapper::EditVod( const QString& name, const QString& input,
+         vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+         vlm_MessageDelete( message );
+ 
+-        QStringList options = inputOptions.split( " :",
+-                                                  #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+-                                                      Qt::SkipEmptyParts
+-                                                  #else
+-                                                      QString::SkipEmptyParts
+-                                                  #endif
+-                                    );
++        QStringList options = inputOptions.split( " :", QString::SkipEmptyParts );
+         for( int i = 0; i < options.count(); i++ )
+         {
+             command = "setup \"" + name + "\" option \"" + options[i].trimmed() + "\"";
+@@ -851,13 +838,7 @@ void VLMWrapper::EditSchedule( const QString& name, const QString& input,
+         vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+         vlm_MessageDelete( message );
+ 
+-        QStringList options = inputOptions.split( " :",
+-                                                  #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+-                                                      Qt::SkipEmptyParts
+-                                                  #else
+-                                                      QString::SkipEmptyParts
+-                                                  #endif
+-                                                );
++        QStringList options = inputOptions.split( " :", QString::SkipEmptyParts );
+         for( int i = 0; i < options.count(); i++ )
+         {
+             command = "setup \"" + name + "\" option \"" + options[i].trimmed() + "\"";
+-- 
+2.50.1
+

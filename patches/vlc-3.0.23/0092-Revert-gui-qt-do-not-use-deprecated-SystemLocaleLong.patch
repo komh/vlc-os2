@@ -1,0 +1,37 @@
+From 57b4dfef559f21c4ac47e514df04102a02aaa5aa Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:16 +0900
+Subject: [PATCH 092/120] Revert "gui/qt: do not use deprecated
+ SystemLocaleLongDate"
+
+This reverts commit 674f3b58cecbd1f6c23318e96b1d50bba6ac0c04.
+---
+ modules/gui/qt/dialogs/epg.cpp | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/modules/gui/qt/dialogs/epg.cpp b/modules/gui/qt/dialogs/epg.cpp
+index 1b0713ea2b..ab570169ce 100644
+--- a/modules/gui/qt/dialogs/epg.cpp
++++ b/modules/gui/qt/dialogs/epg.cpp
+@@ -40,7 +40,6 @@
+ #include <QDialogButtonBox>
+ #include <QTimer>
+ #include <QDateTime>
+-#include <QLocale>
+ 
+ #include "qt.hpp"
+ #include "input_manager.hpp"
+@@ -147,9 +146,8 @@ void EpgDialog::displayEvent( EPGItem *epgItem )
+     QDateTime enddate = epgItem->start().addSecs( epgItem->duration() );
+ 
+     QString start, end;
+-    QLocale locale;
+     if( epgItem->start().daysTo(now) != 0 )
+-        start = locale.toString(epgItem->start());
++        start = epgItem->start().toString( Qt::SystemLocaleLongDate );
+     else
+         start = epgItem->start().time().toString( "hh:mm" );
+ 
+-- 
+2.50.1
+

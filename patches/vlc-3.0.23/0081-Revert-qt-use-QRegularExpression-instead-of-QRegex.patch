@@ -1,0 +1,294 @@
+From c36d68a2e9476f2f3ed48b08d07607339babe3d8 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:43 +0900
+Subject: [PATCH 081/120] Revert "qt: use QRegularExpression instead of QRegex"
+
+This reverts commit 6cf18cc55213569c28bc4bac8bfaf597f628950e.
+---
+ modules/gui/qt/components/extended_panels.cpp     |  6 +++---
+ modules/gui/qt/components/info_panels.cpp         |  3 +--
+ modules/gui/qt/components/open_panels.cpp         | 15 +++++++--------
+ modules/gui/qt/components/simple_preferences.cpp  |  6 +++---
+ .../gui/qt/components/sout/profile_selector.cpp   | 10 +++++-----
+ modules/gui/qt/components/sout/sout_widgets.cpp   |  7 +++----
+ modules/gui/qt/dialogs/open.cpp                   |  4 ++--
+ modules/gui/qt/recents.cpp                        |  8 ++++----
+ modules/gui/qt/recents.hpp                        |  4 ++--
+ 9 files changed, 30 insertions(+), 33 deletions(-)
+
+diff --git a/modules/gui/qt/components/extended_panels.cpp b/modules/gui/qt/components/extended_panels.cpp
+index 6b28edf0cb..585f48fd62 100644
+--- a/modules/gui/qt/components/extended_panels.cpp
++++ b/modules/gui/qt/components/extended_panels.cpp
+@@ -41,7 +41,7 @@
+ #include <QFileDialog>
+ #include <QGraphicsScene>
+ #include <QPainter>
+-#include <QRegularExpression>
++#include <QRegExp>
+ #include <QApplication>
+ #include <QScreen>
+ 
+@@ -109,8 +109,8 @@ static QString OptionFromWidgetName( QObject *obj )
+ {
+     /* Gruik ? ... nah */
+     return obj->objectName()
+-        .remove( QRegularExpression( "Slider|Combo|Dial|Check|Spin|Text" ) )
+-        .replace( QRegularExpression( "([A-Z])" ), "-\\1" )
++        .remove( QRegExp( "Slider|Combo|Dial|Check|Spin|Text" ) )
++        .replace( QRegExp( "([A-Z])" ), "-\\1" )
+         .toLower();
+ }
+ 
+diff --git a/modules/gui/qt/components/info_panels.cpp b/modules/gui/qt/components/info_panels.cpp
+index 2a88b4bfcd..184631ccf6 100644
+--- a/modules/gui/qt/components/info_panels.cpp
++++ b/modules/gui/qt/components/info_panels.cpp
+@@ -46,7 +46,6 @@
+ #include <QLineEdit>
+ #include <QLabel>
+ #include <QTextEdit>
+-#include <QRegularExpression>
+ 
+ /************************************************************************
+  * Single panels
+@@ -255,7 +254,7 @@ void MetaPanel::update( input_item_t *p_item )
+         {
+             currentURL = newURL;
+             lblURL->setText( "<a href='" + currentURL + "'>" +
+-                             currentURL.remove( QRegularExpression( ".*://") ) + "</a>" );
++                             currentURL.remove( QRegExp( ".*://") ) + "</a>" );
+         }
+     }
+     free( psz_meta );
+diff --git a/modules/gui/qt/components/open_panels.cpp b/modules/gui/qt/components/open_panels.cpp
+index 76b33488ea..8b1813e2a2 100644
+--- a/modules/gui/qt/components/open_panels.cpp
++++ b/modules/gui/qt/components/open_panels.cpp
+@@ -52,7 +52,6 @@
+ #include <QUrl>
+ #include <QMimeData>
+ #include <QDropEvent>
+-#include <QRegularExpression>
+ 
+ #define I_DEVICE_TOOLTIP \
+     I_DIR_OR_FOLDER( N_("Select a device or a VIDEO_TS directory"), \
+@@ -68,7 +67,7 @@
+         targetCombo ## StringList << QString( ppsz_devlist[ i ] ); \
+     targetCombo->addItems( QDir( "/dev/" )\
+         .entryList( targetCombo ## StringList, QDir::System )\
+-        .replaceInStrings( QRegularExpression("^"), "/dev/" ) \
++        .replaceInStrings( QRegExp("^"), "/dev/" ) \
+     );
+ 
+ static const char psz_devModule[][8] = { "v4l2", "pvr", "dtv",
+@@ -859,9 +858,9 @@ void CaptureOpenPanel::initialize()
+ 
+         QStringList nodes = QDir( "/dev/snd" ).entryList( patterns,
+                                                           QDir::System );
+-        QStringList names = nodes.replaceInStrings( QRegularExpression("^pcmC"), "hw:" )
+-                                 .replaceInStrings( QRegularExpression("c$"), "" )
+-                                 .replaceInStrings( QRegularExpression("D"), "," );
++        QStringList names = nodes.replaceInStrings( QRegExp("^pcmC"), "hw:" )
++                                 .replaceInStrings( QRegExp("c$"), "" )
++                                 .replaceInStrings( QRegExp("D"), "," );
+         v4l2AudioDevice->addItems( names );
+     }
+     v4l2AudioDevice->clearEditText();
+@@ -1080,9 +1079,9 @@ void CaptureOpenPanel::initialize()
+ 
+         QStringList nodes = QDir( "/dev/snd" ).entryList( patterns,
+                                                           QDir::System );
+-        QStringList names = nodes.replaceInStrings( QRegularExpression("^pcmC"), "hw:" )
+-                                 .replaceInStrings( QRegularExpression("c$"), "" )
+-                                 .replaceInStrings( QRegularExpression("D"), "," );
++        QStringList names = nodes.replaceInStrings( QRegExp("^pcmC"), "hw:" )
++                                 .replaceInStrings( QRegExp("c$"), "" )
++                                 .replaceInStrings( QRegExp("D"), "," );
+         pvrAudioDevice->addItems( names );
+     }
+     pvrAudioDevice->clearEditText();
+diff --git a/modules/gui/qt/components/simple_preferences.cpp b/modules/gui/qt/components/simple_preferences.cpp
+index 6cbe62aa2d..5f0c1ba145 100644
+--- a/modules/gui/qt/components/simple_preferences.cpp
++++ b/modules/gui/qt/components/simple_preferences.cpp
+@@ -628,7 +628,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+                     << "dvd*" << "scd*" << "sr*" << "sg*" << "cd*";
+             ui.DVDDeviceComboBox->addItems( QDir( "/dev/" )
+                     .entryList( DVDDeviceComboBoxStringList, QDir::System )
+-                    .replaceInStrings( QRegularExpression("^"), "/dev/" )
++                    .replaceInStrings( QRegExp("^"), "/dev/" )
+             );
+ #endif
+             CONFIG_GENERIC( "dvd", String, ui.DVDLabel,
+@@ -746,10 +746,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+                 /* defaults to qt */
+                 ui.qt->setChecked( true );
+             }
+-
++            
+             if ( var_InheritBool( p_intf, "qt-dark-palette" ) )
+                 ui.qtdark->setChecked( true ); /*dark palette*/
+-
++            
+             free( psz_intf );
+ 
+             optionWidgets["skinRB"] = ui.skins;
+diff --git a/modules/gui/qt/components/sout/profile_selector.cpp b/modules/gui/qt/components/sout/profile_selector.cpp
+index e4bb34b843..6fae3a2eee 100644
+--- a/modules/gui/qt/components/sout/profile_selector.cpp
++++ b/modules/gui/qt/components/sout/profile_selector.cpp
+@@ -32,7 +32,7 @@
+ #include <QLabel>
+ #include <QMessageBox>
+ #include <QRadioButton>
+-#include <QRegularExpression>
++#include <QRegExp>
+ #include <QButtonGroup>
+ #include <QSpinBox>
+ #include <QUrl>
+@@ -199,9 +199,9 @@ void VLCProfileSelector::saveProfiles()
+ void VLCProfileSelector::updateOptions( int i )
+ {
+     QString options = profileBox->itemData( i ).toString();
+-    QRegularExpression rx(OLDFORMAT);
++    QRegExp rx(OLDFORMAT);
+     if ( !options.contains( ";" ) ) return;
+-    if ( rx.match( options ).hasMatch() )
++    if ( rx.indexIn( options ) != -1 )
+         return updateOptionsOldFormat( i );
+ 
+     transcode = "";
+@@ -659,8 +659,8 @@ void VLCProfileEditor::codecSelected()
+ 
+ void VLCProfileEditor::fillProfile( const QString& qs )
+ {
+-    QRegularExpression rx(OLDFORMAT);
+-    if ( rx.match( qs ).hasMatch() ) return fillProfileOldFormat( qs );
++    QRegExp rx(OLDFORMAT);
++    if ( rx.indexIn( qs ) != -1 ) return fillProfileOldFormat( qs );
+ 
+     QStringList tuples = qs.split( ";" );
+     foreach ( const QString &tuple, tuples )
+diff --git a/modules/gui/qt/components/sout/sout_widgets.cpp b/modules/gui/qt/components/sout/sout_widgets.cpp
+index cec01e8475..6eba8b4f00 100644
+--- a/modules/gui/qt/components/sout/sout_widgets.cpp
++++ b/modules/gui/qt/components/sout/sout_widgets.cpp
+@@ -35,7 +35,6 @@
+ #include <QLineEdit>
+ #include <QFileDialog>
+ #include <QUrl>
+-#include <QRegularExpression>
+ 
+ #define I_FILE_SLASH_DIR \
+     I_DIR_OR_FOLDER( N_("File/Directory"), N_("File/Folder") )
+@@ -156,11 +155,11 @@ QString FileDestBox::getMRL( const QString& mux )
+     QString outputfile = fileEdit->text();
+     if( !mux.isEmpty() )
+     {
+-        if( outputfile.contains( QRegularExpression("\\..{2,4}$")) &&
++        if( outputfile.contains( QRegExp("\\..{2,4}$")) &&
+             !outputfile.endsWith(mux) )
+         {
+            /* Replace the extension according to muxer */
+-           outputfile.replace(QRegularExpression("\\..{2,4}$"),"."+mux);
++           outputfile.replace(QRegExp("\\..{2,4}$"),"."+mux);
+         } else if (!outputfile.endsWith( mux ) )
+         {
+            m.option( "mux", mux );
+@@ -232,7 +231,7 @@ QString HTTPDestBox::getMRL( const QString& mux )
+     /* Path-extension is primary muxer to use if possible,
+        otherwise check for mux-choise and see that it isn't mp4
+        then fallback to flv*/
+-    if ( !path.contains(QRegularExpression("\\..{2,3}$") ) )
++    if ( !path.contains(QRegExp("\\..{2,3}$") ) )
+     {
+         if( !mux.isEmpty() && mux.compare("mp4") )
+            m.option( "mux", mux );
+diff --git a/modules/gui/qt/dialogs/open.cpp b/modules/gui/qt/dialogs/open.cpp
+index bbfce715bf..7a4b809c33 100644
+--- a/modules/gui/qt/dialogs/open.cpp
++++ b/modules/gui/qt/dialogs/open.cpp
+@@ -29,7 +29,7 @@
+ #include "recents.hpp"
+ #include "util/qt_dirs.hpp"
+ 
+-#include <QRegularExpression>
++#include <QRegExp>
+ #include <QMenu>
+ 
+ #ifndef NDEBUG
+@@ -476,7 +476,7 @@ QStringList OpenDialog::SeparateEntries( const QString& entries )
+     int index = 0;
+     while( index < entries.count() )
+     {
+-        int delim_pos = entries.indexOf( QRegularExpression( "\\s+|\"" ), index );
++        int delim_pos = entries.indexOf( QRegExp( "\\s+|\"" ), index );
+         if( delim_pos < 0 ) delim_pos = entries.count() - 1;
+         entry += entries.mid( index, delim_pos - index + 1 );
+         index = delim_pos + 1;
+diff --git a/modules/gui/qt/recents.cpp b/modules/gui/qt/recents.cpp
+index 6e98e960bd..7bfadf1ca9 100644
+--- a/modules/gui/qt/recents.cpp
++++ b/modules/gui/qt/recents.cpp
+@@ -29,7 +29,7 @@
+ #include "util/qt_dirs.hpp"
+ 
+ #include <QStringList>
+-#include <QRegularExpression>
++#include <QRegExp>
+ #include <QSignalMapper>
+ 
+ #ifdef _WIN32
+@@ -65,7 +65,7 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
+     /* Load the filter psz */
+     char* psz_tmp = var_InheritString( p_intf, "qt-recentplay-filter" );
+     if( psz_tmp && *psz_tmp )
+-        filter = new QRegularExpression( psz_tmp, QRegularExpression::CaseInsensitiveOption );
++        filter = new QRegExp( psz_tmp, Qt::CaseInsensitive );
+     else
+         filter = NULL;
+     free( psz_tmp );
+@@ -83,7 +83,7 @@ RecentsMRL::~RecentsMRL()
+ 
+ void RecentsMRL::addRecent( const QString &mrl )
+ {
+-    if ( !isActive || ( filter && filter->match( mrl ).hasMatch() ) )
++    if ( !isActive || ( filter && filter->indexIn( mrl ) >= 0 ) )
+         return;
+ 
+ #ifdef _WIN32
+@@ -143,7 +143,7 @@ void RecentsMRL::load()
+     /* And filter the regexp on the list */
+     for( int i = 0; i < list.count(); ++i )
+     {
+-        if ( !filter || !filter->match( list.at(i) ).hasMatch() ) {
++        if ( !filter || filter->indexIn( list.at(i) ) == -1 ) {
+             recents.append( list.at(i) );
+             times.append( list2.value(i, "-1" ) );
+         }
+diff --git a/modules/gui/qt/recents.hpp b/modules/gui/qt/recents.hpp
+index d624ec997b..1543055249 100644
+--- a/modules/gui/qt/recents.hpp
++++ b/modules/gui/qt/recents.hpp
+@@ -30,7 +30,7 @@
+ 
+ #include <QObject>
+ #include <QStringList>
+-class QRegularExpression;
++class QRegExp;
+ class QSignalMapper;
+ 
+ #define RECENTS_LIST_SIZE 30
+@@ -72,7 +72,7 @@ private:
+ 
+     QStringList   recents;
+     QStringList   times;
+-    QRegularExpression *filter;
++    QRegExp       *filter;
+     bool          isActive;
+ 
+     void load();
+-- 
+2.50.1
+

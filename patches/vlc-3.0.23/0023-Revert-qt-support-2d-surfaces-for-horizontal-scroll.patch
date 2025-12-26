@@ -1,0 +1,62 @@
+From ef5bd95eb534cea8e8d1f0bf3ac595c7676725fd Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Sun, 16 May 2021 18:48:19 +0900
+Subject: [PATCH 023/120] Revert "qt: support 2d surfaces for horizontal
+ scroll"
+
+This reverts commit 704ccf4ea627458dd374d2936146c55ba00ffa12.
+---
+ modules/gui/qt/util/customwidgets.cpp | 30 +++++++--------------------
+ 1 file changed, 7 insertions(+), 23 deletions(-)
+
+diff --git a/modules/gui/qt/util/customwidgets.cpp b/modules/gui/qt/util/customwidgets.cpp
+index 0e4cff2c54..594703f34c 100644
+--- a/modules/gui/qt/util/customwidgets.cpp
++++ b/modules/gui/qt/util/customwidgets.cpp
+@@ -30,7 +30,6 @@
+ 
+ #include "customwidgets.hpp"
+ 
+-#include <QtMath>  // for wheel deadzone calculation
+ #include <QPainter>
+ #include <QRect>
+ #include <QKeyEvent>
+@@ -296,28 +295,13 @@ int qtEventToVLCKey( const QKeyEvent *e )
+ 
+ int qtWheelEventToVLCKey( const QWheelEvent *e )
+ {
+-    const qreal v_cos_deadzone = 0.45; // ~63 degrees
+-    const qreal h_cos_deadzone = 0.95; // ~15 degrees
+-
+-    int i_vlck = qtKeyModifiersToVLC(e);  // Handle modifiers
+-
+-    QPoint p = e->angleDelta();
+-    if (!p.isNull())
+-    {
+-        qreal cos = qFabs(p.x())/qSqrt(qPow(p.x(), 2) + qPow(p.y(), 2));
+-
+-        if (cos < v_cos_deadzone)
+-        {
+-            if (p.y() > 0) i_vlck |= KEY_MOUSEWHEELUP;
+-            else           i_vlck |= KEY_MOUSEWHEELDOWN;
+-        }
+-        else if (cos > h_cos_deadzone)
+-        {
+-            if (p.x() > 0) i_vlck |= KEY_MOUSEWHEELLEFT;
+-            else           i_vlck |= KEY_MOUSEWHEELRIGHT;
+-        }
+-    }
+-
++    int i_vlck = 0;
++    /* Handle modifiers */
++    i_vlck |= qtKeyModifiersToVLC( e );
++    if ( e->delta() > 0 )
++        i_vlck |= KEY_MOUSEWHEELUP;
++    else
++        i_vlck |= KEY_MOUSEWHEELDOWN;
+     return i_vlck;
+ }
+ 
+-- 
+2.50.1
+

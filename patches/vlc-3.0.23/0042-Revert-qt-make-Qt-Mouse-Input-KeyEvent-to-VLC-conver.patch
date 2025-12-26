@@ -1,0 +1,63 @@
+From c45d221b6db448f8370ad83c2e36fabb919f2245 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:05:07 +0900
+Subject: [PATCH 042/120] Revert "qt: make Qt Mouse/Input/KeyEvent to VLC
+ converter functions const"
+
+This reverts commit 5d1b310ca0ae75f02307611a77f90aa2ec7d2250.
+---
+ modules/gui/qt/util/customwidgets.cpp | 6 +++---
+ modules/gui/qt/util/customwidgets.hpp | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/modules/gui/qt/util/customwidgets.cpp b/modules/gui/qt/util/customwidgets.cpp
+index cf321845de..c63bed7f9d 100644
+--- a/modules/gui/qt/util/customwidgets.cpp
++++ b/modules/gui/qt/util/customwidgets.cpp
+@@ -108,7 +108,7 @@ void VLCQDial::paintEvent( QPaintEvent *event )
+ /***************************************************************************
+  * Hotkeys converters
+  ***************************************************************************/
+-int qtKeyModifiersToVLC( const QInputEvent* e )
++int qtKeyModifiersToVLC( QInputEvent* e )
+ {
+     int i_keyModifiers = 0;
+     if( e->modifiers() & Qt::ShiftModifier ) i_keyModifiers |= KEY_MODIFIER_SHIFT;
+@@ -264,7 +264,7 @@ static int keycmp( const void *a, const void *b )
+     return *q - m->qt;
+ }
+ 
+-int qtEventToVLCKey( const QKeyEvent *e )
++int qtEventToVLCKey( QKeyEvent *e )
+ {
+     int qtk = e->key();
+     uint32_t i_vlck = 0;
+@@ -293,7 +293,7 @@ int qtEventToVLCKey( const QKeyEvent *e )
+     return i_vlck;
+ }
+ 
+-int qtWheelEventToVLCKey( const QWheelEvent *e )
++int qtWheelEventToVLCKey( QWheelEvent *e )
+ {
+     int i_vlck = 0;
+     /* Handle modifiers */
+diff --git a/modules/gui/qt/util/customwidgets.hpp b/modules/gui/qt/util/customwidgets.hpp
+index c801900bf7..609b5b76ba 100644
+--- a/modules/gui/qt/util/customwidgets.hpp
++++ b/modules/gui/qt/util/customwidgets.hpp
+@@ -144,9 +144,9 @@ class QKeyEvent;
+ class QWheelEvent;
+ class QInputEvent;
+ 
+-int qtKeyModifiersToVLC( const QInputEvent* e );
+-int qtEventToVLCKey( const QKeyEvent *e );
+-int qtWheelEventToVLCKey( const QWheelEvent *e );
++int qtKeyModifiersToVLC( QInputEvent* e );
++int qtEventToVLCKey( QKeyEvent *e );
++int qtWheelEventToVLCKey( QWheelEvent *e );
+ QString VLCKeyToString( unsigned val, bool );
+ 
+ #endif
+-- 
+2.50.1
+

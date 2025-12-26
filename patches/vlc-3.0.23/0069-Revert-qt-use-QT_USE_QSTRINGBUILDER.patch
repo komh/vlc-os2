@@ -1,0 +1,62 @@
+From 0a836dfb61e778a647ea18c9bfc683c16f0a29dd Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:08 +0900
+Subject: [PATCH 069/120] Revert "qt: use QT_USE_QSTRINGBUILDER"
+
+This reverts commit c780832579dcc28d674d4d94a890ca9f5251e462.
+---
+ modules/gui/qt/Makefile.am         | 1 -
+ modules/gui/qt/dialogs/convert.cpp | 4 ++--
+ modules/gui/qt/dialogs/help.cpp    | 2 +-
+ 3 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/modules/gui/qt/Makefile.am b/modules/gui/qt/Makefile.am
+index 8af171eee0..c67f4afc13 100644
+--- a/modules/gui/qt/Makefile.am
++++ b/modules/gui/qt/Makefile.am
+@@ -12,7 +12,6 @@
+ SUFFIXES += .ui .h .hpp .moc.cpp
+ 
+ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+-	-DQT_USE_QSTRINGBUILDER \
+ 	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt
+ libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
+ libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM)
+diff --git a/modules/gui/qt/dialogs/convert.cpp b/modules/gui/qt/dialogs/convert.cpp
+index 0d796fd1f5..4a9151e246 100644
+--- a/modules/gui/qt/dialogs/convert.cpp
++++ b/modules/gui/qt/dialogs/convert.cpp
+@@ -161,7 +161,7 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
+ 
+ void ConvertDialog::fileBrowse()
+ {
+-    QString fileExtension = ( ! profile->isEnabled() ) ? QStringLiteral(".*") : QStringLiteral(".") + profile->getMux();
++    QString fileExtension = ( ! profile->isEnabled() ) ? ".*" : "." + profile->getMux();
+ 
+ #if HAS_QT5
+     outgoingMRL = QFileDialog::getSaveFileUrl( this, qtr( "Save file..." ),
+@@ -222,7 +222,7 @@ void ConvertDialog::close()
+             // Multiple, use the convention.
+             else
+             {
+-                QString fileExtension = ( ! profile->isEnabled() ) ? QStringLiteral(".*") : QStringLiteral(".") + profile->getMux();
++                QString fileExtension = ( ! profile->isEnabled() ) ? ".*" : "." + profile->getMux();
+ 
+                 newFileName = incomingMRLs->at(i);
+ 
+diff --git a/modules/gui/qt/dialogs/help.cpp b/modules/gui/qt/dialogs/help.cpp
+index 6244e3bd1f..5a78d1a71b 100644
+--- a/modules/gui/qt/dialogs/help.cpp
++++ b/modules/gui/qt/dialogs/help.cpp
+@@ -306,7 +306,7 @@ void UpdateDialog::updateNotify( bool b_result )
+                 .arg( QString::number( p_release->i_major ) )
+                 .arg( QString::number( p_release->i_minor ) )
+                 .arg( QString::number( p_release->i_revision ) )
+-                .arg( p_release->i_extra == 0 ? QStringLiteral("") : QStringLiteral(".") + QString::number( p_release->i_extra ) );
++                .arg( p_release->i_extra == 0 ? "" : "." + QString::number( p_release->i_extra ) );
+ 
+             ui.updateNotifyLabel->setText( message );
+             message = qfu( p_release->psz_desc ).replace( "\n", "<br/>" );
+-- 
+2.50.1
+

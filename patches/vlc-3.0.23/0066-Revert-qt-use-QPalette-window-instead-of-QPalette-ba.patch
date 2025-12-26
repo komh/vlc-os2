@@ -1,0 +1,27 @@
+From 1607787e67f94642e7add936479989e80ada6030 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:58 +0900
+Subject: [PATCH 066/120] Revert "qt: use QPalette::window() instead of
+ QPalette::background()"
+
+This reverts commit b392e3456f27f6bd2cb572bb190befb046a7f104.
+---
+ modules/gui/qt/dialogs/toolbar.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/dialogs/toolbar.cpp b/modules/gui/qt/dialogs/toolbar.cpp
+index 3efa965ec1..47ea7d7c12 100644
+--- a/modules/gui/qt/dialogs/toolbar.cpp
++++ b/modules/gui/qt/dialogs/toolbar.cpp
+@@ -337,7 +337,7 @@ void PreviewWidget::paintEvent( QPaintEvent * )
+             if ( !strcmp( item->widget()->metaObject()->className(), "QLabel" ) )
+             {
+                 QPainter eraser( &pixmaps[i] );
+-                eraser.fillRect( item->geometry(), palette().window() );
++                eraser.fillRect( item->geometry(), palette().background() );
+                 eraser.end();
+             }
+         }
+-- 
+2.50.1
+

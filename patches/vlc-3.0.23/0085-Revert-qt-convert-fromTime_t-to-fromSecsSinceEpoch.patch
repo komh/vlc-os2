@@ -1,0 +1,63 @@
+From 1c802666f192fa3257b967919c0e41a6b91b3b60 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:55 +0900
+Subject: [PATCH 085/120] Revert "qt: convert fromTime_t to fromSecsSinceEpoch"
+
+This reverts commit 29e931a9c711c6d1fce400a705187611bc0a4e0e.
+---
+ modules/gui/qt/components/epg/EPGItem.cpp    | 4 ----
+ modules/gui/qt/components/epg/EPGProgram.cpp | 4 ----
+ modules/gui/qt/components/epg/EPGWidget.cpp  | 4 ----
+ 3 files changed, 12 deletions(-)
+
+diff --git a/modules/gui/qt/components/epg/EPGItem.cpp b/modules/gui/qt/components/epg/EPGItem.cpp
+index 74adca5df8..fbdca4183e 100644
+--- a/modules/gui/qt/components/epg/EPGItem.cpp
++++ b/modules/gui/qt/components/epg/EPGItem.cpp
+@@ -152,11 +152,7 @@ uint16_t EPGItem::eventID() const
+ 
+ bool EPGItem::setData( const vlc_epg_event_t *data )
+ {
+-#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+-    QDateTime newtime = QDateTime::fromSecsSinceEpoch( data->i_start );
+-#else
+     QDateTime newtime = QDateTime::fromTime_t( data->i_start );
+-#endif
+     QString newname = qfu( data->psz_name );
+     QString newdesc = qfu( data->psz_description );
+     QString newshortdesc = qfu( data->psz_short_description );
+diff --git a/modules/gui/qt/components/epg/EPGProgram.cpp b/modules/gui/qt/components/epg/EPGProgram.cpp
+index ab5254192b..242ac1f19c 100644
+--- a/modules/gui/qt/components/epg/EPGProgram.cpp
++++ b/modules/gui/qt/components/epg/EPGProgram.cpp
+@@ -96,11 +96,7 @@ void EPGProgram::updateEvents( const vlc_epg_event_t * const * pp_events, size_t
+     for( size_t i=0; i<i_events; i++ )
+     {
+         const vlc_epg_event_t *p_event = pp_events[i];
+-#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+-        QDateTime eventStart = QDateTime::fromSecsSinceEpoch( p_event->i_start );
+-#else
+         QDateTime eventStart = QDateTime::fromTime_t( p_event->i_start );
+-#endif
+         if( !mindate->isValid() || eventStart < *mindate )
+             *mindate = eventStart;
+ 
+diff --git a/modules/gui/qt/components/epg/EPGWidget.cpp b/modules/gui/qt/components/epg/EPGWidget.cpp
+index 8c89184362..1e3f8738d9 100644
+--- a/modules/gui/qt/components/epg/EPGWidget.cpp
++++ b/modules/gui/qt/components/epg/EPGWidget.cpp
+@@ -110,11 +110,7 @@ void EPGWidget::updateEPG( input_item_t *p_input_item )
+     vlc_mutex_lock(  & p_input_item->lock );
+     m_epgView->updateEPG( p_input_item->pp_epg, p_input_item->i_epg );
+     m_epgView->setEpgTime( ( p_input_item->i_epg_time ) ?
+-#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+-                           QDateTime::fromSecsSinceEpoch( p_input_item->i_epg_time ) :
+-#else
+                            QDateTime::fromTime_t( p_input_item->i_epg_time ) :
+-#endif
+                            QDateTime() );
+     vlc_mutex_unlock( & p_input_item->lock );
+ 
+-- 
+2.50.1
+

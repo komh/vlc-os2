@@ -1,0 +1,34 @@
+From abc6c42c362a02623536d17c05e6e9c0f19ecf76 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:01 +0900
+Subject: [PATCH 087/120] Revert "qt: fix ambiguous string construction"
+
+This reverts commit 732b92b61aad7514c1c3bbcb917eb0aa88731ca5.
+---
+ modules/gui/qt/dialogs/vlm.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/dialogs/vlm.cpp b/modules/gui/qt/dialogs/vlm.cpp
+index d87febdafe..c9c1f006bf 100644
+--- a/modules/gui/qt/dialogs/vlm.cpp
++++ b/modules/gui/qt/dialogs/vlm.cpp
+@@ -889,14 +889,14 @@ void VLMWrapper::EditSchedule( const QString& name, const QString& input,
+ 
+     if( _scherepeatnumber > 0 )
+     {
+-       command = "setup \"" + name + "\" repeat \"" + QString::number(_scherepeatnumber) + "\"";
++       command = "setup \"" + name + "\" repeat \"" + _scherepeatnumber + "\"";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+     }
+ 
+     if( _repeatDays > 0 )
+     {
+-       command = "setup \"" + name + "\" period \"" + QString::number(_repeatDays) + "\"";
++       command = "setup \"" + name + "\" period \"" + _repeatDays + "\"";
+        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+        vlm_MessageDelete( message );
+     }
+-- 
+2.50.1
+

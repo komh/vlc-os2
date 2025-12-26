@@ -1,0 +1,69 @@
+From 68554b69c9180be648c74f8856cefbb72ba81586 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:04:58 +0900
+Subject: [PATCH 039/120] Revert "qt: fix scrolling horizontally on the volumne
+ slider has no effect"
+
+This reverts commit 1d52533d7bfdb157455be31b57b692618e13afa0.
+---
+ modules/gui/qt/util/input_slider.cpp | 25 ++++---------------------
+ modules/gui/qt/util/input_slider.hpp |  2 --
+ 2 files changed, 4 insertions(+), 23 deletions(-)
+
+diff --git a/modules/gui/qt/util/input_slider.cpp b/modules/gui/qt/util/input_slider.cpp
+index 4a0079ed7a..5a12eab994 100644
+--- a/modules/gui/qt/util/input_slider.cpp
++++ b/modules/gui/qt/util/input_slider.cpp
+@@ -698,32 +698,15 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
+ 
+     pixGradient.setMask( mask );
+     pixGradient2.setMask( mask );
+-
+-    connect(&wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, this, [this](int vlcButton){
+-        int newvalue = 0;
+-        //ignore modifiers
+-        switch (vlcButton & 0x00FF0000) {
+-        case KEY_MOUSEWHEELDOWN:
+-        case KEY_MOUSEWHEELLEFT:
+-            newvalue = value() - f_step;
+-            break;
+-        case KEY_MOUSEWHEELUP:
+-        case KEY_MOUSEWHEELRIGHT:
+-            newvalue = value() + f_step;
+-            break;
+-        default:
+-            return;
+-        }
+-
+-        setValue( __MIN( __MAX( minimum(), newvalue ), maximum() ) );
+-        emit sliderMoved( value() );
+-    });
+ }
+ 
+ void SoundSlider::wheelEvent( QWheelEvent *event )
+ {
+-    wheelEventConverter.wheelEvent(event);
++    int newvalue = value() + event->angleDelta().y() / QWheelEvent::DefaultDeltasPerStep * f_step;
++    setValue( __MIN( __MAX( minimum(), newvalue ), maximum() ) );
++
+     emit sliderReleased();
++    emit sliderMoved( value() );
+ }
+ 
+ void SoundSlider::mousePressEvent( QMouseEvent *event )
+diff --git a/modules/gui/qt/util/input_slider.hpp b/modules/gui/qt/util/input_slider.hpp
+index a2c7cde465..255b0836b8 100644
+--- a/modules/gui/qt/util/input_slider.hpp
++++ b/modules/gui/qt/util/input_slider.hpp
+@@ -178,8 +178,6 @@ private:
+     QFont textfont;
+     QRect textrect;
+ 
+-    WheelToVLCConverter wheelEventConverter;
+-
+     void changeValue( int x ); /* Function to modify the value from pixel x() */
+ };
+ 
+-- 
+2.50.1
+

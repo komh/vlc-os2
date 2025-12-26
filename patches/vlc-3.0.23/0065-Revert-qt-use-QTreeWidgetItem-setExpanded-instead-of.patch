@@ -1,0 +1,27 @@
+From f2b7e91ac13db061caef39ae8ea8b18006efd8f7 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:55 +0900
+Subject: [PATCH 065/120] Revert "qt: use QTreeWidgetItem::setExpanded()
+ instead of QTreeWidget::InfoTree->setItemExpanded()"
+
+This reverts commit 71693edd4cf1f3c9ab9fe39099886b664ae7bf84.
+---
+ modules/gui/qt/components/info_panels.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/components/info_panels.cpp b/modules/gui/qt/components/info_panels.cpp
+index 2bcd1805f8..2a88b4bfcd 100644
+--- a/modules/gui/qt/components/info_panels.cpp
++++ b/modules/gui/qt/components/info_panels.cpp
+@@ -520,7 +520,7 @@ void InfoPanel::update( input_item_t *p_item)
+ 
+             current_item->addChild(child_item);
+         }
+-        current_item->setExpanded(true);
++        InfoTree->setItemExpanded( current_item, true);
+     }
+ }
+ 
+-- 
+2.50.1
+

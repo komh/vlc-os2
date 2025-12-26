@@ -1,0 +1,216 @@
+From 5a9b08920da8b896daa6ea75f7b9f4f6614a6d92 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:18 +0900
+Subject: [PATCH 053/120] Revert "qt: disable statusBar() usage if Qt is not
+ built with it"
+
+This reverts commit acad49d6dff6aeca59d657b4c29847f23581033a.
+---
+ modules/gui/qt/main_interface.cpp | 31 +------------------------------
+ modules/gui/qt/menus.cpp          |  7 +------
+ 2 files changed, 2 insertions(+), 36 deletions(-)
+
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index a101a6ea12..00d353a6a9 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -56,16 +56,13 @@
+ 
+ #include <QMenu>
+ #include <QMenuBar>
++#include <QStatusBar>
+ #include <QLabel>
+ #include <QStackedWidget>
+ #ifdef _WIN32
+ #include <QFileInfo>
+ #endif
+ 
+-#ifndef QT_NO_STATUSBAR
+-# include <QStatusBar>
+-#endif
+-
+ #if ! HAS_QT510 && defined(QT5_HAS_X11)
+ # include <QX11Info>
+ # include <X11/Xlib.h>
+@@ -163,13 +160,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
+ 
+     createMainWidget( settings );
+ 
+-#ifndef QT_NO_STATUSBAR
+     /**************
+      * Status Bar *
+      **************/
+     createStatusBar();
+     setStatusBarVisibility( getSettings()->value( "MainWindow/status-bar-visible", false ).toBool() );
+-#endif
+ 
+     /*********************************
+      * Create the Systray Management *
+@@ -551,7 +546,6 @@ inline void MainInterface::initSystray()
+         createSystray();
+ }
+ 
+-#ifndef QT_NO_STATUSBAR
+ inline void MainInterface::createStatusBar()
+ {
+     /****************
+@@ -589,10 +583,8 @@ inline void MainInterface::createStatusBar()
+          elapsed time.*/
+     CONNECT( timeLabel, doubleClicked(), THEDP, gotoTimeDialog() );
+ 
+-#ifndef QT_NO_STATUSBAR
+     CONNECT( THEMIM->getIM(), encryptionChanged( bool ),
+              this, showCryptedLabel( bool ) );
+-#endif
+ 
+     /* This shouldn't be necessary, but for somehow reason, the statusBarr
+        starts at height of 20px and when a text is shown it needs more space.
+@@ -602,7 +594,6 @@ inline void MainInterface::createStatusBar()
+      */
+     statusBarr->setFixedHeight( statusBarr->sizeHint().height() + 2 );
+ }
+-#endif
+ 
+ /**********************************************************************
+  * Handling of sizing of the components
+@@ -833,10 +824,8 @@ void MainInterface::setVideoSize( unsigned int w, unsigned int h )
+                         h -= menuBar()->height();
+                     if( controls->isVisible() )
+                         h -= controls->height();
+-#ifndef QT_NO_STATUSBAR
+                     if( statusBar()->isVisible() )
+                         h -= statusBar()->height();
+-#endif
+                     if( inputC->isVisible() )
+                         h -= inputC->height();
+                 }
+@@ -1103,9 +1092,7 @@ void MainInterface::displayNormalView()
+ {
+     menuBar()->setVisible( false );
+     controls->setVisible( false );
+-#ifndef QT_NO_STATUSBAR
+     statusBar()->setVisible( false );
+-#endif
+     inputC->setVisible( false );
+ }
+ 
+@@ -1117,9 +1104,7 @@ void MainInterface::setMinimalView( bool b_minimal )
+ {
+     bool b_menuBarVisible = menuBar()->isVisible();
+     bool b_controlsVisible = controls->isVisible();
+-#ifndef QT_NO_STATUSBAR
+     bool b_statusBarVisible = statusBar()->isVisible();
+-#endif
+     bool b_inputCVisible = inputC->isVisible();
+ 
+     if( !isFullScreen() && !isMaximized() && b_minimal && !b_isWindowTiled )
+@@ -1130,10 +1115,8 @@ void MainInterface::setMinimalView( bool b_minimal )
+             i_heightChange += menuBar()->height();
+         if( b_controlsVisible )
+             i_heightChange += controls->height();
+-#ifndef QT_NO_STATUSBAR
+         if( b_statusBarVisible )
+             i_heightChange += statusBar()->height();
+-#endif
+         if( b_inputCVisible )
+             i_heightChange += inputC->height();
+ 
+@@ -1143,9 +1126,7 @@ void MainInterface::setMinimalView( bool b_minimal )
+ 
+     menuBar()->setVisible( !b_minimal );
+     controls->setVisible( !b_minimal );
+-#ifndef QT_NO_STATUSBAR
+     statusBar()->setVisible( !b_minimal && b_statusbarVisible );
+-#endif
+     inputC->setVisible( !b_minimal );
+ 
+     if( !isFullScreen() && !isMaximized() && !b_minimal && !b_isWindowTiled )
+@@ -1156,10 +1137,8 @@ void MainInterface::setMinimalView( bool b_minimal )
+             i_heightChange += menuBar()->height();
+         if( !b_controlsVisible && controls->isVisible() )
+             i_heightChange += controls->height();
+-#ifndef QT_NO_STATUSBAR
+         if( !b_statusBarVisible && statusBar()->isVisible() )
+             i_heightChange += statusBar()->height();
+-#endif
+         if( !b_inputCVisible && inputC->isVisible() )
+             i_heightChange += inputC->height();
+ 
+@@ -1227,11 +1206,9 @@ StandardPLPanel *MainInterface::getPlaylistView()
+ 
+ void MainInterface::setStatusBarVisibility( bool b_visible )
+ {
+-#ifndef QT_NO_STATUSBAR
+     statusBar()->setVisible( b_visible );
+     b_statusbarVisible = b_visible;
+     if( controls ) controls->setGripVisible( !b_statusbarVisible );
+-#endif
+ }
+ 
+ 
+@@ -1249,12 +1226,10 @@ void MainInterface::setPlaylistVisibility( bool b_visible )
+ void MainInterface::setName( const QString& name )
+ {
+     input_name = name; /* store it for the QSystray use */
+-#ifndef QT_NO_STATUSBAR
+     /* Display it in the status bar, but also as a Tooltip in case it doesn't
+        fit in the label */
+     nameLabel->setText( name );
+     nameLabel->setToolTip( name );
+-#endif // QT_NO_STATUSBAR
+ }
+ 
+ /**
+@@ -1275,20 +1250,16 @@ void MainInterface::setVLCWindowsTitle( const QString& aTitle )
+ 
+ void MainInterface::showCryptedLabel( bool b_show )
+ {
+-#ifndef QT_NO_STATUSBAR
+     if( cryptedLabel == NULL )
+     {
+         cryptedLabel = new QLabel;
+         // The lock icon is not the right one for DRM protection/scrambled.
+         //cryptedLabel->setPixmap( QPixmap( ":/lock.svg" ) );
+         cryptedLabel->setText( "DRM" );
+-#ifndef QT_NO_STATUSBAR
+         statusBar()->addWidget( cryptedLabel );
+-#endif
+     }
+ 
+     cryptedLabel->setVisible( b_show );
+-#endif
+ }
+ 
+ /*****************************************************************************
+diff --git a/modules/gui/qt/menus.cpp b/modules/gui/qt/menus.cpp
+index c808bf56b5..f68c8e11dc 100644
+--- a/modules/gui/qt/menus.cpp
++++ b/modules/gui/qt/menus.cpp
+@@ -54,10 +54,7 @@
+ #include <QAction>
+ #include <QActionGroup>
+ #include <QSignalMapper>
+-
+-#ifndef QT_NO_STATUSBAR
+-# include <QStatusBar>
+-#endif
++#include <QStatusBar>
+ 
+ /*
+   This file defines the main menus and the pop-up menu (right-click menu)
+@@ -537,12 +534,10 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
+         action->setChecked( true );
+     action->setEnabled(mi->isAdvancedWidgetAvailable());
+ 
+-#ifndef QT_NO_STATUSBAR
+     action = menu->addAction( qtr( "Status Bar" ) );
+     action->setCheckable( true );
+     action->setChecked( mi->statusBar()->isVisible() );
+     CONNECT( action, triggered( bool ), mi, setStatusBarVisibility( bool) );
+-#endif
+ #if 0 /* For Visualisations. Not yet working */
+     adv = menu->addAction( qtr( "Visualizations selector" ), mi,
+                            SLOT( visual() ) );
+-- 
+2.50.1
+

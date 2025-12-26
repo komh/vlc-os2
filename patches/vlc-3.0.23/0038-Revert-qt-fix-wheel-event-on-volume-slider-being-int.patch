@@ -1,0 +1,26 @@
+From 4d0a3c3e38786814cdd5fab7f866c38ce9231ae0 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:04:55 +0900
+Subject: [PATCH 038/120] Revert "qt: fix wheel event on volume slider being
+ interpreted multiple times"
+
+This reverts commit 8da71b5a45b8064a96bb576be86f03b8e17753b0.
+---
+ modules/gui/qt/util/input_slider.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/modules/gui/qt/util/input_slider.cpp b/modules/gui/qt/util/input_slider.cpp
+index 351cbb2ecf..4a0079ed7a 100644
+--- a/modules/gui/qt/util/input_slider.cpp
++++ b/modules/gui/qt/util/input_slider.cpp
+@@ -723,7 +723,6 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
+ void SoundSlider::wheelEvent( QWheelEvent *event )
+ {
+     wheelEventConverter.wheelEvent(event);
+-    event->accept();
+     emit sliderReleased();
+ }
+ 
+-- 
+2.50.1
+

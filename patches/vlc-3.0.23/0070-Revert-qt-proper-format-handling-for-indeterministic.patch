@@ -1,0 +1,36 @@
+From f9c6f7cd3d33ab146f574be87303eb45622fa98e Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:10 +0900
+Subject: [PATCH 070/120] Revert "qt: proper format handling for
+ indeterministic integer type"
+
+This reverts commit adacb4ff6d96781b2ae2dffd56022ad886d4a05d.
+---
+ modules/gui/qt/dialogs/open.cpp | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/modules/gui/qt/dialogs/open.cpp b/modules/gui/qt/dialogs/open.cpp
+index 4c0b790092..bbfce715bf 100644
+--- a/modules/gui/qt/dialogs/open.cpp
++++ b/modules/gui/qt/dialogs/open.cpp
+@@ -32,8 +32,6 @@
+ #include <QRegularExpression>
+ #include <QMenu>
+ 
+-#include <cstddef>
+-
+ #ifndef NDEBUG
+ # define DEBUG_QT 1
+ #endif
+@@ -413,7 +411,7 @@ void OpenDialog::stream( bool b_transcode_only )
+     toggleVisible();
+ 
+     /* Dbg and send :D */
+-    msg_Dbg( p_intf, "MRL(s) passed to the Sout: %zu", static_cast<size_t>( soutMRLS.length() ) );
++    msg_Dbg( p_intf, "MRL(s) passed to the Sout: %i", soutMRLS.length() );
+     for(int i = 0; i < soutMRLS.length(); i++)
+     {
+         msg_Dbg( p_intf, "MRL(s) passed to the Sout: %s", qtu( soutMRLS[i] ) );
+-- 
+2.50.1
+

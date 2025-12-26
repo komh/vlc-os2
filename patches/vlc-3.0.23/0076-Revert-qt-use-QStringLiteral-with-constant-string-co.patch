@@ -1,0 +1,27 @@
+From 1f90d03fac9c1ed9753bb5c6f267683165761d84 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:28 +0900
+Subject: [PATCH 076/120] Revert "qt: use QStringLiteral with constant string
+ concatenation"
+
+This reverts commit 0c699ef96efdd11b16f05d811f446c24e01bc063.
+---
+ modules/gui/qt/components/preferences_widgets.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/components/preferences_widgets.cpp b/modules/gui/qt/components/preferences_widgets.cpp
+index 2c1fa92694..ef15ee2350 100644
+--- a/modules/gui/qt/components/preferences_widgets.cpp
++++ b/modules/gui/qt/components/preferences_widgets.cpp
+@@ -1404,7 +1404,7 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
+     existingkeys = NULL;
+ 
+     table = _table;
+-    setWindowTitle( ( b_global ? qtr( "Global" ) + QString(" ") : QStringLiteral("") )
++    setWindowTitle( ( b_global ? qtr( "Global" ) + QString(" ") : "" )
+                     + qtr( "Hotkey change" ) );
+     setWindowRole( "vlc-key-input" );
+ 
+-- 
+2.50.1
+

@@ -1,0 +1,25 @@
+From 60345c0e298bf335850ca1368901f4016e15e715 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:03:19 +0900
+Subject: [PATCH 029/120] Revert "qt: remove unused DialogEventTypeOffset"
+
+This reverts commit 548e797d83b716806fddd0c7fd17abab26632180.
+---
+ modules/gui/qt/qt.hpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/modules/gui/qt/qt.hpp b/modules/gui/qt/qt.hpp
+index c64db1ab84..81ca8f4d83 100644
+--- a/modules/gui/qt/qt.hpp
++++ b/modules/gui/qt/qt.hpp
+@@ -59,6 +59,7 @@
+ #endif
+ 
+ enum {
++    DialogEventTypeOffset = 0,
+     IMEventTypeOffset     = 100,
+     PLEventTypeOffset     = 200,
+     MsgEventTypeOffset    = 300,
+-- 
+2.50.1
+

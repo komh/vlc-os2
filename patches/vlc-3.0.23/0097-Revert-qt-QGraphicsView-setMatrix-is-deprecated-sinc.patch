@@ -1,0 +1,30 @@
+From 5d3ecb73b55d8c0a2526bab1a8c7b0cb4c90f6f4 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:31 +0900
+Subject: [PATCH 097/120] Revert "qt: QGraphicsView::setMatrix is deprecated
+ since Qt 5.15"
+
+This reverts commit 952f7990086b036449e99d5fc3a1a22d464f9d78.
+---
+ modules/gui/qt/components/epg/EPGView.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/components/epg/EPGView.cpp b/modules/gui/qt/components/epg/EPGView.cpp
+index 80f4a774cb..15e6a93e60 100644
+--- a/modules/gui/qt/components/epg/EPGView.cpp
++++ b/modules/gui/qt/components/epg/EPGView.cpp
+@@ -95,9 +95,9 @@ EPGView::EPGView( QWidget *parent ) : QGraphicsView( parent )
+ void EPGView::setScale( double scaleFactor )
+ {
+     m_scaleFactor = scaleFactor;
+-    QTransform matrix;
++    QMatrix matrix;
+     matrix.scale( scaleFactor, 1 );
+-    setTransform( matrix );
++    setMatrix( matrix );
+ }
+ 
+ const QDateTime& EPGView::startTime() const
+-- 
+2.50.1
+

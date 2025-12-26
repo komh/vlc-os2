@@ -1,0 +1,27 @@
+From e7d38800080abd9c63aeebc8cbbfc9f83ab09a2a Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:43 +0900
+Subject: [PATCH 061/120] Revert "qt: use QAbstractItemModel::index() instead
+ of QModelIndex::child()"
+
+This reverts commit 7ae9caeb96f0387e4c6786b798ddb694c78da6a8.
+---
+ modules/gui/qt/components/playlist/vlc_model.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/components/playlist/vlc_model.cpp b/modules/gui/qt/components/playlist/vlc_model.cpp
+index 9a881d0b21..6144272c05 100644
+--- a/modules/gui/qt/components/playlist/vlc_model.cpp
++++ b/modules/gui/qt/components/playlist/vlc_model.cpp
+@@ -206,7 +206,7 @@ void VLCModel::ensureArtRequested( const QModelIndex &index )
+         QModelIndex child;
+         for( int row = 0 ; row < nbnodes ; row++ )
+         {
+-            child = index.model()->index( row, COLUMN_COVER );
++            child = index.child( row, COLUMN_COVER );
+             if ( child.isValid() && child.data().toString().isEmpty() )
+                 THEMIM->getIM()->requestArtUpdate( getInputItem( child ), false );
+         }
+-- 
+2.50.1
+

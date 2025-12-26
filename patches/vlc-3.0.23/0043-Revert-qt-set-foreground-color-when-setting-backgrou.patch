@@ -1,0 +1,30 @@
+From ca1273e8823dfe6ef651ced00526d3e248157331 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:05:10 +0900
+Subject: [PATCH 043/120] Revert "qt: set foreground color when setting
+ background color in stylesheet"
+
+This reverts commit 553e1def6a7d8371292208279c1c695206696b00.
+---
+ modules/gui/qt/main_interface.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index 5274d42512..dfb0e82262 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -572,9 +572,9 @@ inline void MainInterface::createStatusBar()
+     nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
+     auto updateStyle = [=]() {
+         timeLabel->setStyleSheet(
+-            "QLabel:hover { color: black; background-color: rgba(255, 255, 255, 50%) }" );
++            "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
+         speedLabel->setStyleSheet(
+-            "QLabel:hover { color: black; background-color: rgba(255, 255, 255, 50%) }" );
++            "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
+         /* pad both label and its tooltip */
+         nameLabel->setStyleSheet( "padding-left: 5px; padding-right: 5px;" );
+ 
+-- 
+2.50.1
+

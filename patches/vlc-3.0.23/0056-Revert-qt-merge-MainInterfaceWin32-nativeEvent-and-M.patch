@@ -1,0 +1,44 @@
+From 0f08889ee409ea7347726ff55a0c11c7991bde21 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:28 +0900
+Subject: [PATCH 056/120] Revert "qt: merge MainInterfaceWin32::nativeEvent()
+ and MainInterfaceWin32::winEvent()"
+
+This reverts commit 0713a59ad9836ae100fef924c16ec4971de2d7e8.
+---
+ modules/gui/qt/main_interface_win32.cpp | 5 ++++-
+ modules/gui/qt/main_interface_win32.hpp | 1 +
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/main_interface_win32.cpp b/modules/gui/qt/main_interface_win32.cpp
+index c6f687042a..b8012aedff 100644
+--- a/modules/gui/qt/main_interface_win32.cpp
++++ b/modules/gui/qt/main_interface_win32.cpp
+@@ -230,8 +230,11 @@ void MainInterfaceWin32::createTaskBarButtons()
+ 
+ bool MainInterfaceWin32::nativeEvent(const QByteArray &, void *message, long *result)
+ {
+-    MSG * msg = static_cast<MSG*>( message );
++    return winEvent( static_cast<MSG*>( message ), result );
++}
+ 
++bool MainInterfaceWin32::winEvent ( MSG * msg, long * result )
++{
+     if (msg->message == taskbar_wmsg)
+     {
+         //We received the taskbarbuttoncreated, now we can really create the buttons
+diff --git a/modules/gui/qt/main_interface_win32.hpp b/modules/gui/qt/main_interface_win32.hpp
+index 09538d4c29..1e456c4c35 100644
+--- a/modules/gui/qt/main_interface_win32.hpp
++++ b/modules/gui/qt/main_interface_win32.hpp
+@@ -37,6 +37,7 @@ public:
+ 
+ private:
+     virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) Q_DECL_OVERRIDE;
++    virtual bool winEvent( MSG *, long * );
+     virtual void toggleUpdateSystrayMenuWhenVisible() Q_DECL_OVERRIDE;
+ 
+ protected:
+-- 
+2.50.1
+

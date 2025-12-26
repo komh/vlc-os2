@@ -1,0 +1,25 @@
+From 704529bd980f487a8c24966659a6ab3b01b8be0c Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:04:52 +0900
+Subject: [PATCH 037/120] Revert "qt: consume THBN_CLICKED events"
+
+This reverts commit aa9ff8aca3a67e2e86aa39d4c158a94073ce9c08.
+---
+ modules/gui/qt/main_interface_win32.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/modules/gui/qt/main_interface_win32.cpp b/modules/gui/qt/main_interface_win32.cpp
+index 1ac4d09fb9..29fefcfe27 100644
+--- a/modules/gui/qt/main_interface_win32.cpp
++++ b/modules/gui/qt/main_interface_win32.cpp
+@@ -261,7 +261,6 @@ bool MainInterfaceWin32::nativeEventFilter(const QByteArray &, void *message, lo
+                         THEMIM->next();
+                         break;
+                 }
+-                return true;
+             }
+             break;
+         case WM_APPCOMMAND:
+-- 
+2.50.1
+

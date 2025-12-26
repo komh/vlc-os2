@@ -1,0 +1,50 @@
+From cf809b8219863dde467b91740b92aafa3bb7cab1 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:07 +0900
+Subject: [PATCH 089/120] Revert "qt: preferences_widgets: use override"
+
+This reverts commit 9399cc218cccdea08791f30f00cabab91410bf88.
+---
+ modules/gui/qt/components/preferences_widgets.hpp | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/modules/gui/qt/components/preferences_widgets.hpp b/modules/gui/qt/components/preferences_widgets.hpp
+index 75b79139ee..5f516fbd5d 100644
+--- a/modules/gui/qt/components/preferences_widgets.hpp
++++ b/modules/gui/qt/components/preferences_widgets.hpp
+@@ -116,8 +116,8 @@ class VIntConfigControl : public ConfigControl
+ Q_OBJECT
+ public:
+     virtual int getValue() const = 0;
+-    virtual int getType() const override;
+-    virtual void doApply() override;
++    virtual int getType() const Q_DECL_OVERRIDE;
++    virtual void doApply() Q_DECL_OVERRIDE;
+ protected:
+     VIntConfigControl( vlc_object_t *a, module_config_t *b ) :
+                 ConfigControl(a,b) {}
+@@ -252,8 +252,8 @@ class VFloatConfigControl : public ConfigControl
+     Q_OBJECT
+ public:
+     virtual float getValue() const = 0;
+-    int getType() const override;
+-    void doApply() override;
++    int getType() const Q_DECL_OVERRIDE;
++    void doApply() Q_DECL_OVERRIDE;
+ protected:
+     VFloatConfigControl( vlc_object_t *a, module_config_t *b ) :
+                 ConfigControl(a,b) {};
+@@ -301,8 +301,8 @@ class VStringConfigControl : public ConfigControl
+     Q_OBJECT
+ public:
+     virtual QString getValue() const = 0;
+-    int getType() const override;
+-    void doApply() override;
++    int getType() const Q_DECL_OVERRIDE;
++    void doApply() Q_DECL_OVERRIDE;
+ protected:
+     VStringConfigControl( vlc_object_t *a, module_config_t *b ) :
+                 ConfigControl(a,b) {}
+-- 
+2.50.1
+

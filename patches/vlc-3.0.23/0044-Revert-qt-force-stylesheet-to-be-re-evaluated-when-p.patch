@@ -1,0 +1,202 @@
+From a64a68a0e1620693f4e3556fd8984b030135d6b6 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:05:13 +0900
+Subject: [PATCH 044/120] Revert "qt: force stylesheet to be re-evaluated when
+ palette changes"
+
+This reverts commit 6da8ba684714ee535dc9ae2c67ca3f9d57eadb90.
+---
+ .../gui/qt/components/interface_widgets.cpp   | 14 +--------
+ .../gui/qt/components/playlist/selector.cpp   | 15 +---------
+ modules/gui/qt/main_interface.cpp             | 18 +++---------
+ modules/gui/qt/qt.cpp                         |  3 --
+ modules/gui/qt/qt.hpp                         |  1 -
+ modules/gui/qt/util/customwidgets.cpp         | 11 +------
+ modules/gui/qt/util/searchlineedit.cpp        | 29 +++++++------------
+ 7 files changed, 17 insertions(+), 74 deletions(-)
+
+diff --git a/modules/gui/qt/components/interface_widgets.cpp b/modules/gui/qt/components/interface_widgets.cpp
+index 93499a3bce..f0ee3915d9 100644
+--- a/modules/gui/qt/components/interface_widgets.cpp
++++ b/modules/gui/qt/components/interface_widgets.cpp
+@@ -1002,19 +1002,7 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
+     CONNECT( THEMIM->getIM(), remainingTimeChanged( bool ),
+               this, setRemainingTime( bool ) );
+ 
+-
+-    auto updateStyle = [this]() {
+-        setStyleSheet( "TimeLabel {  padding-left: 4px; padding-right: 4px; }" );
+-    };
+-
+-    updateStyle();
+-
+-//same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
+-#if !HAS_QT57
+-    connect(qApp, &QApplication::paletteChanged, this, [this, updateStyle](){
+-        updateStyle();
+-    });
+-#endif
++    setStyleSheet( "QLabel { padding-left: 4px; padding-right: 4px; }" );
+ }
+ 
+ void TimeLabel::setRemainingTime( bool remainingTime )
+diff --git a/modules/gui/qt/components/playlist/selector.cpp b/modules/gui/qt/components/playlist/selector.cpp
+index 68324a90e8..66e180bf47 100644
+--- a/modules/gui/qt/components/playlist/selector.cpp
++++ b/modules/gui/qt/components/playlist/selector.cpp
+@@ -424,20 +424,7 @@ PLSelItem * PLSelector::addItem (
+       new QTreeWidgetItem( parentItem ) : new QTreeWidgetItem( this );
+ 
+   PLSelItem *selItem = new PLSelItem( item, qtr( str ) );
+-
+-
+-  if ( bold ) {
+-      auto updateStyle = [selItem]() {
+-          selItem->setStyleSheet( "font-weight: bold;" );
+-      };
+-      updateStyle();
+-//same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
+-#if !HAS_QT57
+-      connect(qApp, &QApplication::paletteChanged, selItem, [selItem, updateStyle](){
+-          updateStyle();
+-      });
+-#endif
+-  }
++  if ( bold ) selItem->setStyleSheet( "font-weight: bold;" );
+   setItemWidget( item, 0, selItem );
+   item->setData( 0, TYPE_ROLE, (int)type );
+   if( !drop ) item->setFlags( item->flags() & ~Qt::ItemIsDropEnabled );
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index dfb0e82262..396cf3a89e 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -570,22 +570,12 @@ inline void MainInterface::createStatusBar()
+     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
+     speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
+     nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
+-    auto updateStyle = [=]() {
+-        timeLabel->setStyleSheet(
++    timeLabel->setStyleSheet(
+             "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
+-        speedLabel->setStyleSheet(
++    speedLabel->setStyleSheet(
+             "QLabel:hover { background-color: rgba(255, 255, 255, 50%) }" );
+-        /* pad both label and its tooltip */
+-        nameLabel->setStyleSheet( "padding-left: 5px; padding-right: 5px;" );
+-
+-    };
+-    updateStyle();
+-//same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
+-#if !HAS_QT57
+-    connect(qApp, &QApplication::paletteChanged, this, [this, updateStyle](){
+-        updateStyle();
+-    });
+-#endif
++    /* pad both label and its tooltip */
++    nameLabel->setStyleSheet( "padding-left: 5px; padding-right: 5px;" );
+ 
+     /* and adding those */
+     statusBarr->addWidget( nameLabel, 8 );
+diff --git a/modules/gui/qt/qt.cpp b/modules/gui/qt/qt.cpp
+index 5d3b2e6928..98cdbf4c6c 100644
+--- a/modules/gui/qt/qt.cpp
++++ b/modules/gui/qt/qt.cpp
+@@ -588,9 +588,6 @@ static void *ThreadPlatform( void *obj, char *platform_name )
+     QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
+     QApplication::setAttribute( Qt::AA_UseHighDpiPixmaps );
+ #endif
+-#if HAS_QT57
+-    QApplication::setAttribute( Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
+-#endif
+ 
+     /* Start the QApplication here */
+     QVLCApp app( argc, argv );
+diff --git a/modules/gui/qt/qt.hpp b/modules/gui/qt/qt.hpp
+index 81ca8f4d83..0408259c87 100644
+--- a/modules/gui/qt/qt.hpp
++++ b/modules/gui/qt/qt.hpp
+@@ -50,7 +50,6 @@
+ #define HAS_QT5  ( QT_VERSION >= 0x050000 )
+ #define HAS_QT54 ( QT_VERSION >= 0x050400 )
+ #define HAS_QT56 ( QT_VERSION >= 0x050600 )
+-#define HAS_QT57 ( QT_VERSION >= 0x050700 )
+ #define HAS_QT510 ( QT_VERSION >= 0x051000 )
+ 
+ /* Q_DECL_OVERRIDE is a Qt5 feature, add empty define to not break with Qt4 */
+diff --git a/modules/gui/qt/util/customwidgets.cpp b/modules/gui/qt/util/customwidgets.cpp
+index c63bed7f9d..2f55009b98 100644
+--- a/modules/gui/qt/util/customwidgets.cpp
++++ b/modules/gui/qt/util/customwidgets.cpp
+@@ -401,8 +401,7 @@ void QToolButtonExt::clickedSlot()
+ YesNoCheckBox::YesNoCheckBox( QWidget *parent ) : QCheckBox( parent )
+ {
+     setEnabled( false );
+-    auto updateStyle = [this]() {
+-        setStyleSheet("\
++    setStyleSheet("\
+                   QCheckBox::indicator:unchecked:hover,\
+                   QCheckBox::indicator:unchecked {\
+                       image: url(:/toolbar/clear.svg);\
+@@ -412,12 +411,4 @@ YesNoCheckBox::YesNoCheckBox( QWidget *parent ) : QCheckBox( parent )
+                       image: url(:/valid.svg);\
+                   }\
+         ");
+-    };
+-    updateStyle();
+-//same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
+-#if !HAS_QT57
+-    connect(qApp, &QApplication::paletteChanged, this, [this, updateStyle](){
+-        updateStyle();
+-    });
+-#endif
+ }
+diff --git a/modules/gui/qt/util/searchlineedit.cpp b/modules/gui/qt/util/searchlineedit.cpp
+index 3031f03716..c4c7d8e2b6 100644
+--- a/modules/gui/qt/util/searchlineedit.cpp
++++ b/modules/gui/qt/util/searchlineedit.cpp
+@@ -37,7 +37,6 @@
+ #include <QRect>
+ #include <QStyle>
+ #include <QStyleOption>
+-#include <QApplication>
+ 
+ #include <vlc_intf_strings.h>
+ 
+@@ -52,24 +51,16 @@ SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
+ 
+     CONNECT( clearButton, clicked(), this, clear() );
+ 
+-    auto updateStyle = [=]() {
+-        int frameWidth = style()->pixelMetric( QStyle::PM_DefaultFrameWidth, 0, this );
+-        QFontMetrics metrics( font() );
+-        QString styleSheet = QString( "min-height: %1px; "
+-                                     "padding-top: 1px; "
+-                                     "padding-bottom: 1px; "
+-                                     "padding-right: %2px;" )
+-                                 .arg( metrics.height() + ( 2 * frameWidth ) )
+-                                 .arg( clearButton->sizeHint().width() + 6 );
+-        setStyleSheet( styleSheet );
+-    };
+-    updateStyle();
+-//same as Qt::AA_UseStyleSheetPropagationInWidgetStyles
+-#if !HAS_QT57
+-    connect(qApp, &QApplication::paletteChanged, this, [this, updateStyle](){
+-        updateStyle();
+-    });
+-#endif
++    int frameWidth = style()->pixelMetric( QStyle::PM_DefaultFrameWidth, 0, this );
++
++    QFontMetrics metrics( font() );
++    QString styleSheet = QString( "min-height: %1px; "
++                                  "padding-top: 1px; "
++                                  "padding-bottom: 1px; "
++                                  "padding-right: %2px;" )
++                                  .arg( metrics.height() + ( 2 * frameWidth ) )
++                                  .arg( clearButton->sizeHint().width() + 6 );
++    setStyleSheet( styleSheet );
+ 
+     setMessageVisible( true );
+ 
+-- 
+2.50.1
+

@@ -1,0 +1,55 @@
+From 5727a066e1c2317e98a04b3e9b231e5dc05c768b Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:05:25 +0900
+Subject: [PATCH 048/120] Revert "qt: use QWheelEvent::DefaultDeltasPerStep
+ instead of hardcoded values"
+
+This reverts commit 7b9c6bf309d9da4c22b3605608893a0af9b73ce2.
+---
+ modules/gui/qt/components/playlist/standardpanel.cpp | 2 +-
+ modules/gui/qt/util/input_slider.cpp                 | 2 +-
+ modules/gui/qt/util/pictureflow.cpp                  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/modules/gui/qt/components/playlist/standardpanel.cpp b/modules/gui/qt/components/playlist/standardpanel.cpp
+index 4b0926ce67..d27da0260c 100644
+--- a/modules/gui/qt/components/playlist/standardpanel.cpp
++++ b/modules/gui/qt/components/playlist/standardpanel.cpp
+@@ -538,7 +538,7 @@ void StandardPLPanel::browseInto()
+ void StandardPLPanel::wheelEvent( QWheelEvent *e )
+ {
+     if( e->modifiers() & Qt::ControlModifier ) {
+-        int numSteps = e->angleDelta().y() / QWheelEvent::DefaultDeltasPerStep;
++        int numSteps = e->angleDelta().y() / 8 / 15;
+         if( numSteps > 0)
+             increaseZoom();
+         else if( numSteps < 0)
+diff --git a/modules/gui/qt/util/input_slider.cpp b/modules/gui/qt/util/input_slider.cpp
+index d0bca18afa..7670f33d3a 100644
+--- a/modules/gui/qt/util/input_slider.cpp
++++ b/modules/gui/qt/util/input_slider.cpp
+@@ -683,7 +683,7 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
+ 
+ void SoundSlider::wheelEvent( QWheelEvent *event )
+ {
+-    int newvalue = value() + event->angleDelta().y() / QWheelEvent::DefaultDeltasPerStep * f_step;
++    int newvalue = value() + event->angleDelta().y() / ( 8 * 15 ) * f_step;
+     setValue( __MIN( __MAX( minimum(), newvalue ), maximum() ) );
+ 
+     emit sliderReleased();
+diff --git a/modules/gui/qt/util/pictureflow.cpp b/modules/gui/qt/util/pictureflow.cpp
+index e0ce549374..08279bc007 100644
+--- a/modules/gui/qt/util/pictureflow.cpp
++++ b/modules/gui/qt/util/pictureflow.cpp
+@@ -887,7 +887,7 @@ void PictureFlow::wheelEvent(QWheelEvent * event)
+     }
+     else
+     {
+-        int numSteps = -(p.y() / QWheelEvent::DefaultDeltasPerStep);
++        int numSteps = -((p.y() / 8) / 15);
+ 
+         if (numSteps > 0)
+         {
+-- 
+2.50.1
+

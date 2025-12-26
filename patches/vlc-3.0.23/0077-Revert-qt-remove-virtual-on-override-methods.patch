@@ -1,0 +1,101 @@
+From f56fda5af87746f75eb84d6bcdbce9ed86a5bde2 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:31 +0900
+Subject: [PATCH 077/120] Revert "qt: remove virtual on override methods"
+
+This reverts commit 3e64644242783c68892262b11c178a1c668ab14a.
+---
+ modules/gui/qt/components/interface_widgets.hpp   | 2 +-
+ modules/gui/qt/components/open_panels.hpp         | 4 ++--
+ modules/gui/qt/components/preferences_widgets.hpp | 2 +-
+ modules/gui/qt/dialogs/epg.hpp                    | 2 +-
+ modules/gui/qt/dialogs/help.hpp                   | 4 ++--
+ modules/gui/qt/dialogs/openurl.hpp                | 2 +-
+ 6 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/modules/gui/qt/components/interface_widgets.hpp b/modules/gui/qt/components/interface_widgets.hpp
+index c953004d62..9730e602ff 100644
+--- a/modules/gui/qt/components/interface_widgets.hpp
++++ b/modules/gui/qt/components/interface_widgets.hpp
+@@ -161,7 +161,7 @@ class ClickableQLabel : public QLabel
+ {
+     Q_OBJECT
+ public:
+-    void mouseDoubleClickEvent( QMouseEvent *event ) override
++    virtual void mouseDoubleClickEvent( QMouseEvent *event ) override
+     {
+         Q_UNUSED( event );
+         emit doubleClicked();
+diff --git a/modules/gui/qt/components/open_panels.hpp b/modules/gui/qt/components/open_panels.hpp
+index 4c20b470f4..f0874de78b 100644
+--- a/modules/gui/qt/components/open_panels.hpp
++++ b/modules/gui/qt/components/open_panels.hpp
+@@ -185,9 +185,9 @@ public:
+     void clear() Q_DECL_OVERRIDE;
+     virtual void accept();
+ #if defined( _WIN32 ) || defined( __OS2__ )
+-    void onFocus() override;
++    virtual void onFocus() override;
+ #endif
+-    void updateContext(int) Q_DECL_OVERRIDE;
++    virtual void updateContext(int) Q_DECL_OVERRIDE;
+ private:
+     Ui::OpenDisk ui;
+     char *psz_dvddiscpath, *psz_vcddiscpath, *psz_cddadiscpath;
+diff --git a/modules/gui/qt/components/preferences_widgets.hpp b/modules/gui/qt/components/preferences_widgets.hpp
+index aa27563b1b..75b79139ee 100644
+--- a/modules/gui/qt/components/preferences_widgets.hpp
++++ b/modules/gui/qt/components/preferences_widgets.hpp
+@@ -117,7 +117,7 @@ Q_OBJECT
+ public:
+     virtual int getValue() const = 0;
+     virtual int getType() const override;
+-    void doApply() override;
++    virtual void doApply() override;
+ protected:
+     VIntConfigControl( vlc_object_t *a, module_config_t *b ) :
+                 ConfigControl(a,b) {}
+diff --git a/modules/gui/qt/dialogs/epg.hpp b/modules/gui/qt/dialogs/epg.hpp
+index 8bc9192f52..26a28be99c 100644
+--- a/modules/gui/qt/dialogs/epg.hpp
++++ b/modules/gui/qt/dialogs/epg.hpp
+@@ -37,7 +37,7 @@ class EpgDialog : public QVLCFrame, public Singleton<EpgDialog>
+ {
+     Q_OBJECT
+ protected:
+-    void showEvent(QShowEvent * event) override;
++    virtual void showEvent(QShowEvent * event) override;
+ 
+ private:
+     EpgDialog( intf_thread_t * );
+diff --git a/modules/gui/qt/dialogs/help.hpp b/modules/gui/qt/dialogs/help.hpp
+index 7d8f56956c..1293be4e1f 100644
+--- a/modules/gui/qt/dialogs/help.hpp
++++ b/modules/gui/qt/dialogs/help.hpp
+@@ -61,8 +61,8 @@ public slots:
+     friend class    Singleton<AboutDialog>;
+ 
+ protected:
+-    bool eventFilter(QObject *obj, QEvent *event) Q_DECL_OVERRIDE;
+-    void showEvent ( QShowEvent * ) Q_DECL_OVERRIDE;
++    virtual bool eventFilter(QObject *obj, QEvent *event) Q_DECL_OVERRIDE;
++    virtual void showEvent ( QShowEvent * ) Q_DECL_OVERRIDE;
+ 
+ private:
+     bool b_advanced;
+diff --git a/modules/gui/qt/dialogs/openurl.hpp b/modules/gui/qt/dialogs/openurl.hpp
+index d1d84b04f1..31380e1cfa 100644
+--- a/modules/gui/qt/dialogs/openurl.hpp
++++ b/modules/gui/qt/dialogs/openurl.hpp
+@@ -53,7 +53,7 @@ public:
+ 
+     QString url() const;
+     bool shouldEnqueue() const;
+-    void showEvent( QShowEvent *ev ) Q_DECL_OVERRIDE;
++    virtual void showEvent( QShowEvent *ev ) Q_DECL_OVERRIDE;
+ 
+ public slots:
+     void close() Q_DECL_OVERRIDE { play(); }
+-- 
+2.50.1
+

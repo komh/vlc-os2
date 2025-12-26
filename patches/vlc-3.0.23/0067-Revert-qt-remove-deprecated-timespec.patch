@@ -1,0 +1,37 @@
+From 23ab5805432320cb929890cef7522273be1b0a1e Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:01 +0900
+Subject: [PATCH 067/120] Revert "qt: remove deprecated timespec"
+
+This reverts commit 2c43e321f246e1ef4588400cfb77e95d05a2a0ca.
+---
+ modules/gui/qt/ui/open.ui | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/modules/gui/qt/ui/open.ui b/modules/gui/qt/ui/open.ui
+index b9c01307f0..f105fe42bf 100644
+--- a/modules/gui/qt/ui/open.ui
++++ b/modules/gui/qt/ui/open.ui
+@@ -249,6 +249,9 @@
+         <property name="displayFormat">
+          <string>HH'H':mm'm':ss's'.zzz</string>
+         </property>
++        <property name="timeSpec">
++         <enum>Qt::LocalTime</enum>
++        </property>
+        </widget>
+       </item>
+       <item row="1" column="4" colspan="2">
+@@ -265,6 +268,9 @@
+         <property name="displayFormat">
+          <string>HH'H':mm'm':ss's'.zzz</string>
+         </property>
++        <property name="timeSpec">
++         <enum>Qt::LocalTime</enum>
++        </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="6">
+-- 
+2.50.1
+

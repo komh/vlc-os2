@@ -1,0 +1,156 @@
+From 70b2fd42e197918281fbecda1d92201022a44c4a Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:52 +0900
+Subject: [PATCH 084/120] Revert "qt: replace setMargin with
+ setContentsMargins"
+
+This reverts commit 66f095c3aac1fe03a915803ba77a43f817c95cab.
+---
+ modules/gui/qt/components/complete_preferences.cpp | 2 +-
+ modules/gui/qt/components/open_panels.cpp          | 2 +-
+ modules/gui/qt/components/preferences_widgets.cpp  | 2 +-
+ modules/gui/qt/components/simple_preferences.cpp   | 4 ++--
+ modules/gui/qt/dialogs/epg.cpp                     | 2 +-
+ modules/gui/qt/dialogs/plugins.cpp                 | 6 +++---
+ modules/gui/qt/dialogs/preferences.cpp             | 6 +++---
+ 7 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/modules/gui/qt/components/complete_preferences.cpp b/modules/gui/qt/components/complete_preferences.cpp
+index fabf22f6cf..42be4e3663 100644
+--- a/modules/gui/qt/components/complete_preferences.cpp
++++ b/modules/gui/qt/components/complete_preferences.cpp
+@@ -622,7 +622,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+ 
+     /* Widgets now */
+     global_layout = new QVBoxLayout();
+-    global_layout->setContentsMargins( 2, 2, 2, 2 );
++    global_layout->setMargin( 2 );
+     QString head;
+     QString help;
+ 
+diff --git a/modules/gui/qt/components/open_panels.cpp b/modules/gui/qt/components/open_panels.cpp
+index 5f4bd42256..6c218aa246 100644
+--- a/modules/gui/qt/components/open_panels.cpp
++++ b/modules/gui/qt/components/open_panels.cpp
+@@ -161,7 +161,7 @@ inline void FileOpenPanel::BuildOldPanel()
+     /* Change the text that was uncool in the usual box */
+     listLabel[2]->setText( qtr( "Filter:" ) );
+ 
+-    dialogBox->layout()->setContentsMargins(0, 0, 0, 0);
++    dialogBox->layout()->setMargin( 0 );
+     dialogBox->layout()->setSizeConstraint( QLayout::SetNoConstraint );
+ 
+     /** END of QFileDialog tweaking **/
+diff --git a/modules/gui/qt/components/preferences_widgets.cpp b/modules/gui/qt/components/preferences_widgets.cpp
+index ef15ee2350..149db90ba3 100644
+--- a/modules/gui/qt/components/preferences_widgets.cpp
++++ b/modules/gui/qt/components/preferences_widgets.cpp
+@@ -273,7 +273,7 @@ void FileConfigControl::fillGrid( QGridLayout *l, int line )
+     l->addWidget( label, line, 0 );
+     l->setColumnMinimumWidth( 1, 10 );
+     QHBoxLayout *textAndButton = new QHBoxLayout();
+-    textAndButton->setContentsMargins( 0, 0, 0, 0 );
++    textAndButton->setMargin( 0 );
+     textAndButton->addWidget( text, 2 );
+     textAndButton->addWidget( browse, 0 );
+     l->addLayout( textAndButton, line, LAST_COLUMN );
+diff --git a/modules/gui/qt/components/simple_preferences.cpp b/modules/gui/qt/components/simple_preferences.cpp
+index 5f0c1ba145..04611a203a 100644
+--- a/modules/gui/qt/components/simple_preferences.cpp
++++ b/modules/gui/qt/components/simple_preferences.cpp
+@@ -253,7 +253,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
+ #undef ADD_CATEGORY
+ 
+     SPrefsInterface->setChecked( true );
+-    layout->setContentsMargins(0, 0, 0, 0);
++    layout->setMargin( 0 );
+     layout->setSpacing( 1 );
+ 
+     setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Preferred);
+@@ -348,7 +348,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+ 
+     QVBoxLayout *panel_layout = new QVBoxLayout();
+     QWidget *panel = new QWidget();
+-    panel_layout->setContentsMargins(3, 3, 3, 3);
++    panel_layout->setMargin( 3 );
+ 
+     // Title Label
+     QLabel *panel_label = new QLabel;
+diff --git a/modules/gui/qt/dialogs/epg.cpp b/modules/gui/qt/dialogs/epg.cpp
+index 8d61d021d6..3a4f46cf9b 100644
+--- a/modules/gui/qt/dialogs/epg.cpp
++++ b/modules/gui/qt/dialogs/epg.cpp
+@@ -49,7 +49,7 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
+     setWindowTitle( qtr( "Program Guide" ) );
+ 
+     QVBoxLayout *layout = new QVBoxLayout( this );
+-    layout->setContentsMargins(0, 0, 0, 0);
++    layout->setMargin( 0 );
+     epg = new EPGWidget( this );
+ 
+     QGroupBox *descBox = new QGroupBox( qtr( "Description" ), this );
+diff --git a/modules/gui/qt/dialogs/plugins.cpp b/modules/gui/qt/dialogs/plugins.cpp
+index d2cd5bfbd3..069d90b4d6 100644
+--- a/modules/gui/qt/dialogs/plugins.cpp
++++ b/modules/gui/qt/dialogs/plugins.cpp
+@@ -357,7 +357,7 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
+     QVBoxLayout *layout = new QVBoxLayout( rightPane );
+ 
+     // Left Pane
+-    leftPane->layout()->setContentsMargins(0, 0, 0, 0);
++    leftPane->layout()->setMargin(0);
+     leftPane->layout()->setSpacing(0);
+ 
+     SearchLineEdit *searchInput = new SearchLineEdit();
+@@ -409,7 +409,7 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
+                   ADDON_EXTENSION );
+ 
+     // Right Pane
+-    rightPane->layout()->setContentsMargins(0, 0, 0, 0);
++    rightPane->layout()->setMargin(0);
+     rightPane->layout()->setSpacing(0);
+ 
+     // Splitter sizes init
+@@ -1303,7 +1303,7 @@ QWidget *AddonItemDelegate::createEditor( QWidget *parent,
+     QPushButton *infoButton;
+ 
+     editorWidget->setLayout( new QHBoxLayout() );
+-    editorWidget->layout()->setContentsMargins(0, 0, 0, 0);
++    editorWidget->layout()->setMargin( 0 );
+ 
+     infoButton = new QPushButton( QIcon( ":/menu/info.svg" ),
+                                   qtr( "More information..." ) );
+diff --git a/modules/gui/qt/dialogs/preferences.cpp b/modules/gui/qt/dialogs/preferences.cpp
+index 1776df2099..e0b769221a 100644
+--- a/modules/gui/qt/dialogs/preferences.cpp
++++ b/modules/gui/qt/dialogs/preferences.cpp
+@@ -72,7 +72,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
+     types = new QGroupBox( qtr("Show settings") );
+     types->setAlignment( Qt::AlignHCenter );
+     QHBoxLayout *types_l = new QHBoxLayout;
+-    types_l->setSpacing( 3 ); types_l->setContentsMargins(3, 3, 3, 3);
++    types_l->setSpacing( 3 ); types_l->setMargin( 3 );
+     simple = new QRadioButton( qtr( "Simple" ), types );
+     simple->setToolTip( qtr( "Switch to simple preferences view" ) );
+     types_l->addWidget( simple );
+@@ -112,7 +112,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
+ 
+     simple_split_widget->layout()->addWidget( simple_tree_panel );
+     simple_split_widget->layout()->addWidget( simple_panels_stack );
+-    simple_split_widget->layout()->setContentsMargins(0, 0, 0, 0);
++    simple_split_widget->layout()->setMargin( 0 );
+ 
+     advanced_split_widget->addWidget( advanced_tree_panel );
+     advanced_split_widget->addWidget( advanced_panels_stack );
+@@ -122,7 +122,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
+     main_layout->addWidget( types, 3, 0, 2, 1 );
+     main_layout->addWidget( buttonsBox, 4, 2, 1 ,1 );
+     main_layout->setRowStretch( 2, 4 );
+-    main_layout->setContentsMargins(9, 9, 9, 9);
++    main_layout->setMargin( 9 );
+     setLayout( main_layout );
+ 
+     /* Margins */
+-- 
+2.50.1
+

@@ -1,0 +1,44 @@
+From 10a62689d3c24f82bb36d9c162d24aefa4b8bd11 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:05 +0900
+Subject: [PATCH 068/120] Revert "qt: define QT_NO_CAST_FROM_BYTEARRAY"
+
+This reverts commit fffeec5ce15d2036b288df85fd5fdfea9ce0ae31.
+---
+ modules/gui/qt/Makefile.am                       | 1 -
+ modules/gui/qt/components/simple_preferences.cpp | 6 +++---
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/modules/gui/qt/Makefile.am b/modules/gui/qt/Makefile.am
+index e97caed492..8af171eee0 100644
+--- a/modules/gui/qt/Makefile.am
++++ b/modules/gui/qt/Makefile.am
+@@ -13,7 +13,6 @@ SUFFIXES += .ui .h .hpp .moc.cpp
+ 
+ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+ 	-DQT_USE_QSTRINGBUILDER \
+-	-DQT_NO_CAST_FROM_BYTEARRAY \
+ 	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt
+ libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
+ libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM)
+diff --git a/modules/gui/qt/components/simple_preferences.cpp b/modules/gui/qt/components/simple_preferences.cpp
+index a9e5a85126..157d0b2ca9 100644
+--- a/modules/gui/qt/components/simple_preferences.cpp
++++ b/modules/gui/qt/components/simple_preferences.cpp
+@@ -1051,10 +1051,10 @@ void SPrefsPanel::apply()
+             qobject_cast<QComboBox *>(optionWidgets["inputLE"])->currentText().toUtf8();
+         if( devicepath.size() > 0 )
+         {
+-            config_PutPsz( p_intf, "dvd", devicepath.constData() );
+-            config_PutPsz( p_intf, "vcd", devicepath.constData() );
++            config_PutPsz( p_intf, "dvd", devicepath );
++            config_PutPsz( p_intf, "vcd", devicepath );
+             if( module_exists( "cdda" ) )
+-                config_PutPsz( p_intf, "cd-audio", devicepath.constData() );
++                config_PutPsz( p_intf, "cd-audio", devicepath );
+         }
+ 
+ #define CaC( name, factor ) config_PutInt( p_intf, name, i_comboValue * factor )
+-- 
+2.50.1
+

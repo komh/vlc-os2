@@ -1,0 +1,39 @@
+From e10f1621596f3d69893018ca9e8cb0a5728baa94 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:03:22 +0900
+Subject: [PATCH 030/120] Revert "qt: fix warning about ambiguous operators"
+
+This reverts commit d87c28fe0e506475a8edc06a9c0b082a1b485530.
+---
+ modules/gui/qt/menus.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/modules/gui/qt/menus.cpp b/modules/gui/qt/menus.cpp
+index 3d44f89109..c808bf56b5 100644
+--- a/modules/gui/qt/menus.cpp
++++ b/modules/gui/qt/menus.cpp
+@@ -147,9 +147,9 @@ QAction* addMIMStaticEntry( intf_thread_t *p_intf,
+     {
+         action = menu->addAction( text, THEMIM, member );
+     }
+-    action->setData( static_cast<int>( VLCMenuBar::ACTION_STATIC |
+-                     ( bStatic ? VLCMenuBar::ACTION_ALWAYS_ENABLED
+-                               : VLCMenuBar::ACTION_NONE ) )
++    action->setData( VLCMenuBar::ACTION_STATIC |
++                     ( bStatic ) ? VLCMenuBar::ACTION_ALWAYS_ENABLED
++                                 : VLCMenuBar::ACTION_NONE
+                    );
+     return action;
+ }
+@@ -1252,7 +1252,7 @@ static bool IsMenuEmpty( const char *psz_var, vlc_object_t *p_object )
+ 
+ #define TEXT_OR_VAR qfue ( text.psz_string ? text.psz_string : psz_var )
+ 
+-void VLCMenuBar::UpdateItem( intf_thread_t *, QMenu *menu,
++void VLCMenuBar::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
+         const char *psz_var, vlc_object_t *p_object, bool b_submenu )
+ {
+     vlc_value_t val, text;
+-- 
+2.50.1
+

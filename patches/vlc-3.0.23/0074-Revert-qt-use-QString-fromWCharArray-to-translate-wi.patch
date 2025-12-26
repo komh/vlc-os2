@@ -1,0 +1,49 @@
+From 781b604c9fcc313952b89d5aacbd40b1057f2553 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:22 +0900
+Subject: [PATCH 074/120] Revert "qt: use QString::fromWCharArray() to
+ translate widows WCHAR strings"
+
+This reverts commit fa92546494eb6a16351f7dab6ebb53e329c127be.
+---
+ modules/gui/qt/components/open_panels.cpp | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/modules/gui/qt/components/open_panels.cpp b/modules/gui/qt/components/open_panels.cpp
+index 141faf2824..76b33488ea 100644
+--- a/modules/gui/qt/components/open_panels.cpp
++++ b/modules/gui/qt/components/open_panels.cpp
+@@ -39,6 +39,9 @@
+ #include <vlc_intf_strings.h>
+ #include <vlc_modules.h>
+ #include <vlc_plugin.h>
++#ifdef _WIN32
++  #include <vlc_charset.h> /* FromWide for Win32 */
++#endif
+ 
+ #include <QFileDialog>
+ #include <QDialogButtonBox>
+@@ -392,14 +395,16 @@ void DiscOpenPanel::onFocus()
+                 wchar_t psz_name[512] = L"";
+                 GetVolumeInformationW( drive, psz_name, 511, NULL, NULL, NULL, NULL, 0 );
+ 
+-                QString psz_drive = QString::fromWCharArray( drive );
++                char *psz_drive = FromWide( drive );
+                 QString displayName = psz_drive;
+-                QString psz_title = QString::fromWCharArray( psz_name );
+-                if( !psz_title.isEmpty()) {
++                char *psz_title = FromWide( psz_name );
++                if( !EMPTY_STR(psz_title)) {
+                     displayName = displayName + " - "  + psz_title;
+                 }
+ 
+-                ui.deviceCombo->addItem( displayName, psz_drive );
++                ui.deviceCombo->addItem( displayName, qfu(psz_drive) );
++                free( psz_drive );
++                free( psz_title );
+             }
+ 
+             /* go to next drive */
+-- 
+2.50.1
+

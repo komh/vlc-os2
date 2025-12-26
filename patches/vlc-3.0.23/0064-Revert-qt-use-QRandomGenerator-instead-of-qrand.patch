@@ -1,0 +1,32 @@
+From 903c8c84c7db1931b2884d0ca19619e2afd8cac1 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:52 +0900
+Subject: [PATCH 064/120] Revert "qt: use QRandomGenerator instead of qrand()"
+
+This reverts commit b811be7a3be63d5c1b9da8ae96039a07f7bf61c5.
+---
+ modules/gui/qt/components/interface_widgets.cpp | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/modules/gui/qt/components/interface_widgets.cpp b/modules/gui/qt/components/interface_widgets.cpp
+index ce3f29c679..7ef09704ba 100644
+--- a/modules/gui/qt/components/interface_widgets.cpp
++++ b/modules/gui/qt/components/interface_widgets.cpp
+@@ -43,14 +43,6 @@
+ #include <QPainter>
+ #include <QTimer>
+ #include <QUrl>
+-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+-#include <QRandomGenerator>
+-
+-static inline int qrand() {
+-    auto * q = QRandomGenerator::system();
+-    return q->generate();
+-}
+-#endif
+ 
+ #if defined (QT5_HAS_X11)
+ # include <X11/Xlib.h>
+-- 
+2.50.1
+

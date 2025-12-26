@@ -1,0 +1,31 @@
+From 80c5f3f1f77711050065da0ca707828f18f7631c Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:19 +0900
+Subject: [PATCH 093/120] Revert "qt: fix QDateTime warning when Qt 5.14 is
+ used"
+
+This reverts commit 928c8e9f638f9ee7317fab5c9bcf541b1743cf1f.
+---
+ modules/gui/qt/components/epg/EPGView.cpp | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/modules/gui/qt/components/epg/EPGView.cpp b/modules/gui/qt/components/epg/EPGView.cpp
+index 54b5bd6ec9..80f4a774cb 100644
+--- a/modules/gui/qt/components/epg/EPGView.cpp
++++ b/modules/gui/qt/components/epg/EPGView.cpp
+@@ -48,12 +48,7 @@ void EPGGraphicsScene::drawBackground( QPainter *painter, const QRectF &rect)
+ 
+     /* day change */
+     QDateTime rectstarttime = epgView->startTime().addSecs( rect.left() );
+-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+-    QDateTime nextdaylimit = rectstarttime.date().startOfDay();
+-#else
+     QDateTime nextdaylimit = QDateTime( rectstarttime.date() );
+-#endif
+-
+     QRectF area( rect );
+     while( area.left() < width() )
+     {
+-- 
+2.50.1
+

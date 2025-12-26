@@ -1,0 +1,53 @@
+From 9098c17c0f0872b3c58ccacc74ea30e1e0628f15 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:25 +0900
+Subject: [PATCH 075/120] Revert "qt: keep the module name as a QString"
+
+This reverts commit d77b9e1dd2ecef2d6b0b593662fd40584e99814f.
+---
+ modules/gui/qt/components/preferences_widgets.cpp | 6 ++++--
+ modules/gui/qt/components/preferences_widgets.hpp | 2 +-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/modules/gui/qt/components/preferences_widgets.cpp b/modules/gui/qt/components/preferences_widgets.cpp
+index 6d372f0fb1..2c1fa92694 100644
+--- a/modules/gui/qt/components/preferences_widgets.cpp
++++ b/modules/gui/qt/components/preferences_widgets.cpp
+@@ -622,6 +622,8 @@ void ModuleListConfigControl::fillGrid( QGridLayout *l, int line )
+ 
+ ModuleListConfigControl::~ModuleListConfigControl()
+ {
++    foreach ( checkBoxListItem *it, modules )
++        free( it->psz_module );
+     qDeleteAll( modules );
+     modules.clear();
+     delete groupBox;
+@@ -651,10 +653,10 @@ void ModuleListConfigControl::checkbox_lists( QString label, QString help, const
+         cb->setToolTip( formatTooltip( help ) );
+     cbl->checkBox = cb;
+ 
+-    cbl->psz_module = qfu( psz_module );
++    cbl->psz_module = strdup( psz_module );
+     modules.append( cbl );
+ 
+-    if( p_item->value.psz && strstr( p_item->value.psz, psz_module ) )
++    if( p_item->value.psz && strstr( p_item->value.psz, cbl->psz_module ) )
+         cbl->checkBox->setChecked( true );
+ }
+ 
+diff --git a/modules/gui/qt/components/preferences_widgets.hpp b/modules/gui/qt/components/preferences_widgets.hpp
+index a40825afbc..aa27563b1b 100644
+--- a/modules/gui/qt/components/preferences_widgets.hpp
++++ b/modules/gui/qt/components/preferences_widgets.hpp
+@@ -407,7 +407,7 @@ private:
+ 
+ struct checkBoxListItem {
+     QCheckBox *checkBox;
+-    QString   psz_module;
++    char *psz_module;
+ };
+ 
+ class ModuleListConfigControl : public VStringConfigControl
+-- 
+2.50.1
+

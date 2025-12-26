@@ -1,0 +1,30 @@
+From d1b4cecdd2eba37d5cbcf30637af033cf78bff67 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:49 +0900
+Subject: [PATCH 103/120] Revert "qt: EPGChannels: replace deprecated
+ QFontMetrics::width"
+
+This reverts commit cdf0eaad2773b89c58907deace0af43446d264c9.
+---
+ modules/gui/qt/components/epg/EPGChannels.cpp | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/modules/gui/qt/components/epg/EPGChannels.cpp b/modules/gui/qt/components/epg/EPGChannels.cpp
+index 6f3e0d7e80..97319486fc 100644
+--- a/modules/gui/qt/components/epg/EPGChannels.cpp
++++ b/modules/gui/qt/components/epg/EPGChannels.cpp
+@@ -82,11 +82,7 @@ void EPGChannels::paintEvent( QPaintEvent *event )
+         p.drawText( 0, - m_offset + ( i++ + 0.5 ) * TRACKS_HEIGHT - 4,
+                     width(), height(), Qt::AlignLeft, text );
+ 
+-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+-        int i_width = fontMetrics().horizontalAdvance( text );
+-#else
+         int i_width = fontMetrics().width( text );
+-#endif
+         if( width() < i_width )
+             setMinimumWidth( i_width );
+     }
+-- 
+2.50.1
+

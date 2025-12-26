@@ -1,0 +1,80 @@
+From 5889c774bf6caa97d692984a1bf676bdfe32ad21 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:40 +0900
+Subject: [PATCH 060/120] Revert "qt: use QWheelEvent::angleDelta() instead of
+ QWheelEvent::delta()"
+
+This reverts commit 2d21d237be8b5609ecb7b00eee2a16043c2340fa.
+---
+ modules/gui/qt/components/playlist/selector.cpp      | 4 ++--
+ modules/gui/qt/components/playlist/standardpanel.cpp | 2 +-
+ modules/gui/qt/util/input_slider.cpp                 | 4 ++--
+ modules/gui/qt/util/pictureflow.cpp                  | 2 +-
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/modules/gui/qt/components/playlist/selector.cpp b/modules/gui/qt/components/playlist/selector.cpp
+index 66e180bf47..308e245ca3 100644
+--- a/modules/gui/qt/components/playlist/selector.cpp
++++ b/modules/gui/qt/components/playlist/selector.cpp
+@@ -640,8 +640,8 @@ int PLSelector::getCurrentItemCategory()
+ void PLSelector::wheelEvent( QWheelEvent *e )
+ {
+     if( verticalScrollBar()->isVisible() && (
+-        (verticalScrollBar()->value() != verticalScrollBar()->minimum() && e->angleDelta().y() >= 0 ) ||
+-        (verticalScrollBar()->value() != verticalScrollBar()->maximum() && e->angleDelta().y() < 0 )
++        (verticalScrollBar()->value() != verticalScrollBar()->minimum() && e->delta() >= 0 ) ||
++        (verticalScrollBar()->value() != verticalScrollBar()->maximum() && e->delta() < 0 )
+         ) )
+         QApplication::sendEvent(verticalScrollBar(), e);
+ 
+diff --git a/modules/gui/qt/components/playlist/standardpanel.cpp b/modules/gui/qt/components/playlist/standardpanel.cpp
+index d27da0260c..f4107cad45 100644
+--- a/modules/gui/qt/components/playlist/standardpanel.cpp
++++ b/modules/gui/qt/components/playlist/standardpanel.cpp
+@@ -538,7 +538,7 @@ void StandardPLPanel::browseInto()
+ void StandardPLPanel::wheelEvent( QWheelEvent *e )
+ {
+     if( e->modifiers() & Qt::ControlModifier ) {
+-        int numSteps = e->angleDelta().y() / 8 / 15;
++        int numSteps = e->delta() / 8 / 15;
+         if( numSteps > 0)
+             increaseZoom();
+         else if( numSteps < 0)
+diff --git a/modules/gui/qt/util/input_slider.cpp b/modules/gui/qt/util/input_slider.cpp
+index 40f34fa8a2..d26ecb7fad 100644
+--- a/modules/gui/qt/util/input_slider.cpp
++++ b/modules/gui/qt/util/input_slider.cpp
+@@ -403,7 +403,7 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
+     {
+         vlc_tick_t i_size = var_InheritInteger( p_intf->obj.libvlc, "short-jump-size" );
+         int i_mode = var_InheritInteger( p_intf->obj.libvlc, "hotkeys-x-wheel-mode" );
+-        if ( ( event->angleDelta().x() < 0 && i_mode != 3 ) || ( event->angleDelta().x() > 0 && i_mode == 3 ) )
++        if ( ( event->delta() < 0 && i_mode != 3 ) || ( event->delta() > 0 && i_mode == 3 ) )
+             i_size = - i_size;
+         float posOffset = static_cast<float>( i_size ) / static_cast<float>( inputLength );
+         setValue( value() + posOffset * maximum() );
+@@ -674,7 +674,7 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
+ 
+ void SoundSlider::wheelEvent( QWheelEvent *event )
+ {
+-    int newvalue = value() + event->angleDelta().y() / ( 8 * 15 ) * f_step;
++    int newvalue = value() + event->delta() / ( 8 * 15 ) * f_step;
+     setValue( __MIN( __MAX( minimum(), newvalue ), maximum() ) );
+ 
+     emit sliderReleased();
+diff --git a/modules/gui/qt/util/pictureflow.cpp b/modules/gui/qt/util/pictureflow.cpp
+index cf4c2af47c..cf00f9d8c9 100644
+--- a/modules/gui/qt/util/pictureflow.cpp
++++ b/modules/gui/qt/util/pictureflow.cpp
+@@ -869,7 +869,7 @@ void PictureFlow::wheelEvent(QWheelEvent * event)
+     }
+     else
+     {
+-        int numSteps = -((event->angleDelta().y() / 8) / 15);
++        int numSteps = -((event->delta() / 8) / 15);
+ 
+         if (numSteps > 0)
+         {
+-- 
+2.50.1
+

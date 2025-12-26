@@ -1,0 +1,34 @@
+From 49dc0e8093ae30f7f9c484f79f219d5f359497a5 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:15:20 +0900
+Subject: [PATCH 113/120] Revert "qt: avoid using obsolete
+ QSysInfo::windowsVersion() to check for Windows 10"
+
+This reverts commit 30d837043c3f9907b1bd52b292a40424d7136660.
+---
+ modules/gui/qt/util/qvlcframe.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/util/qvlcframe.hpp b/modules/gui/qt/util/qvlcframe.hpp
+index 8057cb17bc..ab32bc3b95 100644
+--- a/modules/gui/qt/util/qvlcframe.hpp
++++ b/modules/gui/qt/util/qvlcframe.hpp
+@@ -38,13 +38,13 @@
+ 
+ #ifdef _WIN32
+     #include <QLibrary>
++    #include <QSysInfo>
+     #include <dwmapi.h>
+ 
+     inline bool setImmersiveDarkModeAttribute(HWND hwnd, bool enable) {
+         typedef HRESULT(WINAPI *DwmSetWindowAttributeFunc)(HWND, DWORD, LPCVOID, DWORD);
+         static const auto dwmSetWindowAttributeFunc = []() -> DwmSetWindowAttributeFunc {
+-            HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+-            if (GetProcAddress(hKernel32, "GetSystemCpuSetInformation") == NULL)
++            if (QSysInfo::windowsVersion() < QSysInfo::WinVersion::WV_WINDOWS10)
+                 return nullptr;
+ 
+             QLibrary dwmapidll("dwmapi");
+-- 
+2.50.1
+

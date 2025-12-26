@@ -1,0 +1,36 @@
+From 15e69f30157ba113552490ca4e7430afd35d852c Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:46 +0900
+Subject: [PATCH 062/120] Revert "qt: use QPixmapCache::find(QPixmap*) instead
+ of QPixmapCache::find(QPixmap&)"
+
+This reverts commit 02de7fdafe7da0bdcc2389391b9647d1f9f6ed5f.
+---
+ modules/gui/qt/components/playlist/vlc_model.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/components/playlist/vlc_model.cpp b/modules/gui/qt/components/playlist/vlc_model.cpp
+index 6144272c05..e56efde560 100644
+--- a/modules/gui/qt/components/playlist/vlc_model.cpp
++++ b/modules/gui/qt/components/playlist/vlc_model.cpp
+@@ -83,7 +83,7 @@ QPixmap VLCModel::getArtPixmap( const QModelIndex & index, const QSize & size )
+ 
+     QString key = artUrl + QString("%1%2").arg(size.width()).arg(size.height());
+ 
+-    if( !QPixmapCache::find( key, &artPix ))
++    if( !QPixmapCache::find( key, artPix ))
+     {
+         if( artUrl.isEmpty() == false )
+         {
+@@ -97,7 +97,7 @@ QPixmap VLCModel::getArtPixmap( const QModelIndex & index, const QSize & size )
+             }
+         }
+         key = QString("noart%1%2").arg(size.width()).arg(size.height());
+-        if( !QPixmapCache::find( key, &artPix ) )
++        if( !QPixmapCache::find( key, artPix ) )
+         {
+             artPix = QPixmap( ":/noart" ).scaled( size,
+                                           Qt::KeepAspectRatio,
+-- 
+2.50.1
+

@@ -1,0 +1,27 @@
+From 3266282c48b7172d9763785bb114258f14e37959 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:15:05 +0900
+Subject: [PATCH 108/120] Revert "qt: use QString::setNum() rather than
+ QString::sprintf()"
+
+This reverts commit 1482690de7e7a924b56ea7db08ebf59242b4b930.
+---
+ modules/gui/qt/menus.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/menus.cpp b/modules/gui/qt/menus.cpp
+index 622c0fbda7..8568f0c438 100644
+--- a/modules/gui/qt/menus.cpp
++++ b/modules/gui/qt/menus.cpp
+@@ -1441,7 +1441,7 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
+             case VLC_VAR_FLOAT:
+                 var_Get( p_object, psz_var, &val );
+                 if( CURTEXT ) menutext = qfue( CURTEXT );
+-                else menutext.setNum(CURVAL.f_float, 'f', 2);
++                else menutext.sprintf( "%.2f", CURVAL.f_float );
+                 CreateAndConnect( submenu, psz_var, menutext, "", RADIO_OR_COMMAND,
+                         p_object, CURVAL, i_type,
+                         CURVAL.f_float == val.f_float );
+-- 
+2.50.1
+

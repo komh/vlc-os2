@@ -1,0 +1,55 @@
+From 4ff2465bdb0b2987c9ea368cbeb8be44bf7c5c1d Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:40 +0900
+Subject: [PATCH 080/120] Revert "qt: use QTimeZone::systemTimeZone() instead
+ of QTimeZone::utc()"
+
+This reverts commit 4e5531106becf8cca985dbb458f33cdfd29dad7f.
+---
+ modules/gui/qt/components/epg/EPGItem.cpp    | 2 +-
+ modules/gui/qt/components/epg/EPGProgram.cpp | 2 +-
+ modules/gui/qt/components/epg/EPGWidget.cpp  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/modules/gui/qt/components/epg/EPGItem.cpp b/modules/gui/qt/components/epg/EPGItem.cpp
+index 93177323cf..8ad7b87003 100644
+--- a/modules/gui/qt/components/epg/EPGItem.cpp
++++ b/modules/gui/qt/components/epg/EPGItem.cpp
+@@ -154,7 +154,7 @@ uint16_t EPGItem::eventID() const
+ bool EPGItem::setData( const vlc_epg_event_t *data )
+ {
+ #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+-    QDateTime newtime = QDateTime::fromSecsSinceEpoch( data->i_start, QTimeZone::systemTimeZone() );
++    QDateTime newtime = QDateTime::fromSecsSinceEpoch( data->i_start, QTimeZone::utc() );
+ #else
+     QDateTime newtime = QDateTime::fromTime_t( data->i_start );
+ #endif
+diff --git a/modules/gui/qt/components/epg/EPGProgram.cpp b/modules/gui/qt/components/epg/EPGProgram.cpp
+index 60dfd77d30..67af1c7f98 100644
+--- a/modules/gui/qt/components/epg/EPGProgram.cpp
++++ b/modules/gui/qt/components/epg/EPGProgram.cpp
+@@ -99,7 +99,7 @@ void EPGProgram::updateEvents( const vlc_epg_event_t * const * pp_events, size_t
+     {
+         const vlc_epg_event_t *p_event = pp_events[i];
+ #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+-        QDateTime eventStart = QDateTime::fromSecsSinceEpoch( p_event->i_start, QTimeZone::systemTimeZone() );
++        QDateTime eventStart = QDateTime::fromSecsSinceEpoch( p_event->i_start, QTimeZone::utc() );
+ #else
+         QDateTime eventStart = QDateTime::fromTime_t( p_event->i_start );
+ #endif
+diff --git a/modules/gui/qt/components/epg/EPGWidget.cpp b/modules/gui/qt/components/epg/EPGWidget.cpp
+index 4fc89e1c7e..40ced7f987 100644
+--- a/modules/gui/qt/components/epg/EPGWidget.cpp
++++ b/modules/gui/qt/components/epg/EPGWidget.cpp
+@@ -112,7 +112,7 @@ void EPGWidget::updateEPG( input_item_t *p_input_item )
+     m_epgView->updateEPG( p_input_item->pp_epg, p_input_item->i_epg );
+     m_epgView->setEpgTime( ( p_input_item->i_epg_time ) ?
+ #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+-                           QDateTime::fromSecsSinceEpoch( p_input_item->i_epg_time, QTimeZone::systemTimeZone() ) :
++                           QDateTime::fromSecsSinceEpoch( p_input_item->i_epg_time, QTimeZone::utc() ) :
+ #else
+                            QDateTime::fromTime_t( p_input_item->i_epg_time ) :
+ #endif
+-- 
+2.50.1
+

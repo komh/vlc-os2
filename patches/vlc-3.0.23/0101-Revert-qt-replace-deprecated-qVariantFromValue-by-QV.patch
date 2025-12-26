@@ -1,0 +1,36 @@
+From 22a70ff5e6c45067ba4aecbd729d07751eefb79b Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:44 +0900
+Subject: [PATCH 101/120] Revert "qt: replace deprecated qVariantFromValue by
+ QVariant::fromValue"
+
+This reverts commit de46ad7eef90aaba778a5e6e2459ea79fa1356f0.
+---
+ modules/gui/qt/components/complete_preferences.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/components/complete_preferences.cpp b/modules/gui/qt/components/complete_preferences.cpp
+index 42be4e3663..2516529355 100644
+--- a/modules/gui/qt/components/complete_preferences.cpp
++++ b/modules/gui/qt/components/complete_preferences.cpp
+@@ -132,7 +132,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent,
+             current_item->setIcon( 0 , icon );
+             //current_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
+             current_item->setData( 0, Qt::UserRole,
+-                                   QVariant::fromValue( data ) );
++                                   qVariantFromValue( data ) );
+             addTopLevelItem( current_item );
+             expandItem( current_item );
+             break;
+@@ -182,7 +182,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent,
+             QTreeWidgetItem *subcat_item = new QTreeWidgetItem();
+             subcat_item->setText( 0, data_sub->name );
+             subcat_item->setData( 0, Qt::UserRole,
+-                                  QVariant::fromValue( data_sub ) );
++                                  qVariantFromValue( data_sub ) );
+             //subcat_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
+ 
+             /* Add it to the parent */
+-- 
+2.50.1
+

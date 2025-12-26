@@ -1,0 +1,41 @@
+From fbe05f764aca6120e3a7a42ed3388e5a324c455a Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:59 +0900
+Subject: [PATCH 106/120] Revert "qt: use std::sort instead of deprecated
+ qSort()"
+
+This reverts commit 55138b57794e500f2dacfc185fca243576f9dd40.
+---
+ modules/gui/qt/components/playlist/playlist_model.cpp | 2 +-
+ modules/gui/qt/dialogs/bookmarks.cpp                  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/components/playlist/playlist_model.cpp b/modules/gui/qt/components/playlist/playlist_model.cpp
+index ac1e9ba57c..a0740ed854 100644
+--- a/modules/gui/qt/components/playlist/playlist_model.cpp
++++ b/modules/gui/qt/components/playlist/playlist_model.cpp
+@@ -126,7 +126,7 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
+             list.append(index);
+     }
+ 
+-    std::sort(list.begin(), list.end(), modelIndexLessThen);
++    qSort(list.begin(), list.end(), modelIndexLessThen);
+ 
+     AbstractPLItem *item = NULL;
+     foreach( const QModelIndex &index, list ) {
+diff --git a/modules/gui/qt/dialogs/bookmarks.cpp b/modules/gui/qt/dialogs/bookmarks.cpp
+index 4282a3e6e5..186b4d5d3c 100644
+--- a/modules/gui/qt/dialogs/bookmarks.cpp
++++ b/modules/gui/qt/dialogs/bookmarks.cpp
+@@ -186,7 +186,7 @@ void BookmarksDialog::del()
+         b_ignore_updates = true;
+         /* Sort needed to make sure that selected elements are deleted in descending
+            order, otherwise the indexes might change and wrong bookmarks are deleted. */
+-        std::sort( selected.begin(), selected.end() );
++        qSort( selected.begin(), selected.end() );
+         QModelIndexList::Iterator it = selected.end();
+         for( --it; it != selected.begin(); it-- )
+         {
+-- 
+2.50.1
+

@@ -1,0 +1,50 @@
+From 7359c3c1c26bbd8f9a9f230ae233a009d826f6de Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:09:38 +0900
+Subject: [PATCH 051/120] Revert "qt: use availableGeometry() from the
+ primaryscreen"
+
+This reverts commit 855a266757791de5d4d44ee21d96181a785d479c.
+---
+ modules/gui/qt/main_interface.cpp | 2 +-
+ modules/gui/qt/util/qvlcframe.hpp | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/modules/gui/qt/main_interface.cpp b/modules/gui/qt/main_interface.cpp
+index 396cf3a89e..a101a6ea12 100644
+--- a/modules/gui/qt/main_interface.cpp
++++ b/modules/gui/qt/main_interface.cpp
+@@ -817,7 +817,7 @@ void MainInterface::setVideoSize( unsigned int w, unsigned int h )
+          */
+         if (b_autoresize)
+         {
+-            QRect screen = QGuiApplication::primaryScreen()->availableGeometry();
++            QRect screen = QApplication::desktop()->availableGeometry();
+ #if HAS_QT56
+             float factor = videoWidget->devicePixelRatioF();
+ #else
+diff --git a/modules/gui/qt/util/qvlcframe.hpp b/modules/gui/qt/util/qvlcframe.hpp
+index a139534c3d..fcbf75f8ee 100644
+--- a/modules/gui/qt/util/qvlcframe.hpp
++++ b/modules/gui/qt/util/qvlcframe.hpp
+@@ -29,7 +29,7 @@
+ #include <QApplication>
+ #include <QMainWindow>
+ #include <QKeyEvent>
+-#include <QScreen>
++#include <QDesktopWidget>
+ #include <QSettings>
+ #include <QStyle>
+ 
+@@ -115,7 +115,7 @@ class QVLCTools
+             widget->resize(defSize);
+ 
+             if(defPos.x() == 0 && defPos.y()==0)
+-               widget->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, widget->size(), QGuiApplication::primaryScreen()->availableGeometry()));
++               widget->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, widget->size(), qApp->desktop()->availableGeometry()));
+             return true;
+           }
+           return false;
+-- 
+2.50.1
+

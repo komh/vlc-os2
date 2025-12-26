@@ -1,0 +1,545 @@
+From 79ac4a517568ba1baedfc00581b78e506d8ddddc Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:13 +0900
+Subject: [PATCH 091/120] Revert "qt: purge more redundant includes"
+
+This reverts commit 0d53ece64d595352b28b2fed21099ea6ce41e066.
+---
+ modules/gui/qt/adapters/chromaprint.cpp         | 1 +
+ modules/gui/qt/components/epg/EPGChannels.cpp   | 2 ++
+ modules/gui/qt/components/epg/EPGProgram.cpp    | 2 ++
+ modules/gui/qt/components/epg/EPGView.cpp       | 2 ++
+ modules/gui/qt/components/epg/EPGView.hpp       | 1 +
+ modules/gui/qt/components/epg/EPGWidget.cpp     | 3 ++-
+ modules/gui/qt/components/epg/EPGWidget.hpp     | 3 +--
+ modules/gui/qt/components/extended_panels.hpp   | 2 +-
+ modules/gui/qt/components/info_panels.cpp       | 1 +
+ modules/gui/qt/components/info_widgets.cpp      | 2 ++
+ modules/gui/qt/components/info_widgets.hpp      | 1 +
+ modules/gui/qt/components/interface_widgets.cpp | 9 ++++++++-
+ modules/gui/qt/dialogs/convert.hpp              | 2 --
+ modules/gui/qt/dialogs/epg.cpp                  | 1 +
+ modules/gui/qt/dialogs/extensions.cpp           | 1 +
+ modules/gui/qt/dialogs/fingerprintdialog.cpp    | 2 ++
+ modules/gui/qt/dialogs/fingerprintdialog.hpp    | 1 +
+ modules/gui/qt/dialogs/gototime.cpp             | 3 ++-
+ modules/gui/qt/dialogs/help.cpp                 | 2 ++
+ modules/gui/qt/dialogs/messages.cpp             | 3 +++
+ modules/gui/qt/dialogs/messages.hpp             | 2 ++
+ modules/gui/qt/dialogs/open.cpp                 | 1 +
+ modules/gui/qt/dialogs/openurl.cpp              | 3 ++-
+ modules/gui/qt/dialogs/plugins.cpp              | 3 ++-
+ modules/gui/qt/dialogs/sout.cpp                 | 4 +++-
+ modules/gui/qt/dialogs/vlm.cpp                  | 6 ++++++
+ modules/gui/qt/extensions_manager.hpp           | 5 ++---
+ modules/gui/qt/util/animators.cpp               | 4 ++--
+ modules/gui/qt/util/animators.hpp               | 1 +
+ modules/gui/qt/util/customwidgets.cpp           | 2 ++
+ modules/gui/qt/util/customwidgets.hpp           | 2 ++
+ modules/gui/qt/util/qvlcapp.hpp                 | 1 +
+ modules/gui/qt/util/qvlcframe.hpp               | 1 +
+ 33 files changed, 63 insertions(+), 16 deletions(-)
+
+diff --git a/modules/gui/qt/adapters/chromaprint.cpp b/modules/gui/qt/adapters/chromaprint.cpp
+index 105237a2b4..6c6996a925 100644
+--- a/modules/gui/qt/adapters/chromaprint.cpp
++++ b/modules/gui/qt/adapters/chromaprint.cpp
+@@ -23,6 +23,7 @@
+ #endif
+ 
+ #include "chromaprint.hpp"
++#include <vlc_fingerprinter.h>
+ #include <vlc_modules.h>
+ 
+ Chromaprint::Chromaprint( intf_thread_t *_p_intf ) : p_intf( _p_intf )
+diff --git a/modules/gui/qt/components/epg/EPGChannels.cpp b/modules/gui/qt/components/epg/EPGChannels.cpp
+index 518b977df1..6f3e0d7e80 100644
+--- a/modules/gui/qt/components/epg/EPGChannels.cpp
++++ b/modules/gui/qt/components/epg/EPGChannels.cpp
+@@ -29,7 +29,9 @@
+ #include "EPGView.hpp"
+ 
+ #include <QPainter>
++#include <QFont>
+ #include <QPaintEvent>
++#include <QtAlgorithms>
+ 
+ EPGChannels::EPGChannels( QWidget *parent, EPGView *m_epgView )
+     : QWidget( parent ), m_epgView( m_epgView ), m_offset( 0 )
+diff --git a/modules/gui/qt/components/epg/EPGProgram.cpp b/modules/gui/qt/components/epg/EPGProgram.cpp
+index 242ac1f19c..aad5dd1dd0 100644
+--- a/modules/gui/qt/components/epg/EPGProgram.cpp
++++ b/modules/gui/qt/components/epg/EPGProgram.cpp
+@@ -21,6 +21,8 @@
+ #include "EPGItem.hpp"
+ #include "EPGView.hpp"
+ 
++#include <QtAlgorithms>
++
+ EPGProgram::EPGProgram( EPGView *view_, const vlc_epg_t *p_epg ) : QObject( view_ )
+ {
+     name = QString(p_epg->psz_name);
+diff --git a/modules/gui/qt/components/epg/EPGView.cpp b/modules/gui/qt/components/epg/EPGView.cpp
+index f45811eff1..54b5bd6ec9 100644
+--- a/modules/gui/qt/components/epg/EPGView.cpp
++++ b/modules/gui/qt/components/epg/EPGView.cpp
+@@ -29,6 +29,8 @@
+ #include "EPGItem.hpp"
+ 
+ #include <QDateTime>
++#include <QMatrix>
++#include <QPaintEvent>
+ #include <QRectF>
+ 
+ EPGGraphicsScene::EPGGraphicsScene( QObject *parent ) : QGraphicsScene( parent )
+diff --git a/modules/gui/qt/components/epg/EPGView.hpp b/modules/gui/qt/components/epg/EPGView.hpp
+index 1227cbc749..2f04effb99 100644
+--- a/modules/gui/qt/components/epg/EPGView.hpp
++++ b/modules/gui/qt/components/epg/EPGView.hpp
+@@ -32,6 +32,7 @@
+ 
+ #include <QGraphicsView>
+ #include <QGraphicsScene>
++#include <QList>
+ #include <QHash>
+ #include <QDateTime>
+ 
+diff --git a/modules/gui/qt/components/epg/EPGWidget.cpp b/modules/gui/qt/components/epg/EPGWidget.cpp
+index 1e3f8738d9..d670dbdb69 100644
+--- a/modules/gui/qt/components/epg/EPGWidget.cpp
++++ b/modules/gui/qt/components/epg/EPGWidget.cpp
+@@ -27,9 +27,10 @@
+ #include "input_manager.hpp"
+ 
+ #include <QStackedWidget>
+-#include <QGridLayout>
++#include <QVBoxLayout>
+ #include <QScrollBar>
+ #include <QLabel>
++#include <QStringList>
+ #include <QDateTime>
+ 
+ #include "EPGWidget.hpp"
+diff --git a/modules/gui/qt/components/epg/EPGWidget.hpp b/modules/gui/qt/components/epg/EPGWidget.hpp
+index c8317dc6cb..ba5f497a0c 100644
+--- a/modules/gui/qt/components/epg/EPGWidget.hpp
++++ b/modules/gui/qt/components/epg/EPGWidget.hpp
+@@ -29,8 +29,7 @@
+ #include <vlc_epg.h>
+ 
+ #include <QWidget>
+-
+-class QStackedWidget;
++#include <QStackedWidget>
+ 
+ class EPGView;
+ class EPGItem;
+diff --git a/modules/gui/qt/components/extended_panels.hpp b/modules/gui/qt/components/extended_panels.hpp
+index 87cba5de39..6c75679669 100644
+--- a/modules/gui/qt/components/extended_panels.hpp
++++ b/modules/gui/qt/components/extended_panels.hpp
+@@ -35,7 +35,7 @@
+ #include "ui/equalizer.h"
+ #include "ui/video_effects.h"
+ 
+-class QTabWidget;
++#include <QTabWidget>
+ 
+ #define BANDS 10
+ 
+diff --git a/modules/gui/qt/components/info_panels.cpp b/modules/gui/qt/components/info_panels.cpp
+index 184631ccf6..e78c2cbf54 100644
+--- a/modules/gui/qt/components/info_panels.cpp
++++ b/modules/gui/qt/components/info_panels.cpp
+@@ -41,6 +41,7 @@
+ #include <QTreeWidget>
+ #include <QTableWidget>
+ #include <QHeaderView>
++#include <QList>
+ #include <QStringList>
+ #include <QGridLayout>
+ #include <QLineEdit>
+diff --git a/modules/gui/qt/components/info_widgets.cpp b/modules/gui/qt/components/info_widgets.cpp
+index ab31c1b3be..93a6120fba 100644
+--- a/modules/gui/qt/components/info_widgets.cpp
++++ b/modules/gui/qt/components/info_widgets.cpp
+@@ -21,12 +21,14 @@
+ #include "qt.hpp"
+ #include "info_widgets.hpp"
+ 
++#include <QGridLayout>
+ #include <QLabel>
+ #include <QGraphicsView>
+ #include <QGraphicsScene>
+ #include <QPolygonF>
+ #include <QGraphicsPolygonItem>
+ #include <QGraphicsLineItem>
++#include <QVectorIterator>
+ 
+ #define STATS_LENGTH 60
+ #define ADD_LABEL(row, color, text) \
+diff --git a/modules/gui/qt/components/info_widgets.hpp b/modules/gui/qt/components/info_widgets.hpp
+index 072b5b7403..0a1b22b25e 100644
+--- a/modules/gui/qt/components/info_widgets.hpp
++++ b/modules/gui/qt/components/info_widgets.hpp
+@@ -22,6 +22,7 @@
+ 
+ #include <QGraphicsView>
+ 
++class QGraphicsView;
+ class QGraphicsScene;
+ class QGraphicsPolygonItem;
+ class QGraphicsLineItem;
+diff --git a/modules/gui/qt/components/interface_widgets.cpp b/modules/gui/qt/components/interface_widgets.cpp
+index 7ef09704ba..19e832ae32 100644
+--- a/modules/gui/qt/components/interface_widgets.cpp
++++ b/modules/gui/qt/components/interface_widgets.cpp
+@@ -37,11 +37,18 @@
+ 
+ #include <QDate>
+ #include <QLabel>
++#include <QToolButton>
+ #include <QPalette>
+-#include <QAction>
++#include <QEvent>
++#include <QResizeEvent>
++#include <QDate>
++#include <QMenu>
+ #include <QWidgetAction>
++#include <QDesktopWidget>
+ #include <QPainter>
+ #include <QTimer>
++#include <QSlider>
++#include <QBitmap>
+ #include <QUrl>
+ 
+ #if defined (QT5_HAS_X11)
+diff --git a/modules/gui/qt/dialogs/convert.hpp b/modules/gui/qt/dialogs/convert.hpp
+index c9408df243..eade91774c 100644
+--- a/modules/gui/qt/dialogs/convert.hpp
++++ b/modules/gui/qt/dialogs/convert.hpp
+@@ -24,8 +24,6 @@
+ #ifndef QVLC_CONVERT_DIALOG_H_
+ #define QVLC_CONVERT_DIALOG_H_ 1
+ 
+-#include <QUrl>
+-
+ #include "util/qvlcframe.hpp"
+ 
+ #if !HAS_QT5
+diff --git a/modules/gui/qt/dialogs/epg.cpp b/modules/gui/qt/dialogs/epg.cpp
+index 3a4f46cf9b..1b0713ea2b 100644
+--- a/modules/gui/qt/dialogs/epg.cpp
++++ b/modules/gui/qt/dialogs/epg.cpp
+@@ -31,6 +31,7 @@
+ #include <vlc_playlist.h>
+ 
+ #include <QVBoxLayout>
++#include <QSplitter>
+ #include <QScrollBar>
+ #include <QLabel>
+ #include <QGroupBox>
+diff --git a/modules/gui/qt/dialogs/extensions.cpp b/modules/gui/qt/dialogs/extensions.cpp
+index ea8b83a5d5..7b8a732e6c 100644
+--- a/modules/gui/qt/dialogs/extensions.cpp
++++ b/modules/gui/qt/dialogs/extensions.cpp
+@@ -37,6 +37,7 @@
+ #include <QListWidget>
+ #include <QComboBox>
+ #include <QCloseEvent>
++#include <QCoreApplication>
+ #include <QKeyEvent>
+ #include "util/customwidgets.hpp"
+ 
+diff --git a/modules/gui/qt/dialogs/fingerprintdialog.cpp b/modules/gui/qt/dialogs/fingerprintdialog.cpp
+index af2f8d31be..a8dc7f6b1d 100644
+--- a/modules/gui/qt/dialogs/fingerprintdialog.cpp
++++ b/modules/gui/qt/dialogs/fingerprintdialog.cpp
+@@ -22,9 +22,11 @@
+ #include "ui/fingerprintdialog.h"
+ 
+ #include "adapters/chromaprint.hpp"
++#include <vlc_url.h>
+ 
+ #include <QLabel>
+ #include <QListWidgetItem>
++#include <new>
+ 
+ FingerprintDialog::FingerprintDialog(QWidget *parent, intf_thread_t *p_intf,
+                                      input_item_t *p_item ) :
+diff --git a/modules/gui/qt/dialogs/fingerprintdialog.hpp b/modules/gui/qt/dialogs/fingerprintdialog.hpp
+index 340e3eb88f..c58d59a731 100644
+--- a/modules/gui/qt/dialogs/fingerprintdialog.hpp
++++ b/modules/gui/qt/dialogs/fingerprintdialog.hpp
+@@ -27,6 +27,7 @@
+ #include "qt.hpp"
+ 
+ #include <QDialog>
++#include <vlc_interface.h>
+ #include <vlc_fingerprinter.h>
+ 
+ namespace Ui {
+diff --git a/modules/gui/qt/dialogs/gototime.cpp b/modules/gui/qt/dialogs/gototime.cpp
+index 630f35e68d..727a8a3c31 100644
+--- a/modules/gui/qt/dialogs/gototime.cpp
++++ b/modules/gui/qt/dialogs/gototime.cpp
+@@ -28,11 +28,12 @@
+ 
+ #include "input_manager.hpp"
+ 
++#include <QTabWidget>
+ #include <QLabel>
+ #include <QTimeEdit>
++#include <QGroupBox>
+ #include <QDialogButtonBox>
+ #include <QPushButton>
+-#include <QGridLayout>
+ 
+ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf)
+                : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
+diff --git a/modules/gui/qt/dialogs/help.cpp b/modules/gui/qt/dialogs/help.cpp
+index 5a78d1a71b..8f6304272b 100644
+--- a/modules/gui/qt/dialogs/help.cpp
++++ b/modules/gui/qt/dialogs/help.cpp
+@@ -38,6 +38,8 @@
+ #endif
+ 
+ #include <QTextBrowser>
++#include <QTabWidget>
++#include <QLabel>
+ #include <QString>
+ #include <QDialogButtonBox>
+ #include <QEvent>
+diff --git a/modules/gui/qt/dialogs/messages.cpp b/modules/gui/qt/dialogs/messages.cpp
+index 7aaa9cc62d..688543caf7 100644
+--- a/modules/gui/qt/dialogs/messages.cpp
++++ b/modules/gui/qt/dialogs/messages.cpp
+@@ -30,8 +30,11 @@
+ #include <QFileDialog>
+ #include <QTextStream>
+ #include <QMessageBox>
++#include <QTabWidget>
+ #include <QTreeWidget>
+ #include <QTreeWidgetItem>
++#include <QMutex>
++#include <QLineEdit>
+ #include <QScrollBar>
+ #include <QMutex>
+ #include <QMutexLocker>
+diff --git a/modules/gui/qt/dialogs/messages.hpp b/modules/gui/qt/dialogs/messages.hpp
+index c13d483f29..e8e6de3279 100644
+--- a/modules/gui/qt/dialogs/messages.hpp
++++ b/modules/gui/qt/dialogs/messages.hpp
+@@ -27,9 +27,11 @@
+ #include "util/qvlcframe.hpp"
+ #include "util/singleton.hpp"
+ #include "ui/messages_panel.h"
++#include <stdarg.h>
+ #include <QMutex>
+ #include <atomic>
+ 
++class QPushButton;
+ class QTreeWidget;
+ class QTreeWidgetItem;
+ class MsgEvent;
+diff --git a/modules/gui/qt/dialogs/open.cpp b/modules/gui/qt/dialogs/open.cpp
+index 7a4b809c33..817556ace9 100644
+--- a/modules/gui/qt/dialogs/open.cpp
++++ b/modules/gui/qt/dialogs/open.cpp
+@@ -29,6 +29,7 @@
+ #include "recents.hpp"
+ #include "util/qt_dirs.hpp"
+ 
++#include <QTabWidget>
+ #include <QRegExp>
+ #include <QMenu>
+ 
+diff --git a/modules/gui/qt/dialogs/openurl.cpp b/modules/gui/qt/dialogs/openurl.cpp
+index 7af619222d..8895879c63 100644
+--- a/modules/gui/qt/dialogs/openurl.cpp
++++ b/modules/gui/qt/dialogs/openurl.cpp
+@@ -33,9 +33,10 @@
+ #include <QDialogButtonBox>
+ #include <QApplication>
+ #include <QClipboard>
++#include <QMimeData>
++#include <QList>
+ #include <QFile>
+ #include <QLabel>
+-#include <QVBoxLayout>
+ 
+ #include <assert.h>
+ 
+diff --git a/modules/gui/qt/dialogs/plugins.cpp b/modules/gui/qt/dialogs/plugins.cpp
+index fdacc3cf5f..db7bdfeb0d 100644
+--- a/modules/gui/qt/dialogs/plugins.cpp
++++ b/modules/gui/qt/dialogs/plugins.cpp
+@@ -48,8 +48,10 @@
+ #include <QVBoxLayout>
+ #include <QComboBox>
+ #include <QHBoxLayout>
++#include <QVBoxLayout>
+ #include <QSpacerItem>
+ #include <QListView>
++#include <QListWidget>
+ #include <QPainter>
+ #include <QStyleOptionViewItem>
+ #include <QKeyEvent>
+@@ -65,7 +67,6 @@
+ #include <QToolButton>
+ #include <QStackedWidget>
+ #include <QPainterPath>
+-#include <QSignalMapper>
+ 
+ //match the image source (width/height)
+ #define SCORE_ICON_WIDTH_SCALE 4
+diff --git a/modules/gui/qt/dialogs/sout.cpp b/modules/gui/qt/dialogs/sout.cpp
+index f5cee8c34b..1a6213bf35 100644
+--- a/modules/gui/qt/dialogs/sout.cpp
++++ b/modules/gui/qt/dialogs/sout.cpp
+@@ -32,7 +32,9 @@
+ #include "components/sout/sout_widgets.hpp"
+ 
+ #include <QString>
+-
++#include <QFileDialog>
++#include <QToolButton>
++#include <QSpinBox>
+ #include <assert.h>
+ 
+ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& inputMRL )
+diff --git a/modules/gui/qt/dialogs/vlm.cpp b/modules/gui/qt/dialogs/vlm.cpp
+index c9c1f006bf..aefee2d308 100644
+--- a/modules/gui/qt/dialogs/vlm.cpp
++++ b/modules/gui/qt/dialogs/vlm.cpp
+@@ -34,16 +34,22 @@
+ #include "util/qt_dirs.hpp"
+ 
+ #include <QString>
++#include <QComboBox>
+ #include <QVBoxLayout>
++#include <QStackedWidget>
+ #include <QLabel>
+ #include <QWidget>
+ #include <QGridLayout>
++#include <QLineEdit>
++#include <QCheckBox>
+ #include <QToolButton>
+ #include <QGroupBox>
+ #include <QPushButton>
++#include <QHBoxLayout>
+ #include <QDateTimeEdit>
+ #include <QDateTime>
+ #include <QSpinBox>
++#include <QScrollArea>
+ #include <QFileDialog>
+ 
+ 
+diff --git a/modules/gui/qt/extensions_manager.hpp b/modules/gui/qt/extensions_manager.hpp
+index 03019fe537..72a8153393 100644
+--- a/modules/gui/qt/extensions_manager.hpp
++++ b/modules/gui/qt/extensions_manager.hpp
+@@ -33,9 +33,8 @@
+ #include "qt.hpp"
+ 
+ #include <QObject>
+-
+-class QMenu;
+-class QSignalMapper;
++#include <QMenu>
++#include <QSignalMapper>
+ 
+ class ExtensionsDialogProvider;
+ 
+diff --git a/modules/gui/qt/util/animators.cpp b/modules/gui/qt/util/animators.cpp
+index 889fb75784..17772a8554 100644
+--- a/modules/gui/qt/util/animators.cpp
++++ b/modules/gui/qt/util/animators.cpp
+@@ -22,10 +22,10 @@
+ #include "qt.hpp"
+ #include "util/imagehelper.hpp"
+ 
++#include <QWidget>
++#include <QPixmap>
+ #include <QAbstractItemView>
+ 
+-class QWidget;
+-
+ BasicAnimator::BasicAnimator( QObject *parent )
+     : QAbstractAnimation( parent ), current_frame( 0 )
+ {
+diff --git a/modules/gui/qt/util/animators.hpp b/modules/gui/qt/util/animators.hpp
+index cbaa77fd57..0380c10f6b 100644
+--- a/modules/gui/qt/util/animators.hpp
++++ b/modules/gui/qt/util/animators.hpp
+@@ -31,6 +31,7 @@
+ #include <QPersistentModelIndex>
+ 
+ class QWidget;
++class QPixmap;
+ class QAbstractItemView;
+ 
+ class BasicAnimator : public QAbstractAnimation
+diff --git a/modules/gui/qt/util/customwidgets.cpp b/modules/gui/qt/util/customwidgets.cpp
+index 2f55009b98..3879cc350b 100644
+--- a/modules/gui/qt/util/customwidgets.cpp
++++ b/modules/gui/qt/util/customwidgets.cpp
+@@ -29,11 +29,13 @@
+ #endif
+ 
+ #include "customwidgets.hpp"
++#include "qt.hpp"               /* needed for qtr,  but not necessary */
+ 
+ #include <QPainter>
+ #include <QRect>
+ #include <QKeyEvent>
+ #include <QWheelEvent>
++#include <QPixmap>
+ #include <QApplication>
+ #include <vlc_actions.h>
+ 
+diff --git a/modules/gui/qt/util/customwidgets.hpp b/modules/gui/qt/util/customwidgets.hpp
+index 609b5b76ba..e87f2a7c56 100644
+--- a/modules/gui/qt/util/customwidgets.hpp
++++ b/modules/gui/qt/util/customwidgets.hpp
+@@ -27,11 +27,13 @@
+ #ifndef VLC_QT_CUSTOMWIDGETS_HPP_
+ #define VLC_QT_CUSTOMWIDGETS_HPP_
+ 
++#include <QLineEdit>
+ #include <QPushButton>
+ #include <QLabel>
+ #include <QStackedWidget>
+ #include <QSpinBox>
+ #include <QCheckBox>
++#include <QList>
+ #include <QToolButton>
+ #include <QDial>
+ 
+diff --git a/modules/gui/qt/util/qvlcapp.hpp b/modules/gui/qt/util/qvlcapp.hpp
+index 2674c88106..45b9e59e98 100644
+--- a/modules/gui/qt/util/qvlcapp.hpp
++++ b/modules/gui/qt/util/qvlcapp.hpp
+@@ -26,6 +26,7 @@
+ #define VLC_QT_QVLCAPP_HPP_
+ 
+ #include <QApplication>
++#include <QEvent>
+ 
+ #if defined(Q_OS_WIN)
+ #   include "qt.hpp"
+diff --git a/modules/gui/qt/util/qvlcframe.hpp b/modules/gui/qt/util/qvlcframe.hpp
+index fcbf75f8ee..8057cb17bc 100644
+--- a/modules/gui/qt/util/qvlcframe.hpp
++++ b/modules/gui/qt/util/qvlcframe.hpp
+@@ -26,6 +26,7 @@
+ 
+ #include <QWidget>
+ #include <QDialog>
++#include <QHBoxLayout>
+ #include <QApplication>
+ #include <QMainWindow>
+ #include <QKeyEvent>
+-- 
+2.50.1
+

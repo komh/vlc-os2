@@ -1,0 +1,27 @@
+From cdf275bb20524c15085dbb1f4c21cd6303e0193d Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:52 +0900
+Subject: [PATCH 104/120] Revert "qt: EPGChannels: use std::sort instead of
+ qSort"
+
+This reverts commit 86eff076ad405ac26b5d4031dc761d8480bbb42d.
+---
+ modules/gui/qt/components/epg/EPGChannels.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/components/epg/EPGChannels.cpp b/modules/gui/qt/components/epg/EPGChannels.cpp
+index 97319486fc..bb1272916a 100644
+--- a/modules/gui/qt/components/epg/EPGChannels.cpp
++++ b/modules/gui/qt/components/epg/EPGChannels.cpp
+@@ -50,7 +50,7 @@ void EPGChannels::addProgram( const EPGProgram *program )
+     if ( !programsList.contains( program ) )
+     {
+         programsList << program;
+-        std::sort(programsList.begin(), programsList.end(), EPGProgram::lessThan);
++        qSort(programsList.begin(), programsList.end(), EPGProgram::lessThan);
+         update();
+     }
+ }
+-- 
+2.50.1
+

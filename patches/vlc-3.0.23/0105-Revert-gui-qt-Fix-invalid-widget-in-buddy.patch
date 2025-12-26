@@ -1,0 +1,26 @@
+From daaf45d37d503906101585e25cb50c88f8816931 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:56 +0900
+Subject: [PATCH 105/120] Revert "gui/qt: Fix invalid widget in buddy"
+
+This reverts commit 812fdf1050e75cbb5ae58d92aac60ac47e8268fe.
+---
+ modules/gui/qt/ui/sprefs_audio.ui | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/ui/sprefs_audio.ui b/modules/gui/qt/ui/sprefs_audio.ui
+index 4ef4b8bd71..39d38bddde 100644
+--- a/modules/gui/qt/ui/sprefs_audio.ui
++++ b/modules/gui/qt/ui/sprefs_audio.ui
+@@ -264,7 +264,7 @@
+             <string>HDMI/SPDIF audio passthrough</string>
+            </property>
+            <property name="buddy">
+-            <cstring>mmdevicePassthroughBox</cstring>
++            <cstring>mmdevicePassthrough</cstring>
+            </property>
+           </widget>
+          </item>
+-- 
+2.50.1
+

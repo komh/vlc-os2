@@ -1,0 +1,51 @@
+From fdbd610546d109dd08df2a17f2de0083c89cd98b Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:04:40 +0900
+Subject: [PATCH 033/120] Revert "qt: adapt volume slider to dark palette"
+
+This reverts commit 7dc62530b805c4104f38af1b8308b38f43a238f4.
+---
+ modules/gui/qt/util/input_slider.cpp | 7 +------
+ modules/gui/qt/util/input_slider.hpp | 1 -
+ 2 files changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/modules/gui/qt/util/input_slider.cpp b/modules/gui/qt/util/input_slider.cpp
+index 6e45775a10..351cbb2ecf 100644
+--- a/modules/gui/qt/util/input_slider.cpp
++++ b/modules/gui/qt/util/input_slider.cpp
+@@ -634,8 +634,6 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
+ 
+     pixGradient = QPixmap( pixOutside.size() );
+     pixGradient2 = QPixmap( pixOutside.size() );
+-    dark = isDarkPaletteEnabled(nullptr);
+-
+ #if HAS_QT56
+     pixGradient.setDevicePixelRatio(QApplication::primaryScreen()->devicePixelRatio());
+     pixGradient2.setDevicePixelRatio(QApplication::primaryScreen()->devicePixelRatio());
+@@ -819,10 +817,7 @@ void SoundSlider::paintEvent( QPaintEvent *e )
+     painter.drawPixmap( 0, 0, offsetDst, height(), *paintGradient, 0, 0, offsetSrc, paintGradient->height() );
+     painter.drawPixmap( 0, 0, width(), height(), pixOutside, 0, 0,  pixOutside.width(), pixOutside.height() );
+ 
+-    if (dark)
+-        painter.setPen(Qt::white);
+-    else
+-        painter.setPen(foreground);
++    painter.setPen( foreground );
+     painter.setFont( textfont );
+     painter.drawText( textrect, Qt::AlignRight | Qt::AlignVCenter,
+                       QString::number( value() ) + '%' );
+diff --git a/modules/gui/qt/util/input_slider.hpp b/modules/gui/qt/util/input_slider.hpp
+index d879b446ff..a2c7cde465 100644
+--- a/modules/gui/qt/util/input_slider.hpp
++++ b/modules/gui/qt/util/input_slider.hpp
+@@ -177,7 +177,6 @@ private:
+     QColor foreground;
+     QFont textfont;
+     QRect textrect;
+-    bool dark = false;
+ 
+     WheelToVLCConverter wheelEventConverter;
+ 
+-- 
+2.50.1
+

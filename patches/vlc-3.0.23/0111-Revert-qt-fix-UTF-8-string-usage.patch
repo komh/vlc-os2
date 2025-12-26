@@ -1,0 +1,26 @@
+From 74e74f803b469dfe2632c39d65bd20ae9be0adc3 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:15:14 +0900
+Subject: [PATCH 111/120] Revert "qt: fix UTF-8 string usage"
+
+This reverts commit 66d78681eea3b7c1b188de862daf8beb5c1b90bf.
+---
+ modules/gui/qt/components/preferences_widgets.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/components/preferences_widgets.cpp b/modules/gui/qt/components/preferences_widgets.cpp
+index 4239fd2e12..b634d53542 100644
+--- a/modules/gui/qt/components/preferences_widgets.cpp
++++ b/modules/gui/qt/components/preferences_widgets.cpp
+@@ -1230,7 +1230,7 @@ void KeySelectorControl::finish()
+             treeItem->setText( HOTKEY_COL, keys );
+             treeItem->setToolTip( HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
+             treeItem->setToolTip( GLOBAL_HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
+-            treeItem->setData( HOTKEY_COL, Qt::UserRole, QVariant( qfu( p_config_item->value.psz ) ) );
++            treeItem->setData( HOTKEY_COL, Qt::UserRole, QVariant( p_config_item->value.psz ) );
+             table->addTopLevelItem( treeItem );
+             continue;
+         }
+-- 
+2.50.1
+

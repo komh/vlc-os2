@@ -1,0 +1,45 @@
+From b4c7cbe16fbbf428979e51491135aaf7d7ce22e1 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:38 +0900
+Subject: [PATCH 059/120] Revert "qt: use Qt::MiddleButton instead of
+ Qt::MidButton"
+
+This reverts commit 39742c0b27cbd28e584d59b28b666d41aeaa23ee.
+---
+ modules/gui/qt/util/input_slider.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/modules/gui/qt/util/input_slider.cpp b/modules/gui/qt/util/input_slider.cpp
+index c0247a522d..40f34fa8a2 100644
+--- a/modules/gui/qt/util/input_slider.cpp
++++ b/modules/gui/qt/util/input_slider.cpp
+@@ -281,7 +281,7 @@ void SeekSlider::processReleasedButton()
+ 
+ void SeekSlider::mouseReleaseEvent( QMouseEvent *event )
+ {
+-    if ( event->button() != Qt::LeftButton && event->button() != Qt::MiddleButton )
++    if ( event->button() != Qt::LeftButton && event->button() != Qt::MidButton )
+     {
+         QSlider::mouseReleaseEvent( event );
+         return;
+@@ -294,7 +294,7 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
+ {
+     /* Right-click */
+     if ( !isEnabled() ||
+-         ( event->button() != Qt::LeftButton && event->button() != Qt::MiddleButton )
++         ( event->button() != Qt::LeftButton && event->button() != Qt::MidButton )
+        )
+     {
+         QSlider::mousePressEvent( event );
+@@ -348,7 +348,7 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
+ 
+ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
+ {
+-    if ( ! ( event->buttons() & ( Qt::LeftButton | Qt::MiddleButton ) ) )
++    if ( ! ( event->buttons() & ( Qt::LeftButton | Qt::MidButton ) ) )
+     {
+         /* Handle button release when mouserelease has been hijacked by popup */
+         processReleasedButton();
+-- 
+2.50.1
+

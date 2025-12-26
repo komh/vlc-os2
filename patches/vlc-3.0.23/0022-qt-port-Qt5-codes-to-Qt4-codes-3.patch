@@ -1,0 +1,31 @@
+From 2a61eee5c3f7df8a5c032faba17421c883dcde54 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Sun, 1 Jul 2018 17:11:35 +0900
+Subject: [PATCH 022/120] qt: port Qt5 codes to Qt4 codes #3
+
+---
+ modules/gui/qt/dialogs_provider.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/modules/gui/qt/dialogs_provider.cpp b/modules/gui/qt/dialogs_provider.cpp
+index 5c1a227ad7..198346ca0c 100644
+--- a/modules/gui/qt/dialogs_provider.cpp
++++ b/modules/gui/qt/dialogs_provider.cpp
+@@ -832,7 +832,14 @@ void DialogsProvider::loadSubtitlesFile()
+     if( path )
+     {
+         url.setUrl( qfu(path) );
++#if HAS_QT5
+         url = url.adjusted(QUrl::RemoveFilename);
++#else
++        QString urlpath = url.path();
++        int slash = urlpath.lastIndexOf('/');
++        urlpath.remove(slash + 1, urlpath.length());
++        url.setPath(urlpath);
++#endif
+         if (url.scheme() != "file")
+             url.clear();
+         free(path);
+-- 
+2.50.1
+

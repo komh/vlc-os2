@@ -1,0 +1,65 @@
+From 833a319f2aef2b471a856bae8e3eed54bbc81b40 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:10 +0900
+Subject: [PATCH 090/120] Revert "qt: add missing includes"
+
+This reverts commit ec16474cbad171fa1c09dfbe1c3fe12a53a24cf4.
+---
+ modules/gui/qt/components/playlist/playlist_model.cpp | 1 -
+ modules/gui/qt/components/playlist/playlist_model.hpp | 1 -
+ modules/gui/qt/components/playlist/standardpanel.cpp  | 1 -
+ modules/gui/qt/dialogs/external.cpp                   | 2 --
+ 4 files changed, 5 deletions(-)
+
+diff --git a/modules/gui/qt/components/playlist/playlist_model.cpp b/modules/gui/qt/components/playlist/playlist_model.cpp
+index d4060c8d24..ac1e9ba57c 100644
+--- a/modules/gui/qt/components/playlist/playlist_model.cpp
++++ b/modules/gui/qt/components/playlist/playlist_model.cpp
+@@ -42,7 +42,6 @@
+ #include <QFont>
+ #include <QAction>
+ #include <QStack>
+-#include <QBrush>
+ 
+ /*************************************************************************
+  * Playlist model implementation
+diff --git a/modules/gui/qt/components/playlist/playlist_model.hpp b/modules/gui/qt/components/playlist/playlist_model.hpp
+index 520117e9f6..c83cbcf409 100644
+--- a/modules/gui/qt/components/playlist/playlist_model.hpp
++++ b/modules/gui/qt/components/playlist/playlist_model.hpp
+@@ -42,7 +42,6 @@
+ #include <QVariant>
+ #include <QModelIndex>
+ #include <QAction>
+-#include <QFont>
+ 
+ class PLItem;
+ class PlMimeData;
+diff --git a/modules/gui/qt/components/playlist/standardpanel.cpp b/modules/gui/qt/components/playlist/standardpanel.cpp
+index f4107cad45..326f4f0f2c 100644
+--- a/modules/gui/qt/components/playlist/standardpanel.cpp
++++ b/modules/gui/qt/components/playlist/standardpanel.cpp
+@@ -70,7 +70,6 @@
+ #include <QDesktopServices>
+ #include <QUrl>
+ #include <QFont>
+-#include <QActionGroup>
+ 
+ #include <assert.h>
+ 
+diff --git a/modules/gui/qt/dialogs/external.cpp b/modules/gui/qt/dialogs/external.cpp
+index a14ccade13..69929f7016 100644
+--- a/modules/gui/qt/dialogs/external.cpp
++++ b/modules/gui/qt/dialogs/external.cpp
+@@ -35,8 +35,6 @@
+ #include <QMessageBox>
+ #include <QProgressDialog>
+ #include <QPushButton>
+-#include <QVBoxLayout>
+-#include <QGridLayout>
+ 
+ DialogHandler::DialogHandler (intf_thread_t *p_intf, QObject *_parent)
+     : QObject( _parent ), p_intf (p_intf)
+-- 
+2.50.1
+

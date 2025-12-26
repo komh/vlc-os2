@@ -1,0 +1,44 @@
+From b573f334ec0f97310128d4ad27156c5880ea493b Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:15:29 +0900
+Subject: [PATCH 116/120] Revert "qt: remove unused meta_to_mlmeta()"
+
+This reverts commit 9705833b71329cdf159ba48493536612c6440acf.
+---
+ modules/gui/qt/components/playlist/sorting.h | 22 ++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/modules/gui/qt/components/playlist/sorting.h b/modules/gui/qt/components/playlist/sorting.h
+index 64ce5e02d7..6c1e93514a 100644
+--- a/modules/gui/qt/components/playlist/sorting.h
++++ b/modules/gui/qt/components/playlist/sorting.h
+@@ -136,4 +136,26 @@ static inline int i_column_sorting( uint32_t i_column )
+     }
+ }
+ 
++/* Return the media library query select type */
++static inline ml_select_e meta_to_mlmeta( uint32_t i_column )
++{
++    switch( i_column )
++    {
++    case COLUMN_NUMBER:         return ML_ID;
++    case COLUMN_TITLE:          return ML_TITLE;
++    case COLUMN_DURATION:       return ML_DURATION;
++    case COLUMN_ARTIST:         return ML_ARTIST;
++    case COLUMN_GENRE:          return ML_GENRE;
++    case COLUMN_ALBUM:          return ML_ALBUM;
++    case COLUMN_TRACK_NUMBER:   return ML_TRACK_NUMBER;
++    case COLUMN_DESCRIPTION:    return ML_EXTRA;
++    case COLUMN_URI:            return ML_URI;
++    case COLUMN_RATING:         return ML_VOTE;
++    case COLUMN_COVER:          return ML_COVER;
++    case COLUMN_DISC_NUMBER:    return ML_DISC_NUMBER;
++    case COLUMN_DATE:           return ML_YEAR;
++    default: abort();
++    }
++}
++
+ #endif
+-- 
+2.50.1
+

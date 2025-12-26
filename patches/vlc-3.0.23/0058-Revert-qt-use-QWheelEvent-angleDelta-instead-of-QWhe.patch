@@ -1,0 +1,61 @@
+From f1380684e64dd9fbe0442870745bf187e9b87783 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:35 +0900
+Subject: [PATCH 058/120] Revert "qt: use QWheelEvent::angleDelta() instead of
+ QWheelEvent::orientation()"
+
+This reverts commit 3e2e63bcc38635766168560b0e26513782fb8355.
+---
+ modules/gui/qt/util/pictureflow.cpp | 22 ++--------------------
+ 1 file changed, 2 insertions(+), 20 deletions(-)
+
+diff --git a/modules/gui/qt/util/pictureflow.cpp b/modules/gui/qt/util/pictureflow.cpp
+index 08279bc007..cf4c2af47c 100644
+--- a/modules/gui/qt/util/pictureflow.cpp
++++ b/modules/gui/qt/util/pictureflow.cpp
+@@ -34,7 +34,6 @@
+ #include <QApplication>
+ #include <QImage>
+ #include <QKeyEvent>
+-#include <QtMath>  // for wheel deadzone calculation
+ #include <QPainter>
+ #include <QPixmap>
+ #include <QTimer>
+@@ -862,32 +861,15 @@ void PictureFlow::resizeEvent(QResizeEvent* event)
+     QWidget::resizeEvent(event);
+ }
+ 
+-static Qt::Orientations getWheelOrientation(int x, int y)
+-{
+-    const qreal v_cos_deadzone = 0.45; // ~63 degrees
+-    const qreal h_cos_deadzone = 0.95; // ~15 degrees
+-
+-    if (x == 0 && y == 0)
+-        return Qt::Orientations{};
+-
+-    qreal cos = qFabs(x)/qSqrt(x*x + y*y);
+-    if (cos < v_cos_deadzone)
+-        return Qt::Vertical;
+-    if (cos > h_cos_deadzone)
+-        return Qt::Horizontal;
+-    return Qt::Orientations{};
+-}
+-
+ void PictureFlow::wheelEvent(QWheelEvent * event)
+ {
+-    QPoint p = event->angleDelta();
+-    if (getWheelOrientation(p.x(), p.y()) == Qt::Horizontal)
++    if (event->orientation() == Qt::Horizontal)
+     {
+         event->ignore();
+     }
+     else
+     {
+-        int numSteps = -((p.y() / 8) / 15);
++        int numSteps = -((event->angleDelta().y() / 8) / 15);
+ 
+         if (numSteps > 0)
+         {
+-- 
+2.50.1
+

@@ -1,0 +1,159 @@
+From 41b580beb97b399082f1bc13fe7c04d57081eeee Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:13 +0900
+Subject: [PATCH 071/120] Revert "qt: purge remaining use of Q_DECL_OVERRIDE"
+
+This reverts commit 548889c14217cc0a8ebd1152c5845c6d3064b111.
+---
+ modules/gui/qt/components/extended_panels.hpp | 8 ++++----
+ modules/gui/qt/components/info_panels.hpp     | 2 +-
+ modules/gui/qt/dialogs/extensions.hpp         | 4 ++--
+ modules/gui/qt/dialogs/gototime.hpp           | 4 ++--
+ modules/gui/qt/dialogs/mediainfo.hpp          | 2 +-
+ modules/gui/qt/dialogs/openurl.hpp            | 4 ++--
+ modules/gui/qt/dialogs/vlm.hpp                | 2 +-
+ modules/gui/qt/util/validators.hpp            | 4 ++--
+ 8 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/modules/gui/qt/components/extended_panels.hpp b/modules/gui/qt/components/extended_panels.hpp
+index 34fb63952f..c8d92381fe 100644
+--- a/modules/gui/qt/components/extended_panels.hpp
++++ b/modules/gui/qt/components/extended_panels.hpp
+@@ -74,7 +74,7 @@ class ExtV4l2 : public QWidget
+ public:
+     ExtV4l2( intf_thread_t *, QWidget * );
+ 
+-    void showEvent( QShowEvent *event ) override;
++    void showEvent( QShowEvent *event ) Q_DECL_OVERRIDE;
+ 
+ private:
+     intf_thread_t *p_intf;
+@@ -162,13 +162,13 @@ public:
+                          const slider_data_t *p_data, int index );
+ 
+ protected:
+-    float initialValue() override;
++    float initialValue() Q_DECL_OVERRIDE;
+     int index;
+     QStringList getBandsFromAout() const;
+     void writeToConfig() override;
+ 
+ public slots:
+-    void onValueChanged( int i ) override;
++    void onValueChanged( int i ) Q_DECL_OVERRIDE;
+ };
+ 
+ class Equalizer: public AudioFilterControlWidget
+@@ -179,7 +179,7 @@ public:
+     Equalizer( intf_thread_t *, QWidget * );
+ 
+ protected:
+-    void build() override;
++    void build() Q_DECL_OVERRIDE;
+ 
+ private:
+     FilterSliderData *preamp;
+diff --git a/modules/gui/qt/components/info_panels.hpp b/modules/gui/qt/components/info_panels.hpp
+index c5549f70c8..1490425dd3 100644
+--- a/modules/gui/qt/components/info_panels.hpp
++++ b/modules/gui/qt/components/info_panels.hpp
+@@ -113,7 +113,7 @@ class InputStatsPanel: public QWidget
+ public:
+     InputStatsPanel( QWidget * );
+ protected:
+-    void hideEvent( QHideEvent * ) override;
++    void hideEvent( QHideEvent * ) Q_DECL_OVERRIDE;
+ private:
+     QTreeWidget *StatsTree;
+     QTreeWidgetItem *input;
+diff --git a/modules/gui/qt/dialogs/extensions.hpp b/modules/gui/qt/dialogs/extensions.hpp
+index 05f2b7ab66..2894aa9ff8 100644
+--- a/modules/gui/qt/dialogs/extensions.hpp
++++ b/modules/gui/qt/dialogs/extensions.hpp
+@@ -105,8 +105,8 @@ private:
+     void DestroyWidget( extension_widget_t *p_widget, bool b_cond = true );
+ 
+ protected:
+-    void closeEvent( QCloseEvent* ) override;
+-    void keyPressEvent( QKeyEvent* ) override;
++    void closeEvent( QCloseEvent* ) Q_DECL_OVERRIDE;
++    void keyPressEvent( QKeyEvent* ) Q_DECL_OVERRIDE;
+ 
+ private slots:
+     int TriggerClick( QObject *object );
+diff --git a/modules/gui/qt/dialogs/gototime.hpp b/modules/gui/qt/dialogs/gototime.hpp
+index 79c55486ef..9f980b221a 100644
+--- a/modules/gui/qt/dialogs/gototime.hpp
++++ b/modules/gui/qt/dialogs/gototime.hpp
+@@ -37,8 +37,8 @@ private:
+     virtual ~GotoTimeDialog();
+     QTimeEdit *timeEdit;
+ private slots:
+-    void close() override;
+-    void cancel() override;
++    void close() Q_DECL_OVERRIDE;
++    void cancel() Q_DECL_OVERRIDE;
+     void reset();
+ 
+     friend class    Singleton<GotoTimeDialog>;
+diff --git a/modules/gui/qt/dialogs/mediainfo.hpp b/modules/gui/qt/dialogs/mediainfo.hpp
+index f2f266bb4f..34a40c316b 100644
+--- a/modules/gui/qt/dialogs/mediainfo.hpp
++++ b/modules/gui/qt/dialogs/mediainfo.hpp
+@@ -71,7 +71,7 @@ private slots:
+     void updateAllTabs( input_item_t * );
+     void clearAllTabs();
+ 
+-    void close() override;
++    void close() Q_DECL_OVERRIDE;
+ 
+     void saveMeta();
+     void updateButtons( int i_tab );
+diff --git a/modules/gui/qt/dialogs/openurl.hpp b/modules/gui/qt/dialogs/openurl.hpp
+index baaaf26503..d1d84b04f1 100644
+--- a/modules/gui/qt/dialogs/openurl.hpp
++++ b/modules/gui/qt/dialogs/openurl.hpp
+@@ -53,10 +53,10 @@ public:
+ 
+     QString url() const;
+     bool shouldEnqueue() const;
+-    void showEvent( QShowEvent *ev ) override;
++    void showEvent( QShowEvent *ev ) Q_DECL_OVERRIDE;
+ 
+ public slots:
+-    void close() override { play(); }
++    void close() Q_DECL_OVERRIDE { play(); }
+ 
+ };
+ 
+diff --git a/modules/gui/qt/dialogs/vlm.hpp b/modules/gui/qt/dialogs/vlm.hpp
+index a1cb42c075..2983115c14 100644
+--- a/modules/gui/qt/dialogs/vlm.hpp
++++ b/modules/gui/qt/dialogs/vlm.hpp
+@@ -181,7 +181,7 @@ public:
+     VLMBroadcast( VLMWrapper *, const QString& name, const QString& input,
+                   const QString& inputOptions, const QString& output,
+                   bool _enable, bool _loop, VLMDialog *parent );
+-    void update() override;
++    void update() Q_DECL_OVERRIDE;
+ private:
+     bool b_looped;
+     bool b_playing;
+diff --git a/modules/gui/qt/util/validators.hpp b/modules/gui/qt/util/validators.hpp
+index b08262bfa2..3375ee8f9a 100644
+--- a/modules/gui/qt/util/validators.hpp
++++ b/modules/gui/qt/util/validators.hpp
+@@ -30,8 +30,8 @@ class UrlValidator : public QValidator
+    Q_OBJECT
+ public:
+    UrlValidator( QObject *parent ) : QValidator( parent ) { }
+-   QValidator::State validate( QString&, int& ) const override;
+-   void fixup ( QString & input ) const override;
++   QValidator::State validate( QString&, int& ) const Q_DECL_OVERRIDE;
++   void fixup ( QString & input ) const Q_DECL_OVERRIDE;
+ };
+ 
+ #endif // VALIDATORS_HPP
+-- 
+2.50.1
+

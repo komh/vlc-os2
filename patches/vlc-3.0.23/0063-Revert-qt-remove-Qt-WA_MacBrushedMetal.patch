@@ -1,0 +1,25 @@
+From b1dcf54e6f304028a9060b1f356bb1b4f279ff0c Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:49 +0900
+Subject: [PATCH 063/120] Revert "qt: remove Qt::WA_MacBrushedMetal"
+
+This reverts commit 55ad77f4c1e912d0187844917c1c0b0010669f2f.
+---
+ modules/gui/qt/components/controller.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index d8331299ff..dd9cdc8b46 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -720,6 +720,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
+ #ifdef DEBUG_LAYOUT
+     setStyleSheet( "background: red ");
+ #endif
++    setAttribute( Qt::WA_MacBrushedMetal);
+     controlLayout = new QVBoxLayout( this );
+     controlLayout->setContentsMargins( 3, 1, 0, 1 );
+     controlLayout->setSpacing( 0 );
+-- 
+2.50.1
+

@@ -1,0 +1,40 @@
+From fced3f431165327bc6b1fcca83aa56cf19abd2e9 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:19 +0900
+Subject: [PATCH 073/120] Revert "qt: add missing override specifier"
+
+This reverts commit 692d3bb7822121f2f78d4679cb03bb34325da47c.
+---
+ modules/gui/qt/components/extended_panels.hpp | 2 +-
+ modules/gui/qt/dialogs/plugins.hpp            | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/components/extended_panels.hpp b/modules/gui/qt/components/extended_panels.hpp
+index c8d92381fe..87cba5de39 100644
+--- a/modules/gui/qt/components/extended_panels.hpp
++++ b/modules/gui/qt/components/extended_panels.hpp
+@@ -165,7 +165,7 @@ protected:
+     float initialValue() Q_DECL_OVERRIDE;
+     int index;
+     QStringList getBandsFromAout() const;
+-    void writeToConfig() override;
++    void writeToConfig();
+ 
+ public slots:
+     void onValueChanged( int i ) Q_DECL_OVERRIDE;
+diff --git a/modules/gui/qt/dialogs/plugins.hpp b/modules/gui/qt/dialogs/plugins.hpp
+index 390152a9f4..a0da1073c0 100644
+--- a/modules/gui/qt/dialogs/plugins.hpp
++++ b/modules/gui/qt/dialogs/plugins.hpp
+@@ -143,7 +143,7 @@ private slots:
+ private:
+     AddonsTab( intf_thread_t *p_intf );
+     virtual ~AddonsTab();
+-    bool eventFilter ( QObject * watched, QEvent * event ) override;
++    bool eventFilter ( QObject * watched, QEvent * event );
+ 
+     enum
+     {
+-- 
+2.50.1
+

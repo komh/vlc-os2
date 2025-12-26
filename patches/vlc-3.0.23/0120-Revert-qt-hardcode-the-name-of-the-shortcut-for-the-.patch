@@ -1,0 +1,36 @@
+From af8e2d8c52a08330b54a5604a5eff9fda03d2a0d Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:15:41 +0900
+Subject: [PATCH 120/120] Revert "qt: hardcode the name of the shortcut for the
+ AMD VQ Enhancer"
+
+This reverts commit 34f5c02ae47725965d89625500aa564daee53866.
+---
+ modules/gui/qt/components/preferences_widgets.cpp | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/modules/gui/qt/components/preferences_widgets.cpp b/modules/gui/qt/components/preferences_widgets.cpp
+index b634d53542..64121b6dc1 100644
+--- a/modules/gui/qt/components/preferences_widgets.cpp
++++ b/modules/gui/qt/components/preferences_widgets.cpp
+@@ -632,15 +632,9 @@ ModuleListConfigControl::~ModuleListConfigControl()
+ void ModuleListConfigControl::checkbox_lists( module_t *p_parser )
+ {
+     const char *help = module_get_help( p_parser );
+-    const char *module_name = module_GetLongName( p_parser );
+-    const char *module_shortcut = module_get_object( p_parser );
+-
+-    if ( !strcmp(module_name, "AMD VQ Enhancer"))
+-        module_shortcut = "amf_vqenhancer";
+-
+-    checkbox_lists( qtr( module_name ),
++    checkbox_lists( qtr( module_GetLongName( p_parser ) ),
+                     help != NULL ? qtr( help ): "",
+-                    module_shortcut );
++                    module_get_object( p_parser ) );
+ }
+ 
+ void ModuleListConfigControl::checkbox_lists( QString label, QString help, const char* psz_module )
+-- 
+2.50.1
+

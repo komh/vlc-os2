@@ -1,0 +1,85 @@
+From dfc80af68228a36469e2755d41990db1b58208b3 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:34 +0900
+Subject: [PATCH 078/120] Revert "qt: egp: use override"
+
+This reverts commit 1b50b8af51de10d546a137f2c04210a8d20effb0.
+---
+ modules/gui/qt/components/epg/EPGChannels.hpp |  2 +-
+ modules/gui/qt/components/epg/EPGItem.hpp     | 12 ++++++------
+ modules/gui/qt/components/epg/EPGRuler.hpp    |  2 +-
+ modules/gui/qt/dialogs/epg.hpp                |  2 +-
+ 4 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/modules/gui/qt/components/epg/EPGChannels.hpp b/modules/gui/qt/components/epg/EPGChannels.hpp
+index 404a1f445a..b4fee69819 100644
+--- a/modules/gui/qt/components/epg/EPGChannels.hpp
++++ b/modules/gui/qt/components/epg/EPGChannels.hpp
+@@ -42,7 +42,7 @@ public slots:
+     void reset();
+ 
+ protected:
+-    void paintEvent( QPaintEvent *event ) override;
++    void paintEvent( QPaintEvent *event ) Q_DECL_OVERRIDE;
+ 
+ private:
+     EPGView *m_epgView;
+diff --git a/modules/gui/qt/components/epg/EPGItem.hpp b/modules/gui/qt/components/epg/EPGItem.hpp
+index 36c82cee49..ff2dc49b8e 100644
+--- a/modules/gui/qt/components/epg/EPGItem.hpp
++++ b/modules/gui/qt/components/epg/EPGItem.hpp
+@@ -40,8 +40,8 @@ class EPGItem : public QGraphicsItem
+ public:
+     EPGItem( const vlc_epg_event_t *data, EPGView *view, EPGProgram * );
+ 
+-    QRectF boundingRect() const override;
+-    void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0 ) override;
++    QRectF boundingRect() const Q_DECL_OVERRIDE;
++    void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0 ) Q_DECL_OVERRIDE;
+ 
+     const QDateTime& start() const;
+     QDateTime end() const;
+@@ -60,10 +60,10 @@ public:
+     const QList<QPair<QString, QString>> &descriptionItems() const;
+ 
+ protected:
+-    void focusInEvent( QFocusEvent * event ) override;
+-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * ) override;
+-    void hoverEnterEvent ( QGraphicsSceneHoverEvent * ) override;
+-    void hoverLeaveEvent ( QGraphicsSceneHoverEvent * ) override;
++    void focusInEvent( QFocusEvent * event ) Q_DECL_OVERRIDE;
++    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * ) Q_DECL_OVERRIDE;
++    void hoverEnterEvent ( QGraphicsSceneHoverEvent * ) Q_DECL_OVERRIDE;
++    void hoverLeaveEvent ( QGraphicsSceneHoverEvent * ) Q_DECL_OVERRIDE;
+ 
+ private:
+     EPGProgram *program;
+diff --git a/modules/gui/qt/components/epg/EPGRuler.hpp b/modules/gui/qt/components/epg/EPGRuler.hpp
+index 35f00bae6c..1a8021b6d0 100644
+--- a/modules/gui/qt/components/epg/EPGRuler.hpp
++++ b/modules/gui/qt/components/epg/EPGRuler.hpp
+@@ -43,7 +43,7 @@ public slots:
+     void setOffset( int offset );
+ 
+ protected:
+-    void paintEvent( QPaintEvent *event ) override;
++    void paintEvent( QPaintEvent *event ) Q_DECL_OVERRIDE;
+ 
+ private:
+     qreal m_scale;
+diff --git a/modules/gui/qt/dialogs/epg.hpp b/modules/gui/qt/dialogs/epg.hpp
+index 26a28be99c..1afc3c14a7 100644
+--- a/modules/gui/qt/dialogs/epg.hpp
++++ b/modules/gui/qt/dialogs/epg.hpp
+@@ -37,7 +37,7 @@ class EpgDialog : public QVLCFrame, public Singleton<EpgDialog>
+ {
+     Q_OBJECT
+ protected:
+-    virtual void showEvent(QShowEvent * event) override;
++    virtual void showEvent(QShowEvent * event) Q_DECL_OVERRIDE;
+ 
+ private:
+     EpgDialog( intf_thread_t * );
+-- 
+2.50.1
+

@@ -1,0 +1,26 @@
+From 5c38fbb48daccaf695a64c855b74bf62fd9a573d Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:04 +0900
+Subject: [PATCH 088/120] Revert "qt: open_panels: add missing override"
+
+This reverts commit 8e8a41ac42d481898068283cc025d28e417ed983.
+---
+ modules/gui/qt/components/open_panels.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/components/open_panels.hpp b/modules/gui/qt/components/open_panels.hpp
+index f0874de78b..1a169720d6 100644
+--- a/modules/gui/qt/components/open_panels.hpp
++++ b/modules/gui/qt/components/open_panels.hpp
+@@ -185,7 +185,7 @@ public:
+     void clear() Q_DECL_OVERRIDE;
+     virtual void accept();
+ #if defined( _WIN32 ) || defined( __OS2__ )
+-    virtual void onFocus() override;
++    virtual void onFocus();
+ #endif
+     virtual void updateContext(int) Q_DECL_OVERRIDE;
+ private:
+-- 
+2.50.1
+

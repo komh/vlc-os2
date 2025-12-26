@@ -1,0 +1,41 @@
+From 081bc7755db5844cb2fc4c3e99fba69db8e774b4 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:26 +0900
+Subject: [PATCH 095/120] Revert "qt: using QMap as multimap is deprecated in
+ Qt5.15"
+
+This reverts commit 9072173b468e88429e27165e05a4b9585420c596.
+---
+ modules/gui/qt/components/preferences_widgets.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/modules/gui/qt/components/preferences_widgets.cpp b/modules/gui/qt/components/preferences_widgets.cpp
+index 149db90ba3..87bbd03923 100644
+--- a/modules/gui/qt/components/preferences_widgets.cpp
++++ b/modules/gui/qt/components/preferences_widgets.cpp
+@@ -1205,7 +1205,7 @@ void KeySelectorControl::finish()
+ 
+     p_config = module_config_get (p_main, &confsize);
+ 
+-    QMultiMap<QString, QString> global_keys;
++    QMap<QString, QString> global_keys;
+     for (size_t i = 0; i < confsize; i++)
+     {
+         module_config_t *p_config_item = p_config + i;
+@@ -1240,11 +1240,11 @@ void KeySelectorControl::finish()
+          && !EMPTY_STR( p_config_item->psz_text )
+          && !EMPTY_STR( p_config_item->value.psz ) )
+         {
+-            global_keys.insert( qtr( p_config_item->psz_text ), qfu( p_config_item->value.psz ) );
++            global_keys.insertMulti( qtr( p_config_item->psz_text ), qfu( p_config_item->value.psz ) );
+         }
+     }
+ 
+-    auto i = global_keys.constBegin();
++    QMap<QString, QString>::const_iterator i = global_keys.constBegin();
+     while (i != global_keys.constEnd())
+     {
+         QList<QTreeWidgetItem *> list =
+-- 
+2.50.1
+

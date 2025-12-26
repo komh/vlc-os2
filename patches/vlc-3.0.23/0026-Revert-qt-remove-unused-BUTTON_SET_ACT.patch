@@ -1,0 +1,28 @@
+From c9ca10c7431f500be812f4cbd0ed2de0c25362c2 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:03:10 +0900
+Subject: [PATCH 026/120] Revert "qt: remove unused BUTTON_SET_ACT"
+
+This reverts commit b5ec4940a4a643d5abbe88b0c729fab7f7f2e9ca.
+---
+ modules/gui/qt/qt.hpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/modules/gui/qt/qt.hpp b/modules/gui/qt/qt.hpp
+index 27a3e3c981..c64db1ab84 100644
+--- a/modules/gui/qt/qt.hpp
++++ b/modules/gui/qt/qt.hpp
+@@ -136,6 +136,10 @@ struct vlc_playlist_locker {
+     button->setText( text );                 \
+     button->setToolTip( tooltip );
+ 
++#define BUTTON_SET_ACT( button, text, tooltip, thisslot ) \
++    BUTTON_SET( button, text, tooltip );                  \
++    BUTTONACT( button, thisslot );
++
+ #define BUTTON_SET_IMG( button, text, image, tooltip )    \
+     BUTTON_SET( button, text, tooltip );                  \
+     button->setIcon( QIcon( ":/"#image ".svg") );
+-- 
+2.50.1
+

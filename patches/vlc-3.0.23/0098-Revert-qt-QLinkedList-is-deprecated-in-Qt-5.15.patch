@@ -1,0 +1,88 @@
+From d7b423fb45ebe950fe34e554dfa0772009f71aab Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:34 +0900
+Subject: [PATCH 098/120] Revert "qt: QLinkedList is deprecated in Qt 5.15"
+
+This reverts commit 5a48655d9e51696c669350d8cbaa9a72a7873be6.
+---
+ modules/gui/qt/components/interface_widgets.cpp | 15 +++++++--------
+ modules/gui/qt/components/interface_widgets.hpp |  3 ++-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/modules/gui/qt/components/interface_widgets.cpp b/modules/gui/qt/components/interface_widgets.cpp
+index 19e832ae32..8f53d177ab 100644
+--- a/modules/gui/qt/components/interface_widgets.cpp
++++ b/modules/gui/qt/components/interface_widgets.cpp
+@@ -564,7 +564,7 @@ void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )
+ EasterEggBackgroundWidget::EasterEggBackgroundWidget( intf_thread_t *p_intf )
+     : BackgroundWidget( p_intf )
+ {
+-    flakes = new std::list<flake *>();
++    flakes = new QLinkedList<flake *>();
+     i_rate = 2;
+     i_speed = 1;
+     b_enabled = false;
+@@ -617,7 +617,7 @@ void EasterEggBackgroundWidget::spawnFlakes()
+ 
+     int i_spawn = ( (double) qrand() / RAND_MAX ) * i_rate;
+ 
+-    auto it = flakes->begin();
++    QLinkedList<flake *>::iterator it = flakes->begin();
+     while( it != flakes->end() )
+     {
+         flake *current = *it;
+@@ -637,16 +637,15 @@ void EasterEggBackgroundWidget::spawnFlakes()
+         flake *f = new flake;
+         f->point.setX( qrand() * w );
+         f->b_fat = ( qrand() < ( RAND_MAX * .33 ) );
+-        flakes->push_back( f );
++        flakes->append( f );
+     }
+     update();
+ }
+ 
+ void EasterEggBackgroundWidget::reset()
+ {
+-    for(flake* f: *flakes)
+-        delete f;
+-    flakes->clear();
++    while ( !flakes->isEmpty() )
++        delete flakes->takeFirst();
+ }
+ 
+ void EasterEggBackgroundWidget::paintEvent( QPaintEvent *e )
+@@ -656,8 +655,8 @@ void EasterEggBackgroundWidget::paintEvent( QPaintEvent *e )
+     painter.setBrush( QBrush( QColor(Qt::white) ) );
+     painter.setPen( QPen(Qt::white) );
+ 
+-    auto it = flakes->cbegin();
+-    while( it != flakes->cend() )
++    QLinkedList<flake *>::const_iterator it = flakes->constBegin();
++    while( it != flakes->constEnd() )
+     {
+         const flake * const f = *(it++);
+         if ( f->b_fat )
+diff --git a/modules/gui/qt/components/interface_widgets.hpp b/modules/gui/qt/components/interface_widgets.hpp
+index 8bda8d596a..583f2d1f50 100644
+--- a/modules/gui/qt/components/interface_widgets.hpp
++++ b/modules/gui/qt/components/interface_widgets.hpp
+@@ -43,6 +43,7 @@
+ #include <QLabel>
+ #include <QMouseEvent>
+ #include <QPropertyAnimation>
++#include <QLinkedList>
+ 
+ class QMenu;
+ class QSlider;
+@@ -150,7 +151,7 @@ private:
+         bool b_fat;
+     };
+     QTimer *timer;
+-    std::list<flake *> *flakes;
++    QLinkedList<flake *> *flakes;
+     int i_rate;
+     int i_speed;
+     bool b_enabled;
+-- 
+2.50.1
+

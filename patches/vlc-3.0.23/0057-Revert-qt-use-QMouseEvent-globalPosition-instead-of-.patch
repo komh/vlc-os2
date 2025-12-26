@@ -1,0 +1,80 @@
+From 90c868736e574f9af8628514ebb53085ad190ecd Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:12:31 +0900
+Subject: [PATCH 057/120] Revert "qt: use QMouseEvent::globalPosition() instead
+ of QMouseEvent::globalX/Y()"
+
+This reverts commit ec38184b7dc20670a9a91a382f8b0de58e00abbe.
+---
+ modules/gui/qt/components/controller.cpp | 22 ++++++----------------
+ modules/gui/qt/util/input_slider.cpp     |  7 +------
+ 2 files changed, 7 insertions(+), 22 deletions(-)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index 5744dd6e97..d8331299ff 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -1087,13 +1087,8 @@ void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
+         if( i_mouse_last_x == -1 || i_mouse_last_y == -1 )
+             return;
+ 
+-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+-        const auto pos = event->globalPosition();
+-#else
+-        const auto pos = event->globalPos();
+-#endif
+-        int i_moveX = pos.x() - i_mouse_last_x;
+-        int i_moveY = pos.y() - i_mouse_last_y;
++        int i_moveX = event->globalX() - i_mouse_last_x;
++        int i_moveY = event->globalY() - i_mouse_last_y;
+ 
+         const QRect screenRect = QApplication::desktop()->screenGeometry( targetScreen() );
+ 
+@@ -1102,8 +1097,8 @@ void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
+ 
+         move( i_x, i_y );
+ 
+-        i_mouse_last_x = pos.x();
+-        i_mouse_last_y = pos.y();
++        i_mouse_last_x = event->globalX();
++        i_mouse_last_y = event->globalY();
+     }
+ }
+ 
+@@ -1114,13 +1109,8 @@ void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
+ void FullscreenControllerWidget::mousePressEvent( QMouseEvent *event )
+ {
+     if( isWideFSC ) return;
+-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+-    auto pos = event->globalPosition();
+-#else
+-    auto pos = event->globalPos();
+-#endif
+-    i_mouse_last_x = pos.x();
+-    i_mouse_last_y = pos.y();
++    i_mouse_last_x = event->globalX();
++    i_mouse_last_y = event->globalY();
+     event->accept();
+ }
+ 
+diff --git a/modules/gui/qt/util/input_slider.cpp b/modules/gui/qt/util/input_slider.cpp
+index b0400db553..c0247a522d 100644
+--- a/modules/gui/qt/util/input_slider.cpp
++++ b/modules/gui/qt/util/input_slider.cpp
+@@ -386,12 +386,7 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
+             }
+         }
+ 
+-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+-        const auto pos = event->globalPosition();
+-#else
+-        const auto pos = event->globalPos();
+-#endif
+-        QPoint target( pos.x() - ( event->x() - posX ),
++        QPoint target( event->globalX() - ( event->x() - posX ),
+                 QWidget::mapToGlobal( QPoint( 0, 0 ) ).y() );
+         if( likely( size().width() > handleLength() ) ) {
+             secstotimestr( psz_length, getValuePercentageFromXPos( event->x() ) * inputLength );
+-- 
+2.50.1
+

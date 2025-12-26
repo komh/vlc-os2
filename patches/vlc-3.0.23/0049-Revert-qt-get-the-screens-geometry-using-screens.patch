@@ -1,0 +1,48 @@
+From 7803368d55874acb3e1359b707d7a36f4e086eaa Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:08:44 +0900
+Subject: [PATCH 049/120] Revert "qt: get the screens geometry using screens()"
+
+This reverts commit cf4f31f5c1cad4d11b1460f99e774189990e6f30.
+
+  Conflicts:
+    modules/gui/qt/components/controller.cpp
+    modules/gui/qt/main_interface.cpp
+---
+ modules/gui/qt/components/controller.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/modules/gui/qt/components/controller.cpp b/modules/gui/qt/components/controller.cpp
+index e942de8531..63b614af70 100644
+--- a/modules/gui/qt/components/controller.cpp
++++ b/modules/gui/qt/components/controller.cpp
+@@ -914,7 +914,7 @@ void FullscreenControllerWidget::restoreFSC()
+ 
+ void FullscreenControllerWidget::centerFSC( int number )
+ {
+-    QRect currentRes = QGuiApplication::screens()[ number ]->geometry();
++    QRect currentRes = QApplication::desktop()->screenGeometry( number );
+ 
+     /* screen has changed, calculate new position */
+     QPoint pos = QPoint( currentRes.x() + (currentRes.width() / 2) - (width() / 2),
+@@ -988,7 +988,7 @@ void FullscreenControllerWidget::slowHideFSC()
+ 
+ void FullscreenControllerWidget::updateFullwidthGeometry( int number )
+ {
+-    QRect screenGeometry = QGuiApplication::screens()[ number ]->geometry();
++    QRect screenGeometry = QApplication::desktop()->screenGeometry( number );
+     setMinimumWidth( screenGeometry.width() );
+     setGeometry( screenGeometry.x(), screenGeometry.y() + screenGeometry.height() - height(), screenGeometry.width(), height() );
+     adjustSize();
+@@ -1098,7 +1098,7 @@ void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
+         int i_moveX = pos.x() - i_mouse_last_x;
+         int i_moveY = pos.y() - i_mouse_last_y;
+ 
+-        const QRect screenRect = QGuiApplication::screens()[ targetScreen() ]->geometry();
++        const QRect screenRect = QApplication::desktop()->screenGeometry( targetScreen() );
+ 
+         const int i_x = qBound( screenRect.left(), x() + i_moveX, screenRect.right() - width() );
+         const int i_y = qBound( screenRect.top(),  y() + i_moveY, screenRect.bottom() - height() );
+-- 
+2.50.1
+

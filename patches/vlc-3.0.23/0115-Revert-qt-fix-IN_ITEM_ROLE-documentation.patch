@@ -1,0 +1,26 @@
+From cbb75e44c97354d969d7adadff87d92aad268ba8 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:15:26 +0900
+Subject: [PATCH 115/120] Revert "qt: fix IN_ITEM_ROLE documentation"
+
+This reverts commit 949a27e2e4780c0084c07c7610ab4369171bf069.
+---
+ modules/gui/qt/components/playlist/selector.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/components/playlist/selector.hpp b/modules/gui/qt/components/playlist/selector.hpp
+index 2e333a3a66..b7d629af91 100644
+--- a/modules/gui/qt/components/playlist/selector.hpp
++++ b/modules/gui/qt/components/playlist/selector.hpp
+@@ -58,7 +58,7 @@ enum {
+     LONGNAME_ROLE,       //QString
+     PL_ITEM_ROLE,        //playlist_item_t*
+     PL_ITEM_ID_ROLE,     //playlist_item_t->i_id
+-    IN_ITEM_ROLE,        //input_item_t*
++    IN_ITEM_ROLE,        //input_item_t->i_id
+     SPECIAL_ROLE,        //SpecialData
+     CAP_SEARCH_ROLE,
+     SD_CATEGORY_ROLE,
+-- 
+2.50.1
+

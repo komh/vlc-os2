@@ -1,0 +1,42 @@
+From 56afb07933b57d698b46d7c23b84ccfa88c49088 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:15:17 +0900
+Subject: [PATCH 112/120] Revert "qt: fix bitfield added values set in
+ QVariant"
+
+This reverts commit 4e5956b752e3ea19718c223eec048a427ffa78d1.
+---
+ modules/gui/qt/menus.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/modules/gui/qt/menus.cpp b/modules/gui/qt/menus.cpp
+index 8568f0c438..a3d456c24f 100644
+--- a/modules/gui/qt/menus.cpp
++++ b/modules/gui/qt/menus.cpp
+@@ -849,20 +849,20 @@ void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu,
+     action = addMIMStaticEntry( p_intf, menu, qtr( "Pre&vious" ),
+             ":/toolbar/previous_b.svg", SLOT( prev() ), true );
+     action->setEnabled( !bPlaylistEmpty );
+-    action->setData( static_cast<int>(ACTION_NO_CLEANUP | ACTION_DELETE_ON_REBUILD) );
++    action->setData( ACTION_NO_CLEANUP + ACTION_DELETE_ON_REBUILD );
+     CONNECT( THEMIM, playlistNotEmpty(bool), action, setEnabled(bool) );
+ 
+     action = addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
+             ":/toolbar/next_b.svg", SLOT( next() ), true );
+     action->setEnabled( !bPlaylistEmpty );
+-    action->setData( static_cast<int>(ACTION_NO_CLEANUP | ACTION_DELETE_ON_REBUILD) );
++    action->setData( ACTION_NO_CLEANUP + ACTION_DELETE_ON_REBUILD );
+     CONNECT( THEMIM, playlistNotEmpty(bool), action, setEnabled(bool) );
+ 
+     action = menu->addAction( qtr( "Record" ), THEAM, SLOT( record() ) );
+     action->setIcon( QIcon( ":/toolbar/record.svg" ) );
+     if( !p_input )
+         action->setEnabled( false );
+-    action->setData( static_cast<int>(ACTION_NO_CLEANUP | ACTION_DELETE_ON_REBUILD) );
++    action->setData( ACTION_NO_CLEANUP + ACTION_DELETE_ON_REBUILD );
+     menu->addSeparator();
+ }
+ 
+-- 
+2.50.1
+

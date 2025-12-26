@@ -1,0 +1,343 @@
+From 848e2517ba7b12c9c591587632d1c3b9ad2eae4b Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:05:22 +0900
+Subject: [PATCH 047/120] Revert "include cassert instead of assert.h"
+
+This reverts commit b12613a80361d190660439627f75a0c965074c3d.
+---
+ modules/access/dtv/bdagraph.cpp                       | 2 +-
+ modules/audio_filter/channel_mixer/spatialaudio.cpp   | 2 +-
+ modules/gui/qt/components/info_panels.cpp             | 2 +-
+ modules/gui/qt/components/interface_widgets.cpp       | 2 +-
+ modules/gui/qt/components/playlist/playlist_model.cpp | 2 +-
+ modules/gui/qt/components/preferences_widgets.hpp     | 2 +-
+ modules/gui/qt/components/simple_preferences.cpp      | 2 +-
+ modules/gui/qt/components/sout/profile_selector.cpp   | 2 +-
+ modules/gui/qt/dialogs/extended.cpp                   | 2 +-
+ modules/gui/qt/dialogs/extensions.hpp                 | 2 +-
+ modules/gui/qt/dialogs/help.cpp                       | 2 +-
+ modules/gui/qt/dialogs/messages.cpp                   | 2 +-
+ modules/gui/qt/dialogs/openurl.cpp                    | 2 +-
+ modules/gui/qt/dialogs/plugins.cpp                    | 2 +-
+ modules/gui/qt/dialogs/sout.cpp                       | 2 +-
+ modules/gui/qt/dialogs_provider.hpp                   | 2 +-
+ modules/gui/qt/extensions_manager.cpp                 | 2 +-
+ modules/gui/qt/main_interface_win32.cpp               | 2 +-
+ modules/gui/skins2/controls/ctrl_generic.cpp          | 2 +-
+ modules/gui/skins2/src/vlcproc.cpp                    | 2 +-
+ modules/gui/skins2/x11/x11_window.cpp                 | 4 ++--
+ modules/services_discovery/upnp.cpp                   | 2 +-
+ modules/stream_out/chromecast/chromecast_demux.cpp    | 2 +-
+ 23 files changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/modules/access/dtv/bdagraph.cpp b/modules/access/dtv/bdagraph.cpp
+index d208a27e72..b9ab380377 100644
+--- a/modules/access/dtv/bdagraph.cpp
++++ b/modules/access/dtv/bdagraph.cpp
+@@ -29,7 +29,7 @@
+ # include <config.h>
+ #endif
+ 
+-#include <cassert>
++#include <assert.h>
+ 
+ #include <vlc_common.h>
+ #include <vlc_block.h>
+diff --git a/modules/audio_filter/channel_mixer/spatialaudio.cpp b/modules/audio_filter/channel_mixer/spatialaudio.cpp
+index ec3b0e7489..8e35f89b46 100644
+--- a/modules/audio_filter/channel_mixer/spatialaudio.cpp
++++ b/modules/audio_filter/channel_mixer/spatialaudio.cpp
+@@ -28,7 +28,7 @@
+ # include "config.h"
+ #endif
+ 
+-#include <cassert>
++#include <assert.h>
+ 
+ #include <vlc_common.h>
+ #include <vlc_plugin.h>
+diff --git a/modules/gui/qt/components/info_panels.cpp b/modules/gui/qt/components/info_panels.cpp
+index c7816e642e..2bcd1805f8 100644
+--- a/modules/gui/qt/components/info_panels.cpp
++++ b/modules/gui/qt/components/info_panels.cpp
+@@ -34,7 +34,7 @@
+ #include "dialogs/fingerprintdialog.hpp"
+ #include "adapters/chromaprint.hpp"
+ 
+-#include <cassert>
++#include <assert.h>
+ #include <vlc_url.h>
+ #include <vlc_meta.h>
+ 
+diff --git a/modules/gui/qt/components/interface_widgets.cpp b/modules/gui/qt/components/interface_widgets.cpp
+index f0ee3915d9..95a6df0f95 100644
+--- a/modules/gui/qt/components/interface_widgets.cpp
++++ b/modules/gui/qt/components/interface_widgets.cpp
+@@ -70,7 +70,7 @@ static inline int qrand() {
+ #endif
+ 
+ #include <math.h>
+-#include <cassert>
++#include <assert.h>
+ 
+ #include <vlc_vout.h>
+ #include <vlc_vout_window.h>
+diff --git a/modules/gui/qt/components/playlist/playlist_model.cpp b/modules/gui/qt/components/playlist/playlist_model.cpp
+index 7202386ddd..d4060c8d24 100644
+--- a/modules/gui/qt/components/playlist/playlist_model.cpp
++++ b/modules/gui/qt/components/playlist/playlist_model.cpp
+@@ -38,7 +38,7 @@
+ 
+ #include "sorting.h"
+ 
+-#include <cassert>
++#include <assert.h>
+ #include <QFont>
+ #include <QAction>
+ #include <QStack>
+diff --git a/modules/gui/qt/components/preferences_widgets.hpp b/modules/gui/qt/components/preferences_widgets.hpp
+index e468c780a9..a40825afbc 100644
+--- a/modules/gui/qt/components/preferences_widgets.hpp
++++ b/modules/gui/qt/components/preferences_widgets.hpp
+@@ -31,7 +31,7 @@
+ #endif
+ 
+ #include "qt.hpp"
+-#include <cassert>
++#include <assert.h>
+ 
+ #include <QWidget>
+ 
+diff --git a/modules/gui/qt/components/simple_preferences.cpp b/modules/gui/qt/components/simple_preferences.cpp
+index 818fc366a7..a9e5a85126 100644
+--- a/modules/gui/qt/components/simple_preferences.cpp
++++ b/modules/gui/qt/components/simple_preferences.cpp
+@@ -47,7 +47,7 @@
+ #include <QSettings>
+ #include <QtAlgorithms>
+ #include <QDir>
+-#include <cassert>
++#include <assert.h>
+ #include <math.h>
+ 
+ #define ICON_HEIGHT 48
+diff --git a/modules/gui/qt/components/sout/profile_selector.cpp b/modules/gui/qt/components/sout/profile_selector.cpp
+index 2265bc82a9..e4bb34b843 100644
+--- a/modules/gui/qt/components/sout/profile_selector.cpp
++++ b/modules/gui/qt/components/sout/profile_selector.cpp
+@@ -39,7 +39,7 @@
+ #include <QListWidgetItem>
+ #include <QFontMetrics>
+ 
+-#include <cassert>
++#include <assert.h>
+ #include <vlc_modules.h>
+ 
+ #define CATPROP2NAME( val ) QString("valueholder_%1").arg( val )
+diff --git a/modules/gui/qt/dialogs/extended.cpp b/modules/gui/qt/dialogs/extended.cpp
+index 1d90cffe74..f8f42e0f2b 100644
+--- a/modules/gui/qt/dialogs/extended.cpp
++++ b/modules/gui/qt/dialogs/extended.cpp
+@@ -25,7 +25,7 @@
+ # include "config.h"
+ #endif
+ 
+-#include <cassert>
++#include <assert.h>
+ 
+ #include "dialogs/extended.hpp"
+ 
+diff --git a/modules/gui/qt/dialogs/extensions.hpp b/modules/gui/qt/dialogs/extensions.hpp
+index ae3821429f..05f2b7ab66 100644
+--- a/modules/gui/qt/dialogs/extensions.hpp
++++ b/modules/gui/qt/dialogs/extensions.hpp
+@@ -27,7 +27,7 @@
+ #include "qt.hpp"
+ #include <vlc_extensions.h>
+ 
+-#include <cassert>
++#include "assert.h"
+ 
+ #include <QDialog>
+ class QObject;
+diff --git a/modules/gui/qt/dialogs/help.cpp b/modules/gui/qt/dialogs/help.cpp
+index f8b35f1a1f..6244e3bd1f 100644
+--- a/modules/gui/qt/dialogs/help.cpp
++++ b/modules/gui/qt/dialogs/help.cpp
+@@ -44,7 +44,7 @@
+ #include <QDate>
+ #include <QPushButton>
+ 
+-#include <cassert>
++#include <assert.h>
+ 
+ HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+ 
+diff --git a/modules/gui/qt/dialogs/messages.cpp b/modules/gui/qt/dialogs/messages.cpp
+index 28084c35d6..7aaa9cc62d 100644
+--- a/modules/gui/qt/dialogs/messages.cpp
++++ b/modules/gui/qt/dialogs/messages.cpp
+@@ -36,7 +36,7 @@
+ #include <QMutex>
+ #include <QMutexLocker>
+ 
+-#include <cassert>
++#include <assert.h>
+ 
+ #include <vlc_common.h>
+ #include <vlc_input_item.h>
+diff --git a/modules/gui/qt/dialogs/openurl.cpp b/modules/gui/qt/dialogs/openurl.cpp
+index 0090666032..7af619222d 100644
+--- a/modules/gui/qt/dialogs/openurl.cpp
++++ b/modules/gui/qt/dialogs/openurl.cpp
+@@ -37,7 +37,7 @@
+ #include <QLabel>
+ #include <QVBoxLayout>
+ 
+-#include <cassert>
++#include <assert.h>
+ 
+ OpenUrlDialog::OpenUrlDialog( intf_thread_t *_p_intf,
+                               bool _bClipboard ) :
+diff --git a/modules/gui/qt/dialogs/plugins.cpp b/modules/gui/qt/dialogs/plugins.cpp
+index d35ff26c35..d2cd5bfbd3 100644
+--- a/modules/gui/qt/dialogs/plugins.cpp
++++ b/modules/gui/qt/dialogs/plugins.cpp
+@@ -34,7 +34,7 @@
+ #include "util/animators.hpp"
+ #include "util/imagehelper.hpp"
+ 
+-#include <cassert>
++#include <assert.h>
+ 
+ #include <vlc_modules.h>
+ 
+diff --git a/modules/gui/qt/dialogs/sout.cpp b/modules/gui/qt/dialogs/sout.cpp
+index abfd05df66..f5cee8c34b 100644
+--- a/modules/gui/qt/dialogs/sout.cpp
++++ b/modules/gui/qt/dialogs/sout.cpp
+@@ -33,7 +33,7 @@
+ 
+ #include <QString>
+ 
+-#include <cassert>
++#include <assert.h>
+ 
+ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& inputMRL )
+            : QWizard( parent )
+diff --git a/modules/gui/qt/dialogs_provider.hpp b/modules/gui/qt/dialogs_provider.hpp
+index 8cf980f248..5ac9d72a58 100644
+--- a/modules/gui/qt/dialogs_provider.hpp
++++ b/modules/gui/qt/dialogs_provider.hpp
+@@ -29,7 +29,7 @@
+ # include "config.h"
+ #endif
+ 
+-#include <cassert>
++#include <assert.h>
+ 
+ #include "qt.hpp"
+ 
+diff --git a/modules/gui/qt/extensions_manager.cpp b/modules/gui/qt/extensions_manager.cpp
+index 568a39702d..aecff87787 100644
+--- a/modules/gui/qt/extensions_manager.cpp
++++ b/modules/gui/qt/extensions_manager.cpp
+@@ -26,7 +26,7 @@
+ #include "dialogs/extensions.hpp"
+ 
+ #include <vlc_modules.h>
+-#include <cassert>
++#include "assert.h"
+ 
+ #include <QMenu>
+ #include <QAction>
+diff --git a/modules/gui/qt/main_interface_win32.cpp b/modules/gui/qt/main_interface_win32.cpp
+index 29fefcfe27..136ad8fd02 100644
+--- a/modules/gui/qt/main_interface_win32.cpp
++++ b/modules/gui/qt/main_interface_win32.cpp
+@@ -35,7 +35,7 @@
+ 
+ #include <QBitmap>
+ 
+-#include <cassert>
++#include <assert.h>
+ 
+ #if HAS_QT5
+ # include <QWindow>
+diff --git a/modules/gui/skins2/controls/ctrl_generic.cpp b/modules/gui/skins2/controls/ctrl_generic.cpp
+index 4d60fe16ea..dfa055494e 100644
+--- a/modules/gui/skins2/controls/ctrl_generic.cpp
++++ b/modules/gui/skins2/controls/ctrl_generic.cpp
+@@ -29,7 +29,7 @@
+ #include "../utils/position.hpp"
+ #include "../utils/var_bool.hpp"
+ 
+-#include <cassert>
++#include <assert.h>
+ 
+ 
+ CtrlGeneric::CtrlGeneric( intf_thread_t *pIntf, const UString &rHelp,
+diff --git a/modules/gui/skins2/src/vlcproc.cpp b/modules/gui/skins2/src/vlcproc.cpp
+index 1fc6f220da..a82502a79c 100644
+--- a/modules/gui/skins2/src/vlcproc.cpp
++++ b/modules/gui/skins2/src/vlcproc.cpp
+@@ -56,7 +56,7 @@
+ #include "../utils/var_string.hpp"
+ #include <sstream>
+ 
+-#include <cassert>
++#include <assert.h>
+ 
+ VlcProc *VlcProc::instance( intf_thread_t *pIntf )
+ {
+diff --git a/modules/gui/skins2/x11/x11_window.cpp b/modules/gui/skins2/x11/x11_window.cpp
+index 48b0b0bd38..e469ed64cb 100644
+--- a/modules/gui/skins2/x11/x11_window.cpp
++++ b/modules/gui/skins2/x11/x11_window.cpp
+@@ -35,7 +35,7 @@
+ #include "x11_dragdrop.hpp"
+ #include "x11_factory.hpp"
+ 
+-#include <cassert>
++#include <assert.h>
+ #include <limits.h>
+ 
+ #include <new>
+@@ -334,7 +334,7 @@ void X11Window::setFullscreen( ) const
+         event.format = 32;
+         event.data.l[ 0 ] = 1;
+         event.data.l[ 1 ] = NET_WM_STATE_FULLSCREEN;
+-
++ 
+         XSendEvent( XDISPLAY,
+                     DefaultRootWindow( XDISPLAY ),
+                     False, SubstructureNotifyMask|SubstructureRedirectMask,
+diff --git a/modules/services_discovery/upnp.cpp b/modules/services_discovery/upnp.cpp
+index 1be668fda5..838775a114 100644
+--- a/modules/services_discovery/upnp.cpp
++++ b/modules/services_discovery/upnp.cpp
+@@ -36,7 +36,7 @@
+ #include <vlc_services_discovery.h>
+ #include <vlc_charset.h>
+ 
+-#include <cassert>
++#include <assert.h>
+ #include <limits.h>
+ #include <algorithm>
+ #include <set>
+diff --git a/modules/stream_out/chromecast/chromecast_demux.cpp b/modules/stream_out/chromecast/chromecast_demux.cpp
+index 724ad17bf1..bb7c781c0d 100644
+--- a/modules/stream_out/chromecast/chromecast_demux.cpp
++++ b/modules/stream_out/chromecast/chromecast_demux.cpp
+@@ -34,7 +34,7 @@
+ 
+ #include "chromecast_common.h"
+ 
+-#include <cassert>
++#include <assert.h>
+ #include <new>
+ 
+ static void on_paused_changed_cb(void *data, bool paused);
+-- 
+2.50.1
+

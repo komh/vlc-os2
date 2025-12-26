@@ -1,0 +1,26 @@
+From f04abda230597bfa9c4c05a52bc6f24dae66927e Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:15:32 +0900
+Subject: [PATCH 117/120] Revert "qt: PodcastConfiguration inherits QDialog not
+ QWidget"
+
+This reverts commit b24844ffc7e4962b757269bb43c94811aabad7bd.
+---
+ modules/gui/qt/ui/podcast_configuration.ui | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/ui/podcast_configuration.ui b/modules/gui/qt/ui/podcast_configuration.ui
+index f213963fb3..046bef5a37 100644
+--- a/modules/gui/qt/ui/podcast_configuration.ui
++++ b/modules/gui/qt/ui/podcast_configuration.ui
+@@ -1,6 +1,6 @@
+ <ui version="4.0" >
+  <class>PodcastConfiguration</class>
+- <widget class="QDialog" name="PodcastConfiguration" >
++ <widget class="QWidget" name="PodcastConfiguration" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+-- 
+2.50.1
+

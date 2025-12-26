@@ -1,0 +1,27 @@
+From 5dd24fee14d1b4f7e54a886f9dd98d7377075b83 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:15:23 +0900
+Subject: [PATCH 114/120] Revert "qt: remove deprecated
+ QPainter::HighQualityAntialiasing usage"
+
+This reverts commit dc1e422e0a9f3204474222514682913b27b39185.
+---
+ modules/gui/qt/util/timetooltip.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/util/timetooltip.cpp b/modules/gui/qt/util/timetooltip.cpp
+index a3c9696308..0c02877e93 100644
+--- a/modules/gui/qt/util/timetooltip.cpp
++++ b/modules/gui/qt/util/timetooltip.cpp
+@@ -142,7 +142,7 @@ void TimeTooltip::show()
+ void TimeTooltip::paintEvent( QPaintEvent * )
+ {
+     QPainter p( this );
+-    p.setRenderHints( QPainter::TextAntialiasing );
++    p.setRenderHints( QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing );
+ 
+     p.setPen( Qt::black );
+     p.setBrush( qApp->palette().base() );
+-- 
+2.50.1
+

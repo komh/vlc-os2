@@ -1,0 +1,26 @@
+From d50b4f298980eb9cd5e450cd8154c6b8b431eb31 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:37 +0900
+Subject: [PATCH 079/120] Revert "qt: use override+virtual"
+
+This reverts commit a572d691d7ba23af39189e7ddb737aea01b459b0.
+---
+ modules/gui/qt/components/interface_widgets.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/components/interface_widgets.hpp b/modules/gui/qt/components/interface_widgets.hpp
+index 9730e602ff..8bda8d596a 100644
+--- a/modules/gui/qt/components/interface_widgets.hpp
++++ b/modules/gui/qt/components/interface_widgets.hpp
+@@ -161,7 +161,7 @@ class ClickableQLabel : public QLabel
+ {
+     Q_OBJECT
+ public:
+-    virtual void mouseDoubleClickEvent( QMouseEvent *event ) override
++    void mouseDoubleClickEvent( QMouseEvent *event ) Q_DECL_OVERRIDE
+     {
+         Q_UNUSED( event );
+         emit doubleClicked();
+-- 
+2.50.1
+

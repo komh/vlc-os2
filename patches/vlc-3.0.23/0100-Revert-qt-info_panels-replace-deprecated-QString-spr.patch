@@ -1,0 +1,36 @@
+From 82226dbab809cc98c22b024efe42717caf6c4bf1 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:41 +0900
+Subject: [PATCH 100/120] Revert "qt: info_panels: replace deprecated
+ QString::sprintf"
+
+This reverts commit 6f0a9ec6792db90d54b876262ec141624bb8217d.
+---
+ modules/gui/qt/components/info_panels.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/modules/gui/qt/components/info_panels.cpp b/modules/gui/qt/components/info_panels.cpp
+index b8685169d5..a3c507dc35 100644
+--- a/modules/gui/qt/components/info_panels.cpp
++++ b/modules/gui/qt/components/info_panels.cpp
+@@ -652,13 +652,13 @@ void InputStatsPanel::update( input_item_t *p_item )
+ #define UPDATE_INT( widget, calc... ) \
+     { widget->setText( 1, QString::number( (qulonglong)calc ) ); }
+ 
+-#define UPDATE_FLOAT( widget, calc ) \
+-    widget->setText( 1 , QString().setNum(calc, 'f', 0).leftJustified(6) )
++#define UPDATE_FLOAT( widget, format, calc... ) \
++    { QString str; widget->setText( 1 , str.sprintf( format, ## calc ) );  }
+ 
+     UPDATE_INT( read_media_stat, (p_item->p_stats->i_read_bytes / 1024 ) );
+-    UPDATE_FLOAT( input_bitrate_stat,  (float)(p_item->p_stats->f_input_bitrate *  8000 ));
++    UPDATE_FLOAT( input_bitrate_stat,  "%6.0f", (float)(p_item->p_stats->f_input_bitrate *  8000 ));
+     UPDATE_INT( demuxed_stat,    (p_item->p_stats->i_demux_read_bytes / 1024 ) );
+-    UPDATE_FLOAT( stream_bitrate_stat, (float)(p_item->p_stats->f_demux_bitrate *  8000 ));
++    UPDATE_FLOAT( stream_bitrate_stat, "%6.0f", (float)(p_item->p_stats->f_demux_bitrate *  8000 ));
+     UPDATE_INT( corrupted_stat,      p_item->p_stats->i_demux_corrupted );
+     UPDATE_INT( discontinuity_stat,  p_item->p_stats->i_demux_discontinuity );
+ 
+-- 
+2.50.1
+

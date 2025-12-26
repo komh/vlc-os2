@@ -1,0 +1,68 @@
+From 9bd548ce58348eff375cb56ca28131503e05d121 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:28 +0900
+Subject: [PATCH 096/120] Revert "qt: constructing QFlags from int is
+ deprecated since Qt 5.15"
+
+This reverts commit 880ae34d4b12d6bc046d1c1296e0341c654202df.
+---
+ modules/gui/qt/components/info_panels.cpp         | 4 ++--
+ modules/gui/qt/components/preferences_widgets.cpp | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/modules/gui/qt/components/info_panels.cpp b/modules/gui/qt/components/info_panels.cpp
+index e78c2cbf54..b8685169d5 100644
+--- a/modules/gui/qt/components/info_panels.cpp
++++ b/modules/gui/qt/components/info_panels.cpp
+@@ -552,7 +552,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent ): QWidget( parent )
+      QLabel *topLabel = new QLabel( qtr( "Current"
+                  " media / stream " "statistics") );
+      topLabel->setWordWrap( true );
+-     layout->addWidget( topLabel, 0 );
++     layout->addWidget( topLabel, 0, 0 );
+ 
+      StatsTree = new QTreeWidget(this);
+      StatsTree->setColumnCount( 3 );
+@@ -615,7 +615,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent ): QWidget( parent )
+     StatsTree->resizeColumnToContents( 0 );
+     StatsTree->setColumnWidth( 1 , 200 );
+ 
+-    layout->addWidget(StatsTree, 4 );
++    layout->addWidget(StatsTree, 4, 0 );
+ 
+     statsView = new VLCStatsView( this );
+     statsView->setFrameStyle( QFrame::NoFrame );
+diff --git a/modules/gui/qt/components/preferences_widgets.cpp b/modules/gui/qt/components/preferences_widgets.cpp
+index 87bbd03923..4239fd2e12 100644
+--- a/modules/gui/qt/components/preferences_widgets.cpp
++++ b/modules/gui/qt/components/preferences_widgets.cpp
+@@ -276,7 +276,7 @@ void FileConfigControl::fillGrid( QGridLayout *l, int line )
+     textAndButton->setMargin( 0 );
+     textAndButton->addWidget( text, 2 );
+     textAndButton->addWidget( browse, 0 );
+-    l->addLayout( textAndButton, line, LAST_COLUMN );
++    l->addLayout( textAndButton, line, LAST_COLUMN, 0 );
+ }
+ 
+ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
+@@ -524,7 +524,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
+ void ModuleConfigControl::fillGrid( QGridLayout *l, int line )
+ {
+     l->addWidget( label, line, 0 );
+-    l->addWidget( combo, line, LAST_COLUMN );
++    l->addWidget( combo, line, LAST_COLUMN, 0 );
+ }
+ 
+ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
+@@ -940,7 +940,7 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
+ 
+ void BoolConfigControl::fillGrid( QGridLayout *l, int line )
+ {
+-    l->addWidget( checkbox, line, 0, 1, -1 );
++    l->addWidget( checkbox, line, 0, 1, -1, 0 );
+ }
+ 
+ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
+-- 
+2.50.1
+

@@ -1,0 +1,516 @@
+From da457a8cbba1da85de56e3d7c4b75ddaf6edfdd3 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh@chollian.net>
+Date: Tue, 24 Oct 2017 20:15:06 +0900
+Subject: [PATCH 003/120] Revert "qt: drop Qt 4 support, set minimal Qt version
+ to 5.5"
+
+This reverts commit 1c221a77d92935866e897254c07e1d12a4b95ae0.
+
+OS/2 still uses Qt 4.
+---
+ configure.ac                                  | 99 +------------------
+ modules/gui/qt/components/info_panels.cpp     |  4 +
+ .../gui/qt/components/interface_widgets.cpp   |  8 +-
+ modules/gui/qt/components/open_panels.cpp     |  6 ++
+ modules/gui/qt/components/playlist/views.cpp  |  4 +
+ modules/gui/qt/dialogs/messages.cpp           |  4 +
+ modules/gui/qt/dialogs/plugins.cpp            | 18 ++++
+ modules/gui/qt/dialogs/toolbar.cpp            |  8 ++
+ modules/gui/qt/dialogs_provider.cpp           |  6 ++
+ modules/gui/qt/main_interface_win32.cpp       | 23 ++++-
+ modules/gui/qt/qt.cpp                         | 24 +++--
+ modules/gui/qt/qt.hpp                         | 11 ++-
+ modules/gui/qt/util/timetooltip.cpp           |  2 +-
+ 13 files changed, 107 insertions(+), 110 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index f4a0a02a21..fbd0964077 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3865,99 +3865,7 @@ AS_IF([test "${enable_qt}" != "no"], [
+       AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
+       AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
+     ], [
+-      dnl use any qmake that is available, including from contrib tools
+-      AC_PATH_PROGS(QMAKE6, [qmake6 qmake], qmake6, ["${CONTRIB_DIR}/../bin:$PATH"])
+-
+-      AC_ARG_WITH([qtconf],
+-        AS_HELP_STRING([--with-qtconf=PATH], [location of Qt6 qt.conf file (auto)])
+-      )
+-      AS_IF([test -z "${with_qtconf}"], [
+-        AC_MSG_CHECKING([if contribs provide target_qt.conf])
+-        AS_IF([test -e "${CONTRIB_DIR}/bin/target_qt.conf"], [
+-          with_qtconf=${CONTRIB_DIR}/bin/target_qt.conf
+-          AC_MSG_RESULT([yes])
+-        ],[
+-          AC_MSG_RESULT([no])
+-        ])
+-      ])
+-
+-      QT_PATHS=${QMAKE6}
+-      AS_IF([test -n "${QMAKE6}"], [
+-        AS_IF([test -n "${with_qtconf}"], [
+-          QT_BIN_DIRECTORY="$(${QMAKE6} -qtconf ${with_qtconf} -query QT_HOST_BINS 2>/dev/null)"
+-          AC_MSG_CHECKING([if qmake6 is found with qtconf])
+-          AS_IF([test -n "${QT_BIN_DIRECTORY}" -a -x "${QT_BIN_DIRECTORY}/qmake6"], [
+-            QMAKE6="${QT_BIN_DIRECTORY}/qmake6"
+-            AC_MSG_RESULT([yes])
+-          ],[
+-            AC_MSG_RESULT([no])
+-            AC_MSG_CHECKING([if qmake is found with qtconf])
+-            AS_IF([test -n "${QT_BIN_DIRECTORY}" -a -x "${QT_BIN_DIRECTORY}/qmake"], [
+-                QMAKE6="${QT_BIN_DIRECTORY}/qmake"
+-                AC_MSG_RESULT([yes])
+-            ],[
+-                AC_MSG_RESULT([no])
+-            ])
+-          ])
+-          QT_PATHS="${QMAKE6} -qtconf ${with_qtconf}"
+-        ])
+-      ])
+-
+-      QMAKE="${QT_PATHS}"
+-      AC_MSG_NOTICE([using ${QMAKE}])
+-
+-      AC_MSG_CHECKING([for Qt libraries])
+-      mkdir -p ${ac_pwd}/modules/gui/qt
+-      touch    ${ac_pwd}/modules/gui/qt/.qmake.stash
+-      QT_PKG_ERRORS=$(${QT_PATHS} ${srcdir}/modules/gui/qt/qt6.pro -o ${ac_pwd}/modules/gui/qt/qmake-qt 2>&1)
+-      ac_status=$?
+-      AS_IF([test $ac_status = 0 && test -f "${ac_pwd}/modules/gui/qt/qmake-qt"], [
+-        echo "get_cflags:"                    > ${ac_pwd}/modules/gui/qt/qmake-common.mk
+-        echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+-        echo "get_libs:"                      >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+-        dnl transform /foo/bar/libbaz.so arguments to -L/foo/bar -lbaz
+-        dnl RS: each arguments (space separated) are treated as a new line
+-        dnl FS: split fields using /[^/]* to extract the file basepath ($1)
+-        dnl  /lib.*\.so/ lines (arguments) will add -Lxxx if this is not the current path (p), then transform into a -lxxx argument
+-        dnl other arguments are kept as-is
+-        echo '	echo $(LIBS) | awk '\''BEGIN{FS="/[[^/]]*$$";RS=" ";ORS=" "}{if($$0 ~ /\/lib.*\.so/){ if(p != $$1){ print "-L" $$1; p=$$1}; sub(/.*\/lib/, "-l"); sub(/\.so.*/, "")}; print $$0}'\' >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+-        echo 'get_ldflags:'                   >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+-        echo '	echo $(LFLAGS)'             >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+-
+-        echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"  >> ${ac_pwd}/modules/gui/qt/qmake-qt
+-
+-        AC_MSG_RESULT([yes])
+-        QT_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_libs)
+-        QT_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_cflags)
+-        QT_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_ldflags)
+-        AC_SUBST([QT_LIBS])
+-        AC_SUBST([QT_CFLAGS])
+-        AC_SUBST([QT_LDFLAGS])
+-
+-        QT_PATH="$(${QT_PATHS}                   -query QT_INSTALL_BINS 2>/dev/null)"
+-        QT_HOST_PATH="$(${QT_PATHS}              -query QT_HOST_BINS 2>/dev/null)"
+-        QT_HOST_LIBEXEC_DIRECTORY="$(${QT_PATHS} -query QT_HOST_LIBEXECS 2>/dev/null)"
+-        QT_LIBEXEC_DIRECTORY="$(${QT_PATHS}      -query QT_INSTALL_LIBEXECS 2>/dev/null)"
+-        QT_VERSION="$(${QT_PATHS}                -query QT_VERSION 2>/dev/null)"
+-        AC_PATH_PROGS(MOC, [moc-qt5 moc], moc, ["${QT_HOST_PATH}" "${QT_PATH}/bin" "${QT_HOST_LIBEXEC_DIRECTORY}" "${QT_LIBEXEC_DIRECTORY}"])
+-        AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin" "${QT_HOST_LIBEXEC_DIRECTORY}" "${QT_LIBEXEC_DIRECTORY}"])
+-        AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin" "${QT_HOST_LIBEXEC_DIRECTORY}" "${QT_LIBEXEC_DIRECTORY}"])
+-
+-        AC_MSG_CHECKING([for Qt GUI private])
+-        (${QMAKE} ${srcdir}/modules/gui/qt/private-gui.pro -o ${ac_pwd}/modules/gui/qt/qmake-private-gui) 2>/dev/null
+-        ac_status=$?
+-        AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-private-gui],[
+-          echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"        >> ${ac_pwd}/modules/gui/qt/qmake-private-gui
+-
+-          AC_MSG_RESULT([yes])
+-          QT_GUI_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-gui get_cflags)
+-          AC_SUBST([QT_GUI_PRIVATE_CFLAGS])
+-          have_qt_gui_private="yes"
+-        ],[
+-          AC_MSG_RESULT([no])
+-        ])
+-        rm -f ${ac_pwd}/modules/gui/qt/qmake-private-gui
+-      ],[
++      PKG_CHECK_MODULES([QT], [QtCore QtGui >= 4.8.0],, [
+         AS_IF([test -n "${enable_qt}"],[
+           AC_MSG_ERROR([${QT_PKG_ERRORS}.])
+         ],[
+@@ -3965,9 +3873,12 @@ AS_IF([test "${enable_qt}" != "no"], [
+         ])
+         enable_qt="no"
+       ])
++      QT_PATH="$(eval $PKG_CONFIG --variable=exec_prefix QtCore)"
++      AC_PATH_PROGS(MOC, [moc-qt4 moc], moc, ["${QT_PATH}/bin"])
++      AC_PATH_PROG(RCC, rcc, rcc, ["${QT_PATH}/bin"])
++      AC_PATH_PROGS(UIC, [uic-qt4 uic], uic, ["${QT_PATH}/bin"])
+     ])
+ ])
+-
+ AS_IF([test "${enable_qt}" != "no"], [
+   ALIASES="${ALIASES} qvlc"
+ ])
+diff --git a/modules/gui/qt/components/info_panels.cpp b/modules/gui/qt/components/info_panels.cpp
+index 8ea0fd4f73..c7816e642e 100644
+--- a/modules/gui/qt/components/info_panels.cpp
++++ b/modules/gui/qt/components/info_panels.cpp
+@@ -479,7 +479,11 @@ InfoPanel::InfoPanel( QWidget *parent ) : QWidget( parent )
+      InfoTree = new QTreeWidget(this);
+      InfoTree->setColumnCount( 1 );
+      InfoTree->header()->hide();
++#if HAS_QT5
+      InfoTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
++#else
++     InfoTree->header()->setResizeMode(QHeaderView::ResizeToContents);
++#endif
+      layout->addWidget(InfoTree, 1, 0 );
+ }
+ 
+diff --git a/modules/gui/qt/components/interface_widgets.cpp b/modules/gui/qt/components/interface_widgets.cpp
+index f86327ab0a..84a47e260c 100644
+--- a/modules/gui/qt/components/interface_widgets.cpp
++++ b/modules/gui/qt/components/interface_widgets.cpp
+@@ -64,7 +64,7 @@ static inline int qrand() {
+ # include <QWindow>
+ #endif
+ 
+-#if defined(_WIN32)
++#if defined(_WIN32) && HAS_QT5
+ #include <QWindow>
+ #include <qpa/qplatformnativeinterface.h>
+ #endif
+@@ -207,7 +207,7 @@ QSize VideoWidget::physicalSize() const
+         return QSize( x_attributes.width, x_attributes.height );
+     }
+ #endif
+-#if defined(_WIN32)
++#if defined(_WIN32) && HAS_QT5
+     HWND hwnd;
+     RECT rect;
+ 
+@@ -224,9 +224,11 @@ QSize VideoWidget::physicalSize() const
+ #   if HAS_QT56
+     /* Android-like scaling */
+     current_size *= devicePixelRatioF();
+-#   else
++#   elif HAS_QT54
+     /* OSX-like scaling */
+     current_size *= devicePixelRatio();
++#   else
++#       warning "No HiDPI support"
+ #   endif
+ 
+     return current_size;
+diff --git a/modules/gui/qt/components/open_panels.cpp b/modules/gui/qt/components/open_panels.cpp
+index 6a9bf6c263..a32bff6e45 100644
+--- a/modules/gui/qt/components/open_panels.cpp
++++ b/modules/gui/qt/components/open_panels.cpp
+@@ -262,9 +262,15 @@ void FileOpenPanel::updateMRL()
+             fileList << url.toEncoded();
+     else
+     {
++#if HAS_QT5
+         QList<QUrl> urls = dialogBox->selectedUrls();
+         foreach( const QUrl &url, urls )
+             fileList.append( url.toEncoded() );
++#else
++        fileList = dialogBox->selectedFiles();
++        for( int i = 0; i < fileList.count(); i++ )
++            fileList[i] = toURI( fileList[i] );
++#endif
+     }
+ 
+     /* Options */
+diff --git a/modules/gui/qt/components/playlist/views.cpp b/modules/gui/qt/components/playlist/views.cpp
+index 2e80e1377f..daf51d543a 100644
+--- a/modules/gui/qt/components/playlist/views.cpp
++++ b/modules/gui/qt/components/playlist/views.cpp
+@@ -432,7 +432,11 @@ PlTreeView::PlTreeView( QAbstractItemModel *, QWidget *parent ) : QTreeView( par
+     viewport()->setAttribute( Qt::WA_Hover );
+     header()->setSortIndicator( -1 , Qt::AscendingOrder );
+     header()->setSortIndicatorShown( true );
++#if HAS_QT5
+     header()->setSectionsClickable( true );
++#else
++    header()->setClickable( true );
++#endif
+     header()->setContextMenuPolicy( Qt::CustomContextMenu );
+ 
+     setSelectionBehavior( QAbstractItemView::SelectRows );
+diff --git a/modules/gui/qt/dialogs/messages.cpp b/modules/gui/qt/dialogs/messages.cpp
+index 1a32042bb3..28084c35d6 100644
+--- a/modules/gui/qt/dialogs/messages.cpp
++++ b/modules/gui/qt/dialogs/messages.cpp
+@@ -337,7 +337,11 @@ void MessagesDialog::MsgCallback( void *self, int type, const vlc_log_t *item,
+ {
+     MessagesDialog *dialog = (MessagesDialog *)self;
+     char *str;
++#if HAS_QT5
+     int verbosity = dialog->verbosity.load();
++#else
++    int verbosity = dialog->verbosity;
++#endif
+ 
+     if( verbosity < 0 || verbosity < (type - VLC_MSG_ERR)
+      || unlikely(vasprintf( &str, format, ap ) == -1) )
+diff --git a/modules/gui/qt/dialogs/plugins.cpp b/modules/gui/qt/dialogs/plugins.cpp
+index ba480a666b..d35ff26c35 100644
+--- a/modules/gui/qt/dialogs/plugins.cpp
++++ b/modules/gui/qt/dialogs/plugins.cpp
+@@ -117,7 +117,11 @@ PluginTab::PluginTab( intf_thread_t *p_intf_ )
+     layout->addWidget( treePlugins, 0, 0, 1, -1 );
+ 
+     /* Users cannot move the columns around but we need to sort */
++#if HAS_QT5
+     treePlugins->header()->setSectionsMovable( false );
++#else
++    treePlugins->header()->setMovable( false );
++#endif
+     treePlugins->header()->setSortIndicatorShown( true );
+     //    treePlugins->header()->setResizeMode( QHeaderView::ResizeToContents );
+     treePlugins->setAlternatingRowColors( true );
+@@ -1049,7 +1053,11 @@ void ExtensionItemDelegate::paint( QPainter *painter,
+                                    const QStyleOptionViewItem &option,
+                                    const QModelIndex &index ) const
+ {
++#if HAS_QT5
+     QStyleOptionViewItem opt = option;
++#else
++    QStyleOptionViewItemV4 opt = option;
++#endif
+     initStyleOption( &opt, index );
+ 
+     // Draw background
+@@ -1131,7 +1139,11 @@ void AddonItemDelegate::paint( QPainter *painter,
+                                const QStyleOptionViewItem &option,
+                                const QModelIndex &index ) const
+ {
++#if HAS_QT5
+     QStyleOptionViewItem newopt = option;
++#else
++    QStyleOptionViewItemV4 newopt = option;
++#endif
+     int i_state = index.data( AddonsListModel::StateRole ).toInt();
+     int i_type = index.data( AddonsListModel::TypeRole ).toInt();
+ 
+@@ -1254,9 +1266,15 @@ void AddonItemDelegate::paint( QPainter *painter,
+                 progressbar->setGeometry(
+                     newopt.rect.adjusted( adjustment.width(), adjustment.height(),
+                                           -adjustment.width(), -adjustment.height() ) );
++#if HAS_QT5
+                 painter->drawPixmap( newopt.rect.left() + adjustment.width(),
+                                      newopt.rect.top() + adjustment.height(),
+                                      progressbar->grab() );
++#else
++                painter->drawPixmap( newopt.rect.left() + adjustment.width(),
++                                     newopt.rect.top() + adjustment.height(),
++                                     QPixmap::grabWidget( progressbar ) );
++#endif
+             }
+             painter->restore();
+         }
+diff --git a/modules/gui/qt/dialogs/toolbar.cpp b/modules/gui/qt/dialogs/toolbar.cpp
+index 714f63d1bd..3efa965ec1 100644
+--- a/modules/gui/qt/dialogs/toolbar.cpp
++++ b/modules/gui/qt/dialogs/toolbar.cpp
+@@ -318,6 +318,7 @@ void PreviewWidget::paintEvent( QPaintEvent * )
+ 
+     for( int i=0; i<3; i++ )
+     {
++#if HAS_QT5
+         pixmaps[i] = bars[i]->grab( bars[i]->contentsRect() );
+         /* Because non shown widgets do not have their bitmap updated, we need
+            to force redraw to grab a pixmap matching layout size */
+@@ -327,6 +328,9 @@ void PreviewWidget::paintEvent( QPaintEvent * )
+             pixmaps[i] = bars[i]->grab( bars[i]->contentsRect() );
+         }
+ 
++#else
++        pixmaps[i] = QPixmap::grabWidget( bars[i], bars[i]->contentsRect() );
++#endif
+         for( int j=0; j < bars[i]->layout()->count(); j++ )
+         {
+             QLayoutItem *item = bars[i]->layout()->itemAt( j );
+@@ -584,7 +588,11 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
+         if( widget == NULL ) continue;
+ 
+ 
++#if HAS_QT5
+         widgetItem->setIcon( QIcon( widget->grab() ) );
++#else
++        widgetItem->setIcon( QIcon( QPixmap::grabWidget( widget ) ) );
++#endif
+         widgetItem->setToolTip( widgetItem->text() );
+         widget->hide();
+         widgetItem->setData( Qt::UserRole, QVariant( i ) );
+diff --git a/modules/gui/qt/dialogs_provider.cpp b/modules/gui/qt/dialogs_provider.cpp
+index eaa33e1eb7..754f59203c 100644
+--- a/modules/gui/qt/dialogs_provider.cpp
++++ b/modules/gui/qt/dialogs_provider.cpp
+@@ -121,10 +121,16 @@ QStringList DialogsProvider::getOpenURL( QWidget *parent,
+                                          QString *selectedFilter )
+ {
+     QStringList res;
++#if HAS_QT5
+     QList<QUrl> urls = QFileDialog::getOpenFileUrls( parent, caption, dir, filter, selectedFilter );
+ 
+     foreach( const QUrl& url, urls )
+         res.append( url.toEncoded() );
++#else
++    QStringList files = QFileDialog::getOpenFileNames( parent, caption, dir.toLocalFile(), filter, selectedFilter );
++    foreach ( const QString& file, files )
++        res.append( QUrl::fromLocalFile( file ).toEncoded() );
++#endif
+ 
+     return res;
+ }
+diff --git a/modules/gui/qt/main_interface_win32.cpp b/modules/gui/qt/main_interface_win32.cpp
+index 19cc878316..1ac4d09fb9 100644
+--- a/modules/gui/qt/main_interface_win32.cpp
++++ b/modules/gui/qt/main_interface_win32.cpp
+@@ -37,8 +37,10 @@
+ 
+ #include <cassert>
+ 
+-#include <QWindow>
+-#include <qpa/qplatformnativeinterface.h>
++#if HAS_QT5
++# include <QWindow>
++# include <qpa/qplatformnativeinterface.h>
++#endif
+ 
+ #define WM_APPCOMMAND 0x0319
+ 
+@@ -105,21 +107,32 @@ MainInterfaceWin32::~MainInterfaceWin32()
+ 
+ HWND MainInterfaceWin32::WinId( QWidget *w )
+ {
++#if HAS_QT5
+     if( w && w->windowHandle() )
+         return static_cast<HWND>(QGuiApplication::platformNativeInterface()->
+             nativeResourceForWindow("handle", w->windowHandle()));
+     else
+         return 0;
++#else
++    return winId();
++#endif
+ }
+ 
++#if !HAS_QT5
++static const int PremultipliedAlpha = QPixmap::PremultipliedAlpha;
++static HBITMAP qt_pixmapToWinHBITMAP(const QPixmap &p, int hbitmapFormat = 0)
++{
++    return p.toWinHBITMAP((enum QBitmap::HBitmapFormat)hbitmapFormat);
++}
++#else
+ Q_GUI_EXPORT HBITMAP qt_pixmapToWinHBITMAP(const QPixmap &p, int hbitmapFormat = 0);
+-
+ enum HBitmapFormat
+ {
+     NoAlpha,
+     PremultipliedAlpha,
+     Alpha
+ };
++#endif
+ 
+ void MainInterfaceWin32::createTaskBarButtons()
+ {
+@@ -334,8 +347,12 @@ void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible()
+      * but ignore the ones always on top
+      * and the ones which can't be activated */
+     HWND winId;
++#if HAS_QT5
+     QWindow *window = windowHandle();
+     winId = static_cast<HWND>(QGuiApplication::platformNativeInterface()->nativeResourceForWindow("handle", window));
++#else
++    winId = internalWinId();
++#endif
+ 
+     WINDOWINFO wi;
+     HWND hwnd;
+diff --git a/modules/gui/qt/qt.cpp b/modules/gui/qt/qt.cpp
+index 9da91e587a..b09f83c0bc 100644
+--- a/modules/gui/qt/qt.cpp
++++ b/modules/gui/qt/qt.cpp
+@@ -54,14 +54,18 @@
+ 
+ #ifdef _WIN32 /* For static builds */
+  #include <QtPlugin>
+-
+- #ifdef QT_STATICPLUGIN
+-  Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+-  Q_IMPORT_PLUGIN(QSvgIconPlugin)
+-  Q_IMPORT_PLUGIN(QSvgPlugin)
+-  #if !HAS_QT56
+-   Q_IMPORT_PLUGIN(AccessibleFactory)
++ #if HAS_QT5
++  #ifdef QT_STATICPLUGIN
++   Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
++   Q_IMPORT_PLUGIN(QSvgIconPlugin)
++   Q_IMPORT_PLUGIN(QSvgPlugin)
++   #if !HAS_QT56
++    Q_IMPORT_PLUGIN(AccessibleFactory)
++   #endif
+   #endif
++ #else
++  Q_IMPORT_PLUGIN(qjpeg)
++  Q_IMPORT_PLUGIN(qtaccessiblewidgets)
+  #endif
+ #endif
+ 
+@@ -664,6 +668,7 @@ static void *ThreadPlatform( void *obj, char *platform_name )
+ 
+         /* Check window type from the Qt platform back-end */
+         p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
++#if HAS_QT5
+         QString platform = app.platformName();
+         if( platform == qfu("xcb") )
+             p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
+@@ -675,6 +680,11 @@ static void *ThreadPlatform( void *obj, char *platform_name )
+             p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
+         else
+             msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
++#elif defined (Q_WS_WIN) || defined (Q_WS_PM)
++        p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
++#elif defined (Q_WS_MAC)
++        p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
++#endif
+ 
+         var_Create( THEPL, "qt4-iface", VLC_VAR_ADDRESS );
+         var_SetAddress( THEPL, "qt4-iface", p_intf );
+diff --git a/modules/gui/qt/qt.hpp b/modules/gui/qt/qt.hpp
+index 411f64c541..8efaae7496 100644
+--- a/modules/gui/qt/qt.hpp
++++ b/modules/gui/qt/qt.hpp
+@@ -43,14 +43,21 @@
+ #include <QString>
+ #include <QUrl>
+ 
+-#if ( QT_VERSION < 0x050500 )
+-# error Update your Qt version to at least 5.5.0
++#if ( QT_VERSION < 0x040800 )
++# error Update your Qt version to at least 4.8.0
+ #endif
+ 
++#define HAS_QT5  ( QT_VERSION >= 0x050000 )
++#define HAS_QT54 ( QT_VERSION >= 0x050400 )
+ #define HAS_QT56 ( QT_VERSION >= 0x050600 )
+ #define HAS_QT57 ( QT_VERSION >= 0x050700 )
+ #define HAS_QT510 ( QT_VERSION >= 0x051000 )
+ 
++/* Q_DECL_OVERRIDE is a Qt5 feature, add empty define to not break with Qt4 */
++#if !HAS_QT5 && !defined(Q_DECL_OVERRIDE)
++# define Q_DECL_OVERRIDE
++#endif
++
+ enum {
+     IMEventTypeOffset     = 100,
+     PLEventTypeOffset     = 200,
+diff --git a/modules/gui/qt/util/timetooltip.cpp b/modules/gui/qt/util/timetooltip.cpp
+index ffa2c09986..495fa6add8 100644
+--- a/modules/gui/qt/util/timetooltip.cpp
++++ b/modules/gui/qt/util/timetooltip.cpp
+@@ -73,7 +73,7 @@ void TimeTooltip::adjustPosition()
+ 
+     // The desired label position is just above the target
+     QPoint position( mTarget.x() - size.width() / 2,
+-#if defined( Q_OS_WIN )
++#if defined( Q_OS_WIN ) && HAS_QT5
+         mTarget.y() - 2 * size.height() - TIP_HEIGHT / 2 );
+ #else
+         mTarget.y() - size.height() - TIP_HEIGHT / 2 );
+-- 
+2.50.1
+

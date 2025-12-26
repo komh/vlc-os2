@@ -1,0 +1,32 @@
+From 385f958fc1a80d98761d43d192ef0af419372790 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:14:47 +0900
+Subject: [PATCH 102/120] Revert "qt: extended_panels: replace deprecated
+ QFontMetrics::width"
+
+This reverts commit d7b0eeb143b25fc48048de889f42fa7f6978f60a.
+---
+ modules/gui/qt/components/extended_panels.cpp | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/modules/gui/qt/components/extended_panels.cpp b/modules/gui/qt/components/extended_panels.cpp
+index 8f4d6d9916..dd86a48307 100644
+--- a/modules/gui/qt/components/extended_panels.cpp
++++ b/modules/gui/qt/components/extended_panels.cpp
+@@ -1170,13 +1170,8 @@ void Equalizer::build()
+     connectConfigChanged( preamp );
+ 
+     /* fix sliders spacing accurately */
+-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+-    int i_width = qMax( QFontMetrics( smallFont ).horizontalAdvance( "500 Hz" ),
+-                        QFontMetrics( smallFont ).horizontalAdvance( "-20.0 dB" ) );
+-#else
+     int i_width = qMax( QFontMetrics( smallFont ).width( "500 Hz" ),
+                         QFontMetrics( smallFont ).width( "-20.0 dB" ) );
+-#endif
+     int i = 0;
+     foreach( const FilterSliderData::slider_data_t &data, controls )
+     {
+-- 
+2.50.1
+

@@ -1,0 +1,98 @@
+From 7dedc3807899f67ba7a7966afa096ee310ba3204 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:05:01 +0900
+Subject: [PATCH 040/120] Revert "qt: fix scrolling vertically on input slider
+ always scrolls forward"
+
+This reverts commit b28eb7a58c97f72eb2403d6d2318a6a6c94c1d31.
+---
+ modules/gui/qt/util/input_slider.cpp | 37 +++++++---------------------
+ modules/gui/qt/util/input_slider.hpp |  3 ---
+ 2 files changed, 9 insertions(+), 31 deletions(-)
+
+diff --git a/modules/gui/qt/util/input_slider.cpp b/modules/gui/qt/util/input_slider.cpp
+index 5a12eab994..d0bca18afa 100644
+--- a/modules/gui/qt/util/input_slider.cpp
++++ b/modules/gui/qt/util/input_slider.cpp
+@@ -34,8 +34,6 @@
+ #include "adapters/seekpoints.hpp"
+ #include "input_manager.hpp"
+ #include "imagehelper.hpp"
+-#include "customwidgets.hpp"
+-#include <vlc_actions.h>
+ 
+ #include <QPaintEvent>
+ #include <QPainter>
+@@ -171,31 +169,6 @@ SeekSlider::SeekSlider( intf_thread_t *p_intf, Qt::Orientation q, QWidget *_pare
+     CONNECT( hideHandleTimer, timeout(), this, hideHandle() );
+     CONNECT( startAnimLoadingTimer, timeout(), this, startAnimLoading() );
+     mTimeTooltip->installEventFilter( this );
+-
+-    connect(&wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, this, [this](int vlcButton){
+-        vlc_tick_t i_size = var_InheritInteger( this->p_intf->obj.libvlc, "short-jump-size" );
+-        int i_mode = var_InheritInteger( this->p_intf->obj.libvlc, "hotkeys-x-wheel-mode" );
+-
+-        //ignore modifiers
+-        switch (vlcButton & 0x00FF0000) {
+-        case KEY_MOUSEWHEELDOWN:
+-        case KEY_MOUSEWHEELLEFT:
+-            if (i_mode != 3)
+-                i_size = - i_size;
+-            break;
+-        case KEY_MOUSEWHEELUP:
+-        case KEY_MOUSEWHEELRIGHT:
+-            if (i_mode == 3)
+-                i_size = - i_size;
+-            break;
+-        default:
+-            break;
+-        }
+-
+-        float posOffset = static_cast<float>( i_size ) / static_cast<float>( inputLength );
+-        setValue( value() + posOffset * maximum() );
+-        emit sliderDragged( value() / static_cast<float>( maximum() ) );
+-    });
+ }
+ 
+ SeekSlider::~SeekSlider()
+@@ -432,7 +405,15 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
+ {
+     /* Don't do anything if we are for somehow reason sliding */
+     if( !isSliding && isEnabled() )
+-        wheelEventConverter.wheelEvent(event);
++    {
++        vlc_tick_t i_size = var_InheritInteger( p_intf->obj.libvlc, "short-jump-size" );
++        int i_mode = var_InheritInteger( p_intf->obj.libvlc, "hotkeys-x-wheel-mode" );
++        if ( ( event->angleDelta().x() < 0 && i_mode != 3 ) || ( event->angleDelta().x() > 0 && i_mode == 3 ) )
++            i_size = - i_size;
++        float posOffset = static_cast<float>( i_size ) / static_cast<float>( inputLength );
++        setValue( value() + posOffset * maximum() );
++        emit sliderDragged( value() / static_cast<float>( maximum() ) );
++    }
+     event->accept();
+ }
+ 
+diff --git a/modules/gui/qt/util/input_slider.hpp b/modules/gui/qt/util/input_slider.hpp
+index 255b0836b8..648088220b 100644
+--- a/modules/gui/qt/util/input_slider.hpp
++++ b/modules/gui/qt/util/input_slider.hpp
+@@ -31,7 +31,6 @@
+ #endif
+ 
+ #include "styles/seekstyle.hpp"
+-#include "customwidgets.hpp"
+ 
+ #include <QSlider>
+ #include <QPainter>
+@@ -122,8 +121,6 @@ private:
+     QTimer *hideHandleTimer;
+     QTimer *startAnimLoadingTimer;
+ 
+-    WheelToVLCConverter wheelEventConverter;
+-
+ public slots:
+     void setPosition( float, int64_t, int );
+     void setSeekable( bool b ) { b_seekable = b ; }
+-- 
+2.50.1
+

@@ -1,0 +1,80 @@
+From 2128dc2b24b490ed0df753a6e73d1e7a372fd867 Mon Sep 17 00:00:00 2001
+From: KO Myung-Hun <komh78@gmail.com>
+Date: Fri, 26 Dec 2025 15:13:46 +0900
+Subject: [PATCH 082/120] Revert "qt: use different overload for
+ QDateTime::fromSecsSinceEpoch()"
+
+This reverts commit a22fe6c9468ba48e130a5d277f5423d6d95ebe57.
+---
+ modules/gui/qt/components/epg/EPGItem.cpp    | 3 +--
+ modules/gui/qt/components/epg/EPGProgram.cpp | 4 +---
+ modules/gui/qt/components/epg/EPGWidget.cpp  | 3 +--
+ 3 files changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/modules/gui/qt/components/epg/EPGItem.cpp b/modules/gui/qt/components/epg/EPGItem.cpp
+index 8ad7b87003..74adca5df8 100644
+--- a/modules/gui/qt/components/epg/EPGItem.cpp
++++ b/modules/gui/qt/components/epg/EPGItem.cpp
+@@ -29,7 +29,6 @@
+ #include <QStyleOptionGraphicsItem>
+ #include <QGraphicsSceneHoverEvent>
+ #include <QStyle>
+-#include <QTimeZone>
+ 
+ #include "EPGItem.hpp"
+ #include "EPGView.hpp"
+@@ -154,7 +153,7 @@ uint16_t EPGItem::eventID() const
+ bool EPGItem::setData( const vlc_epg_event_t *data )
+ {
+ #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+-    QDateTime newtime = QDateTime::fromSecsSinceEpoch( data->i_start, QTimeZone::utc() );
++    QDateTime newtime = QDateTime::fromSecsSinceEpoch( data->i_start );
+ #else
+     QDateTime newtime = QDateTime::fromTime_t( data->i_start );
+ #endif
+diff --git a/modules/gui/qt/components/epg/EPGProgram.cpp b/modules/gui/qt/components/epg/EPGProgram.cpp
+index 67af1c7f98..ab5254192b 100644
+--- a/modules/gui/qt/components/epg/EPGProgram.cpp
++++ b/modules/gui/qt/components/epg/EPGProgram.cpp
+@@ -21,8 +21,6 @@
+ #include "EPGItem.hpp"
+ #include "EPGView.hpp"
+ 
+-#include <QTimeZone>
+-
+ EPGProgram::EPGProgram( EPGView *view_, const vlc_epg_t *p_epg ) : QObject( view_ )
+ {
+     name = QString(p_epg->psz_name);
+@@ -99,7 +97,7 @@ void EPGProgram::updateEvents( const vlc_epg_event_t * const * pp_events, size_t
+     {
+         const vlc_epg_event_t *p_event = pp_events[i];
+ #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+-        QDateTime eventStart = QDateTime::fromSecsSinceEpoch( p_event->i_start, QTimeZone::utc() );
++        QDateTime eventStart = QDateTime::fromSecsSinceEpoch( p_event->i_start );
+ #else
+         QDateTime eventStart = QDateTime::fromTime_t( p_event->i_start );
+ #endif
+diff --git a/modules/gui/qt/components/epg/EPGWidget.cpp b/modules/gui/qt/components/epg/EPGWidget.cpp
+index 40ced7f987..8c89184362 100644
+--- a/modules/gui/qt/components/epg/EPGWidget.cpp
++++ b/modules/gui/qt/components/epg/EPGWidget.cpp
+@@ -31,7 +31,6 @@
+ #include <QScrollBar>
+ #include <QLabel>
+ #include <QDateTime>
+-#include <QTimeZone>
+ 
+ #include "EPGWidget.hpp"
+ #include "EPGRuler.hpp"
+@@ -112,7 +111,7 @@ void EPGWidget::updateEPG( input_item_t *p_input_item )
+     m_epgView->updateEPG( p_input_item->pp_epg, p_input_item->i_epg );
+     m_epgView->setEpgTime( ( p_input_item->i_epg_time ) ?
+ #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+-                           QDateTime::fromSecsSinceEpoch( p_input_item->i_epg_time, QTimeZone::utc() ) :
++                           QDateTime::fromSecsSinceEpoch( p_input_item->i_epg_time ) :
+ #else
+                            QDateTime::fromTime_t( p_input_item->i_epg_time ) :
+ #endif
+-- 
+2.50.1
+
